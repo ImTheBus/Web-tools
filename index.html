@@ -544,14 +544,12 @@
             color: var(--accent);
         }
 
-        /* Focus styles for accessibility and polish */
         a:focus-visible,
         button:focus-visible {
             outline: 2px solid var(--accent);
             outline-offset: 3px;
         }
 
-        /* Animations */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -592,12 +590,11 @@
     <header>
         <div class="header-inner">
             <div class="brand">
-                <!-- Replace this with your logo image when ready -->
                 <div class="logo-placeholder">
                     ITB
                 </div>
                 <div>
-                    <div class="brand-text-title">Toolbox</div>
+                    <div class="brand-text-title"></div>
                     <div class="brand-text-name">IMTHEBUS</div>
                 </div>
             </div>
@@ -612,7 +609,7 @@
 
     <main>
         <div class="shell">
-            <!-- Hero -->
+
             <section class="hero" aria-labelledby="hero-title">
                 <div class="hero-tag">
                     <span class="hero-tag-badge">Live</span>
@@ -623,7 +620,7 @@
                 </h1>
                 <p class="hero-subtitle">
                     IMTHEBUS is a simple collection of browser-based tools. They are built to be used
-                    in real conversations with teams, not to lock your data away behind logins.
+                    in real conversations with teams, not behind logins.
                 </p>
                 <div class="hero-actions">
                     <button class="btn btn-primary" type="button"
@@ -652,19 +649,18 @@
                 </div>
             </section>
 
-            <!-- Tools -->
             <section id="tools" class="section" aria-labelledby="tools-title">
                 <div class="section-header">
                     <div>
                         <h2 class="section-title" id="tools-title">Tools</h2>
                         <p class="section-subtitle">
-                            Links will appear here as tools move from prototype into something stable enough to share.
+                            Links will appear here as tools move from prototype into something stable.
                         </p>
                     </div>
                 </div>
 
                 <div class="tools-grid" aria-label="Tool list">
-                    <!-- Bored to Panic tool -->
+
                     <article class="tool-card">
                         <div class="tool-image-placeholder tool-image-bored-to-panic">
                             <div class="tool-image-label">
@@ -682,8 +678,7 @@
                             and support toward a healthy performance zone.
                         </p>
                         <div class="tool-footer">
-                            <!-- Update this URL if the tool lives somewhere else -->
-                            <a class="tool-link" href="/tools/bored-to-panic/">
+                            <a class="tool-link" href="bored-to-panic.html">
                                 Open tool
                                 <span aria-hidden="true">↗</span>
                             </a>
@@ -693,7 +688,6 @@
                         </div>
                     </article>
 
-                    <!-- Tool card placeholder 2 -->
                     <article class="tool-card">
                         <div class="tool-image-placeholder">
                             <div class="tool-image-label">
@@ -702,15 +696,15 @@
                         </div>
                         <div class="tool-header">
                             <h3 class="tool-title">
-                                Tool title placeholder
+                                Feedback Scale
                             </h3>
                             <span class="tool-status">In development</span>
                         </div>
                         <p class="tool-description">
-                            Use this card for a different tool. Keep the same layout so everything feels consistent.
+                            Coming soon. Detailed feedback calibration tool.
                         </p>
                         <div class="tool-footer">
-                            <a class="tool-link" href="#">
+                            <a class="tool-link" href="feedback-scale.html">
                                 Open tool
                                 <span aria-hidden="true">↗</span>
                             </a>
@@ -720,7 +714,6 @@
                         </div>
                     </article>
 
-                    <!-- Tool card placeholder 3 -->
                     <article class="tool-card">
                         <div class="tool-image-placeholder">
                             <div class="tool-image-label">
@@ -729,15 +722,15 @@
                         </div>
                         <div class="tool-header">
                             <h3 class="tool-title">
-                                Tool title placeholder
+                                Important vs Urgent
                             </h3>
                             <span class="tool-status">Prototype</span>
                         </div>
                         <p class="tool-description">
-                            Another placeholder card. When you are ready, swap the placeholders for a real name and link.
+                            Prioritisation tool based on the classic 2×2 matrix.
                         </p>
                         <div class="tool-footer">
-                            <a class="tool-link" href="#">
+                            <a class="tool-link" href="important-urgent2x2.html">
                                 Open tool
                                 <span aria-hidden="true">↗</span>
                             </a>
@@ -746,16 +739,16 @@
                             </div>
                         </div>
                     </article>
+
                 </div>
             </section>
 
-            <!-- About this site -->
             <section id="about" class="section" aria-labelledby="about-title">
                 <div class="section-header">
                     <div>
                         <h2 class="section-title" id="about-title">About this site</h2>
                         <p class="section-subtitle">
-                            Why IMTHEBUS exists and what you can expect when you use it.
+                            Why IMTHEBUS exists and what it offers.
                         </p>
                     </div>
                 </div>
@@ -765,74 +758,15 @@
                         The aim is to make it easier to run better conversations, make clearer decisions, and support
                         development without needing a full platform or a new login.
                     </p>
-                    <p>
-                        Each tool is designed to be:
-                    </p>
+                    <p>Each tool is designed to be:</p>
                     <ul>
-                        <li><strong>Lightweight</strong> - open it in a browser and you are ready to go.</li>
-                        <li><strong>Focused</strong> - each tool solves one problem instead of trying to do everything.</li>
-                        <li><strong>Conversation-first</strong> - intended to be used with other people, not just alone.</li>
+                        <li><strong>Lightweight</strong> - open it and use it immediately.</li>
+                        <li><strong>Focused</strong> - one tool, one purpose.</li>
+                        <li><strong>Conversation-first</strong> - built to use with people, not alone.</li>
                     </ul>
                 </div>
             </section>
 
-            <!-- Roadmap / Coming soon -->
-            <section id="updates" class="section" aria-labelledby="updates-title">
-                <div class="section-header">
-                    <div>
-                        <h2 class="section-title" id="updates-title">Roadmap and updates</h2>
-                        <p class="section-subtitle">
-                            A rough sense of what is coming next. No promises, just intent.
-                        </p>
-                    </div>
-                </div>
-                <div class="section-body">
-                    <p>
-                        Over time this site will grow slowly rather than all at once. Planned directions include:
-                    </p>
-                    <ul>
-                        <li>More reusable tools to support managers and their teams.</li>
-                        <li>Simple self-assessment and reflection utilities you can complete in a few minutes.</li>
-                        <li>Visual models that make it easier to explain concepts in workshops or coaching sessions.</li>
-                        <li>A small reference area for explaining the ideas behind each tool.</li>
-                    </ul>
-                    <p>
-                        When new tools or major changes go live, they will appear here with a short note
-                        explaining what changed and why.
-                    </p>
-                </div>
-            </section>
-
-            <!-- How to use this site -->
-            <section class="section" aria-labelledby="howto-title">
-                <div class="section-header">
-                    <div>
-                        <h2 class="section-title" id="howto-title">How to use this site</h2>
-                        <p class="section-subtitle">
-                            A few simple guidelines so you get the best out of the tools.
-                        </p>
-                    </div>
-                </div>
-                <div class="section-body">
-                    <ul>
-                        <li>
-                            <strong>Open tools directly</strong> - each tool runs in your browser. No account is required.
-                        </li>
-                        <li>
-                            <strong>Use them in conversations</strong> - have the tool open during 1:1s, team meetings,
-                            or coaching sessions so you can work through it together.
-                        </li>
-                        <li>
-                            <strong>Keep your own records</strong> - if a tool offers exports or print views, save those
-                            locally in whatever system you already use.
-                        </li>
-                        <li>
-                            <strong>Share feedback</strong> - if something does not quite work, or a new tool would make
-                            your life easier, send a note using the contact links.
-                        </li>
-                    </ul>
-                </div>
-            </section>
         </div>
     </main>
 
@@ -840,9 +774,7 @@
         <div class="footer-inner">
             <div class="footer-brand">
                 <div>© <span id="year"></span> IMTHEBUS. All rights reserved.</div>
-                <div>
-                    Built as a small, evolving collection of tools to support real work.
-                </div>
+                <div>Built as a small, evolving collection of tools.</div>
             </div>
             <div class="footer-links">
                 <div class="footer-link-group">
@@ -871,7 +803,6 @@
 </div>
 
 <script>
-    // Footer year
     document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 </body>
