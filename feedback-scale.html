@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Feedback Scale Assessment</title>
+  <style>
+    :root {
+      --bg-page: #f3f4f6;
+      --card-bg: #ffffff;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.1);
+      --border-soft: #e5e7eb;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 2rem 0;
+      background: radial-gradient(circle at top left, #e5f0ff, #f3f4f6 55%);
+      color: var(--text-main);
+    }
+
+    .shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 1rem;
+      box-shadow:
+        0 18px 45px rgba(15, 23, 42, 0.08),
+        0 1px 3px rgba(15, 23, 42, 0.08);
+      padding: 1.75rem 1.75rem 2rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      margin-bottom: 1.75rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin: 0 0 0.5rem;
+    }
+
+    h2 {
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+      font-size: 1.25rem;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      max-width: 52rem;
+    }
+
+    .field {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    select,
+    input[type="text"],
+    textarea {
+      font: inherit;
+      padding: 0.5rem 0.6rem;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-soft);
+      background: #f9fafb;
+      color: var(--text-main);
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    select:focus,
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+      background: #ffffff;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .scale-description {
+      border-radius: 0.75rem;
+      padding: 0.75rem 0.9rem;
+      margin-top: 0.5rem;
+      background: #f9fafb;
+      border: 1px solid var(--border-soft);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .summary {
+      margin-top: 1.75rem;
+      border-top: 1px solid var(--border-soft);
+      padding-top: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      background: #ffffff;
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--border-soft);
+      padding: 0.4rem 0.5rem;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #f3f4f6;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      font: inherit;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+      transition: background 0.15s, box-shadow 0.15s, transform 0.08s;
+    }
+
+    button.secondary {
+      background: #ffffff;
+      color: #1f2933;
+      border-color: var(--border-soft);
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
+    }
+
+    button.danger {
+      background: #ef4444;
+      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.25);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.32);
+    }
+
+    button.secondary:hover {
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+    }
+
+    button.danger:hover {
+      box-shadow: 0 10px 24px rgba(239, 68, 68, 0.32);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    button.small {
+      padding: 0.2rem 0.55rem;
+      font-size: 0.78rem;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+    }
+
+    .toggle-active {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: rgba(37, 99, 235, 0.4);
+    }
+
+    .question-text {
+      max-width: 520px;
+    }
+
+    .radio-group {
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .results-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: flex-start;
+      margin-top: 0.5rem;
+    }
+
+    .results-box {
+      border-radius: 0.75rem;
+      padding: 0.85rem 1rem;
+      background: #f9fafb;
+      border: 1px solid var(--border-soft);
+      font-size: 0.9rem;
+      flex: 1 1 260px;
+      min-width: 260px;
+    }
+
+    .results-box strong {
+      display: inline-block;
+      min-width: 110px;
+    }
+
+    #chartPanel {
+      flex: 0 0 360px;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    #chartContainer {
+      background: #ffffff;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-soft);
+      padding: 0.6rem 0.6rem 0.4rem;
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.2);
+    }
+
+    #chartContainer canvas {
+      width: 100% !important;
+      height: 260px !important;
+    }
+
+    #ringContainer {
+      background: #ffffff;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-soft);
+      padding: 0.6rem;
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #ringToggleRow {
+      align-self: flex-end;
+      margin-bottom: 0.25rem;
+      font-size: 0.78rem;
+    }
+
+    #ringToggleRow button {
+      box-shadow: none;
+    }
+
+    #zoneRing {
+      width: 220px;
+      height: 220px;
+    }
+
+    #zoneRingLegend {
+      margin-top: 0.4rem;
+      font-size: 0.8rem;
+      width: 100%;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .legend-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+    }
+
+    .legend-label {
+      flex: 1;
+    }
+
+    .legend-value {
+      text-align: right;
+      min-width: 2.5rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .flags {
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid #e0e0e0;
+      font-size: 0.88rem;
+    }
+
+    .flags ul {
+      margin: 0.25rem 0 0 1.1rem;
+      padding: 0;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 0.12rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      background: var(--accent-soft);
+      color: #1d4ed8;
+      font-weight: 500;
+      margin-left: 0.25rem;
+    }
+
+    .muted {
+      color: var(--text-muted);
+    }
+
+    .radio-input {
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .comparison-table {
+      margin-top: 0.6rem;
+      font-size: 0.84rem;
+    }
+
+    .comparison-table table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 0.25rem 0.4rem;
+      text-align: left;
+    }
+
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .card {
+        padding: 1.25rem 1.1rem 1.5rem;
+      }
+      #chartContainer canvas {
+        height: 220px !important;
+      }
+      #zoneRing {
+        width: 200px;
+        height: 200px;
+      }
+    }
+  </style>
+
+  <!-- PDF libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+  <div class="shell">
+
+    <div class="card" id="mainCard">
+      <h1>Feedback Scale Assessment</h1>
+      <p class="subtitle">
+        This tool is designed to help you and your manager understand what feedback looks and feels like
+        in your role. It focuses on the volume, quality and tone of feedback, and how easy it is to turn
+        that feedback into clear action.
+      </p>
+
+      <p class="subtitle">
+        The Silent → Sparse → Resonant → Loud → Overwhelming scale turns that into a simple conversational
+        tool. It captures how your last few days or weeks have felt so that you can talk about feedback,
+        expectations and support in a consistent way. It is not a replacement for good management or
+        judgement. It is a structured way to collect how the feedback environment feels, track patterns
+        over time, and support better conversations about what needs to change.
+      </p>
+
+      <h2>About the five zones</h2>
+      <div class="scale-description">
+        <p><strong>Silent:</strong> Little or no feedback. You rarely hear how you are doing. You are often guessing what good looks like.</p>
+        <p><strong>Sparse:</strong> Occasional or basic feedback. You hear something now and again, usually focused on tasks, not on development.</p>
+        <p><strong>Resonant:</strong> The healthy zone. Feedback is regular, specific and respectful. You understand what is going well, what needs work and why it matters.</p>
+        <p><strong>Loud:</strong> High volume or intense feedback. Messages may feel rushed or reactive. It can be hard to sort the signal from the noise.</p>
+        <p><strong>Overwhelming:</strong> Feedback feels constant, conflicting or unsafe. You may feel on edge or worried about criticism. This is a system problem, not a personal failing.</p>
+      </div>
+
+      <div class="field">
+        <label for="personName">Name (optional)</label>
+        <input id="personName" type="text" placeholder="e.g. Alex, Operator" />
+      </div>
+
+      <div class="field">
+        <label for="roleLevel">Role level (optional)</label>
+        <select id="roleLevel">
+          <option value="">Select role level</option>
+          <option value="L1">Operator</option>
+          <option value="L2">Senior Operator</option>
+          <option value="L3">Supervisor</option>
+          <option value="L4">Manager</option>
+          <option value="L5">Director</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="context">Context (optional)</label>
+        <select id="context">
+          <option value="">Select context</option>
+          <option value="Normal week">Normal week</option>
+          <option value="Peak period">Peak period</option>
+          <option value="Project workload">Project workload</option>
+          <option value="Returning from leave">Returning from leave</option>
+          <option value="Team changes">Team changes</option>
+          <option value="User-defined">Other (specify below)</option>
+        </select>
+        <input id="contextCustom" type="text" placeholder="Specify your context (optional)"
+               style="margin-top:0.5rem; display:none;">
+      </div>
+
+      <h2>Questionnaire</h2>
+      <p class="muted" style="font-size: 0.9rem;">
+        For each statement, select how often it reflects your current experience of feedback at work.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 40px;">#</th>
+            <th>Question</th>
+            <th class="radio-group">Never</th>
+            <th class="radio-group">Rarely</th>
+            <th class="radio-group">Sometimes</th>
+            <th class="radio-group">Often</th>
+            <th class="radio-group">Always</th>
+          </tr>
+        </thead>
+        <tbody id="questionsBody">
+          <!-- questions injected by JS -->
+        </tbody>
+      </table>
+
+      <div class="button-row" style="margin-top: 0.9rem;">
+        <button id="calculateFromQuestions" type="button">
+          Calculate from answers
+        </button>
+      </div>
+
+      <div class="field" style="margin-top: 1.2rem;">
+        <label>Calculated zone and scores</label>
+        <div class="results-layout">
+          <div id="calculationResults" class="results-box">
+            Answer the questions and click <strong>Calculate from answers</strong> to see your results.
+          </div>
+          <div id="chartPanel">
+            <div id="chartContainer">
+              <canvas id="zoneChart"></canvas>
+            </div>
+            <div id="ringContainer">
+              <div id="ringToggleRow">
+                <button type="button" class="secondary small toggle-active" id="ringModeCurrent">Current</button>
+                <button type="button" class="secondary small" id="ringModeIdeal">Ideal</button>
+              </div>
+              <canvas id="zoneRing" width="220" height="220"></canvas>
+              <div id="zoneRingLegend" class="muted">
+                The outer circle represents 100% of your current feedback experience. Bands show how much sits in each zone.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2>Overall scale result</h2>
+      <div class="field">
+        <div id="overallResult" class="scale-description">
+          Run a calculation to see the overall score, description, key deviations from the ideal profile for this role, and a suggested focus to move your feedback environment closer to Resonant.
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button id="saveEntry">Save entry</button>
+        <button id="exportCsv" type="button" class="secondary">Export CSV</button>
+        <button id="exportPdf" type="button" class="secondary">Save as PDF</button>
+        <button id="clearEntries" type="button" class="danger">Clear all saved entries</button>
+      </div>
+
+      <div class="field" style="margin-top: 1.4rem;">
+        <label for="loadEntry">Load a previous result</label>
+        <select id="loadEntry">
+          <option value="">Select saved entry</option>
+        </select>
+        <p class="muted" style="font-size: 0.8rem;">
+          Loading will replace the current answers and results with the selected entry.
+        </p>
+      </div>
+
+      <div class="summary">
+        <h2>Recorded entries (browser only)</h2>
+        <p class="muted" style="font-size: 0.9rem;">
+          Entries are stored in this browser only using local storage. Export to CSV to analyse elsewhere.
+        </p>
+        <table id="entriesTable">
+          <thead>
+            <tr>
+              <th>Date/time</th>
+              <th>Name</th>
+              <th>Role level</th>
+              <th>Context</th>
+              <th>Score</th>
+              <th>Zone</th>
+            </tr>
+          </thead>
+          <tbody>
+          <!-- rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <p class="muted" style="font-size:0.8rem; margin-top:2rem;">
+        Tool design, questions, scoring model and interpretation framework created by Dean Rougvie.
+        All calculations are experimental and may contain errors.
+      </p>
+    </div>
+
+    <div class="card" id="privacyCard" style="background:#f9fafb;">
+      <h2>Your data and privacy</h2>
+      <p class="muted">
+        Your responses are stored <strong>only in this browser</strong> using local storage.
+        Nothing is uploaded, shared or sent anywhere.
+        If you clear your browser storage or press “Clear all saved entries”, your data will be
+        <strong>permanently deleted and cannot be recovered</strong>.
+      </p>
+
+      <p style="margin-top:1rem;">
+        The questions, scoring model and interpretations were created for internal use and may contain
+        errors or be incomplete. They are intended as a practical tool to support conversation, not as a
+        diagnostic, assessment or formal evaluation system.
+      </p>
+
+      <button id="sendFeedback" type="button" class="secondary">Send feedback or suggest a feature</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    // Questions focused on feedback quality, frequency and tone
+    const questions = [
+      { id: 1,  text: "I receive specific feedback on my work, not just general comments." },
+      { id: 2,  text: "I can go long periods without anyone commenting on how I am doing." },
+      { id: 3,  text: "Feedback I receive is mostly about small day to day tasks rather than bigger development." },
+      { id: 4,  text: "Feedback helps me understand the impact of my work on others or on the business." },
+      { id: 5,  text: "I receive so much feedback that it is hard to know what to act on first." },
+      { id: 6,  text: "When something goes well, someone usually notices and says so." },
+      { id: 7,  text: "Feedback usually arrives only when something has gone wrong." },
+      { id: 8,  text: "I feel comfortable asking for feedback when I need it." },
+      { id: 9,  text: "Different people give me conflicting feedback about what good looks like." },
+      { id: 10, text: "I know what my manager would say I am doing well right now." },
+      { id: 11, text: "I know what my manager would say I should improve next." },
+      { id: 12, text: "Feedback conversations feel rushed, squeezed in or reactive." },
+      { id: 13, text: "I leave feedback conversations with a clear next step or action." },
+      { id: 14, text: "I feel anxious or worried in the lead up to feedback conversations." },
+      { id: 15, text: "The tone of feedback is respectful, even when it is challenging." },
+      { id: 16, text: "I receive feedback in group settings that would feel better one to one." },
+      { id: 17, text: "I get regular check ins about how I am doing, even when nothing is on fire." },
+      { id: 18, text: "During feedback conversations I feel listened to, not just spoken at." },
+      { id: 19, text: "The amount of feedback I receive matches the level of responsibility I have." },
+      { id: 20, text: "Feedback focuses only on results, not on how the work gets done." },
+      { id: 21, text: "I hear a consistent message about what good performance looks like." },
+      { id: 22, text: "Feedback connects my work to the bigger picture or strategy." },
+      { id: 23, text: "I feel on edge because I am expecting more criticism or negative feedback." },
+      { id: 24, text: "I understand how feedback will be used in performance or pay decisions." },
+      { id: 25, text: "I sometimes avoid asking for feedback because of how it is usually handled." }
+    ];
+
+    // No reverse scored items for this version
+    const reverseScored = new Set([]);
+
+    const responseOptions = [
+      { value: 0, label: "Never" },
+      { value: 1, label: "Rarely" },
+      { value: 2, label: "Sometimes" },
+      { value: 3, label: "Often" },
+      { value: 4, label: "Always" }
+    ];
+
+    const contextSelect = document.getElementById("context");
+    const contextCustom = document.getElementById("contextCustom");
+
+    contextSelect.addEventListener("change", () => {
+      contextCustom.style.display = contextSelect.value === "User-defined" ? "block" : "none";
+    });
+
+    // Zone mapping for feedback
+    const zoneQuestions = {
+      silent:       [2, 7],
+      sparse:       [3, 7, 24],
+      resonant:     [1, 4, 6, 8, 10, 11, 13, 15, 17, 18, 19, 21, 22],
+      loud:         [12, 14, 16, 20],
+      overwhelming: [5, 9, 14, 16, 23, 25]
+    };
+
+    // Colours
+    const zoneColors = {
+      silent:       { fill: "rgba(0, 0, 0, 0.25)",   stroke: "#111827" },
+      sparse:       { fill: "rgba(59, 130, 246, 0.45)", stroke: "#3b82f6" },
+      resonant:     { fill: "rgba(34, 197, 94, 0.45)",  stroke: "#22c55e" },
+      loud:         { fill: "rgba(245, 158, 11, 0.45)", stroke: "#f59e0b" },
+      overwhelming: { fill: "rgba(239, 68, 68, 0.45)",  stroke: "#ef4444" }
+    };
+
+    // Role targets - ideal patterns of feedback by level
+    const roleTargets = {
+      L1: { silent: 20, sparse: 35, resonant: 35, loud: 10, overwhelming: 0 }, // Operator
+      L2: { silent: 15, sparse: 30, resonant: 40, loud: 15, overwhelming: 0 }, // Senior Operator
+      L3: { silent: 10, sparse: 25, resonant: 45, loud: 20, overwhelming: 0 }, // Supervisor
+      L4: { silent: 8,  sparse: 20, resonant: 50, loud: 22, overwhelming: 0 }, // Manager
+      L5: { silent: 5,  sparse: 15, resonant: 55, loud: 25, overwhelming: 0 }  // Director
+    };
+
+    const roleLabels = {
+      L1: "Operator",
+      L2: "Senior Operator",
+      L3: "Supervisor",
+      L4: "Manager",
+      L5: "Director"
+    };
+
+    // Scale descriptions (1 to 5)
+    const descriptions = {
+      1: {
+        label: "Silent",
+        text: "Very little feedback. You are often guessing how you are doing. Wins may go unnoticed and development needs are not clearly named.",
+        manager: "Create regular, low drama check ins. Start with simple questions such as what is going well, what is hard and what should we focus on next. Make feedback a normal part of the week."
+      },
+      2: {
+        label: "Sparse",
+        text: "Some feedback appears, usually around tasks or problems, but it is irregular and not joined up. The signal is there, but it is faint.",
+        manager: "Agree a basic rhythm for feedback. Add short, structured conversations that cover strengths, development and expectations, not only issues when they arise."
+      },
+      3: {
+        label: "Resonant",
+        text: "Healthy feedback pattern. Conversations are regular, specific and respectful. You understand what is working, what needs attention and why it matters.",
+        manager: "Protect this pattern. Keep feedback anchored to concrete examples and shared goals. Remove friction that gets in the way of good conversations."
+      },
+      4: {
+        label: "Loud",
+        text: "Feedback is frequent or intense. It may feel rushed, highly reactive or focused only on problems. It can be difficult to tease out the most important points.",
+        manager: "Slow things down. Prioritise no more than one or two key messages. Agree what can wait and use quieter follow ups rather than everything in one burst."
+      },
+      5: {
+        label: "Overwhelming",
+        text: "Feedback feels constant, conflicting or emotionally heavy. It may feel unsafe or exhausting to be on the receiving end of it.",
+        manager: "Step back and reset. Clarify which feedback matters, remove unnecessary criticism and agree clear boundaries about how and where feedback will be given."
+      }
+    };
+
+    const roleLevelSelect = document.getElementById("roleLevel");
+    const saveButton = document.getElementById("saveEntry");
+    const exportButton = document.getElementById("exportCsv");
+    const exportPdfButton = document.getElementById("exportPdf");
+    const clearButton = document.getElementById("clearEntries");
+    const questionsBody = document.getElementById("questionsBody");
+    const calculationResults = document.getElementById("calculationResults");
+    const calculateButton = document.getElementById("calculateFromQuestions");
+    const tableBody = document.querySelector("#entriesTable tbody");
+    const loadSelect = document.getElementById("loadEntry");
+    const overallResult = document.getElementById("overallResult");
+    const ringModeCurrentBtn = document.getElementById("ringModeCurrent");
+    const ringModeIdealBtn = document.getElementById("ringModeIdeal");
+    const sendFeedbackButton = document.getElementById("sendFeedback");
+
+    // State
+    let latestZonePercents = null;
+    let latestZoneRaw = null;
+    let latestTopZone = null;
+    let latestTopScore = null;
+    let latestResponses = null;
+    let latestScaleScore = null;
+    let ringMode = "current";
+
+    // Radar chart
+    const chartCtx = document.getElementById("zoneChart").getContext("2d");
+    let radarChart = new Chart(chartCtx, {
+      type: "radar",
+      data: {
+        labels: ["Silent", "Sparse", "Resonant", "Loud", "Overwhelming"],
+        datasets: [
+          {
+            label: "Actual",
+            data: [0, 0, 0, 0, 0],
+            fill: true,
+            borderWidth: 2,
+            pointRadius: 3,
+            backgroundColor: "rgba(37, 99, 235, 0.15)",
+            borderColor: "rgba(37, 99, 235, 1)"
+          },
+          {
+            label: "Ideal",
+            data: [0, 0, 0, 0, 0],
+            fill: false,
+            borderWidth: 1.5,
+            pointRadius: 0,
+            borderDash: [4, 3],
+            borderColor: "rgba(148, 163, 184, 0.9)",
+            hidden: true
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          r: {
+            beginAtZero: true,
+            min: 0,
+            max: 50,
+            ticks: {
+              showLabelBackdrop: false,
+              stepSize: 10,
+              callback: value => value + "%"
+            },
+            angleLines: { color: "rgba(0,0,0,0.06)" },
+            grid: { color: "rgba(0,0,0,0.06)" },
+            pointLabels: { font: { size: 11 } }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          title: { display: false }
+        }
+      }
+    });
+
+    // Concentric ring chart
+    const ringCanvas = document.getElementById("zoneRing");
+    const ringCtx = ringCanvas.getContext("2d");
+
+    function drawRingChart(data) {
+      const w = ringCanvas.width;
+      const h = ringCanvas.height;
+      ringCtx.clearRect(0, 0, w, h);
+
+      const cx = w / 2;
+      const cy = h / 2;
+      const maxRadius = Math.min(w, h) / 2 - 8;
+
+      if (!data) {
+        ringCtx.beginPath();
+        ringCtx.arc(cx, cy, maxRadius, 0, 2 * Math.PI);
+        ringCtx.strokeStyle = "#e5e7eb";
+        ringCtx.lineWidth = 2;
+        ringCtx.stroke();
+        return;
+      }
+
+      const order = ["silent", "sparse", "resonant", "loud", "overwhelming"];
+      let innerR = 0;
+      order.forEach(zone => {
+        const pct = data[zone] || 0;
+        const outerR = innerR + maxRadius * (pct / 100);
+        if (outerR <= innerR) return;
+
+        ringCtx.beginPath();
+        ringCtx.arc(cx, cy, outerR, 0, 2 * Math.PI);
+        ringCtx.arc(cx, cy, innerR, 2 * Math.PI, 0, true);
+        ringCtx.closePath();
+        ringCtx.fillStyle = zoneColors[zone].fill;
+        ringCtx.fill();
+
+        innerR = outerR;
+      });
+
+      ringCtx.beginPath();
+      ringCtx.arc(cx, cy, maxRadius, 0, 2 * Math.PI);
+      ringCtx.strokeStyle = "#d1d5db";
+      ringCtx.lineWidth = 1.5;
+      ringCtx.stroke();
+    }
+
+    function updateRingLegend(data, labelText) {
+      const legend = document.getElementById("zoneRingLegend");
+      if (!data) {
+        legend.classList.add("muted");
+        legend.innerHTML = "The outer circle represents 100% of your current feedback experience. Bands show how much sits in each zone.";
+        return;
+      }
+      const order = ["silent", "sparse", "resonant", "loud", "overwhelming"];
+      const labels = {
+        silent: "Silent",
+        sparse: "Sparse",
+        resonant: "Resonant",
+        loud: "Loud",
+        overwhelming: "Overwhelming"
+      };
+      const rows = order.map(z => {
+        const pct = data[z] ?? 0;
+        const color = zoneColors[z].stroke;
+        return `
+          <div class="legend-row">
+            <span class="legend-swatch" style="background:${color};"></span>
+            <span class="legend-label">${labels[z]}</span>
+            <span class="legend-value">${pct}%</span>
+          </div>`;
+      }).join("");
+      legend.classList.remove("muted");
+      legend.innerHTML = `<div style="margin-bottom:0.15rem;font-weight:500;font-size:0.78rem;">${labelText}</div>${rows}`;
+    }
+
+    function currentTarget(role) {
+      return role ? roleTargets[role] : null;
+    }
+
+    function updateCharts(percents, target, role) {
+      radarChart.data.datasets[0].data = [
+        percents.silent,
+        percents.sparse,
+        percents.resonant,
+        percents.loud,
+        percents.overwhelming
+      ];
+      if (target) {
+        radarChart.data.datasets[1].data = [
+          target.silent,
+          target.sparse,
+          target.resonant,
+          target.loud,
+          target.overwhelming
+        ];
+        radarChart.data.datasets[1].hidden = false;
+      } else {
+        radarChart.data.datasets[1].hidden = true;
+      }
+
+      const allValues = [
+        percents.silent,
+        percents.sparse,
+        percents.resonant,
+        percents.loud,
+        percents.overwhelming
+      ];
+      if (target) {
+        allValues.push(
+          target.silent,
+          target.sparse,
+          target.resonant,
+          target.loud,
+          target.overwhelming
+        );
+      }
+      const maxVal = Math.max(...allValues, 10);
+      const maxScale = Math.max(30, Math.ceil((maxVal + 5) / 10) * 10);
+      radarChart.options.scales.r.max = maxScale;
+      radarChart.update();
+
+      let ringData = percents;
+      let labelText = "Current pattern";
+      if (ringMode === "ideal" && target) {
+        ringData = target;
+        const label = roleLabels[role] || "role";
+        labelText = `Ideal feedback profile for ${label}`;
+      } else if (ringMode === "ideal" && !target) {
+        ringData = percents;
+        labelText = "Current pattern (no role selected for ideal profile)";
+      }
+      drawRingChart(ringData);
+      updateRingLegend(ringData, labelText);
+    }
+
+    function buildQuestions() {
+      questions.forEach(q => {
+        const tr = document.createElement("tr");
+
+        const tdNum = document.createElement("td");
+        tdNum.textContent = q.id;
+        tr.appendChild(tdNum);
+
+        const tdText = document.createElement("td");
+        tdText.className = "question-text";
+        tdText.textContent = q.text;
+        tr.appendChild(tdText);
+
+        responseOptions.forEach(opt => {
+          const td = document.createElement("td");
+          td.className = "radio-group";
+          const id = `q${q.id}_${opt.value}`;
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = `q${q.id}`;
+          input.id = id;
+          input.value = opt.value;
+          input.className = "radio-input";
+          const label = document.createElement("label");
+          label.setAttribute("for", id);
+          label.style.display = "inline-block";
+          label.style.margin = "0";
+          label.textContent = "";
+          td.appendChild(input);
+          td.appendChild(label);
+          tr.appendChild(td);
+        });
+
+        questionsBody.appendChild(tr);
+      });
+    }
+
+    function getResponses() {
+      const responses = {};
+      for (const q of questions) {
+        const checked = document.querySelector(`input[name="q${q.id}"]:checked`);
+        if (!checked) {
+          return null;
+        }
+        responses[q.id] = parseInt(checked.value, 10);
+      }
+      return responses;
+    }
+
+    function calculateZoneScores(responses) {
+      const raw = {};
+      let totalRaw = 0;
+
+      for (const [zone, ids] of Object.entries(zoneQuestions)) {
+        let sum = 0;
+        ids.forEach(id => {
+          const base = responses[id] ?? 0;
+          const score = reverseScored.has(id) ? (4 - base) : base;
+          sum += score;
+        });
+        raw[zone] = sum;
+        totalRaw += sum;
+      }
+
+      const percents = {};
+      const zones = Object.keys(raw);
+
+      if (totalRaw === 0) {
+        zones.forEach(z => { percents[z] = 0; });
+      } else {
+        let runningTotal = 0;
+        zones.forEach((zone, idx) => {
+          if (idx === zones.length - 1) {
+            percents[zone] = 100 - runningTotal;
+          } else {
+            const p = Math.round((raw[zone] / totalRaw) * 100);
+            percents[zone] = p;
+            runningTotal += p;
+          }
+        });
+      }
+
+      return { raw, percents };
+    }
+
+    function buildFlags(percents) {
+      const flags = [];
+
+      if (percents.overwhelming >= 15) {
+        flags.push("Overwhelming feedback at or above 15%: explore what feels unsafe or excessive and agree clear changes to how feedback is given.");
+      } else if (percents.overwhelming >= 10) {
+        flags.push("Overwhelming feedback between 10% and 15%: agree regular check ins to spot patterns that push things too far.");
+      }
+
+      if (percents.loud + percents.overwhelming >= 35) {
+        flags.push("Combined Loud and Overwhelming above 35%: feedback may feel intense or chaotic. Simplify the message and slow the pace.");
+      }
+
+      if (percents.silent >= 25) {
+        flags.push("Silent at or above 25%: feedback is mostly absent. Agree a basic rhythm of short check ins and clearer expectations.");
+      }
+
+      if (percents.resonant < 30) {
+        flags.push("Resonant below 30%: there may be few high quality, useful feedback conversations. Look for one or two places to improve quality first.");
+      }
+
+      if (
+        percents.resonant >= 35 &&
+        percents.resonant <= 60 &&
+        percents.overwhelming < 15 &&
+        percents.silent < 20 &&
+        percents.loud >= 10 &&
+        percents.loud <= 25
+      ) {
+        flags.push("Overall pattern looks healthy: mostly in Resonant with some Loud for urgency and low Overwhelming. Focus on keeping messages clear and aligned.");
+      }
+
+      return flags;
+    }
+
+    function levelLabel(actual, ideal) {
+      const diff = actual - ideal;
+      if (Math.abs(diff) <= 5) return "about right";
+      if (diff > 5) return "high";
+      return "low";
+    }
+
+    function zoneNarrative(zone, actual, ideal) {
+      const level = levelLabel(actual, ideal);
+      switch (zone) {
+        case "silent":
+          if (level === "high") return "Silence is high; build in regular, low pressure feedback moments.";
+          if (level === "low") return "Silence is low; people usually know where they stand.";
+          return "Silence is about right; there is enough information flowing.";
+        case "sparse":
+          if (level === "high") return "Sparse feedback is high; make basic conversations more frequent and purposeful.";
+          if (level === "low") return "Sparse feedback is low; focus instead on maintaining strong Resonant feedback.";
+          return "Sparse feedback is about right; day to day comments exist but do not dominate.";
+        case "resonant":
+          if (level === "high") return "Resonant feedback is high; check that the volume is still manageable and focused.";
+          if (level === "low") return "Resonant feedback is low; introduce clearer, specific conversations about strengths and development.";
+          return "Resonant feedback is about right; protect the quality of these conversations.";
+        case "loud":
+          if (level === "high") return "Loud feedback is high; strip out noise and reduce reactive, problem only feedback.";
+          if (level === "low") return "Loud feedback is low; consider whether there is enough urgency and follow through where needed.";
+          return "Loud feedback is near ideal; watch for spikes and avoid constant firefighting.";
+        case "overwhelming":
+          if (level === "high") return "Overwhelming feedback is high; reset expectations and boundaries so feedback feels safer and more focused.";
+          return "Overwhelming feedback is low; keep escalation paths clear for more serious issues.";
+        default:
+          return "";
+      }
+    }
+
+    function buildComparisonTable(percents, target) {
+      const zones = ["silent", "sparse", "resonant", "loud", "overwhelming"];
+      const labels = {
+        silent: "Silent",
+        sparse: "Sparse",
+        resonant: "Resonant",
+        loud: "Loud",
+        overwhelming: "Overwhelming"
+      };
+      let rows = "";
+      zones.forEach(z => {
+        const actual = percents[z];
+        const ideal = target[z];
+        const comment = zoneNarrative(z, actual, ideal);
+        rows += `
+          <tr>
+            <td>${labels[z]}</td>
+            <td>${actual}%</td>
+            <td>${ideal}%</td>
+            <td>${comment}</td>
+          </tr>
+        `;
+      });
+      return `
+        <div class="comparison-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Zone</th>
+                <th>Actual</th>
+                <th>Ideal</th>
+                <th>Quick interpretation and action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function buildIdealSummary(role, target) {
+      if (!target) {
+        return `<span class="muted">Select a role level to see the ideal feedback distribution for that role.</span>`;
+      }
+      const label = roleLabels[role] || role;
+      return `
+        Ideal for <strong>${label}</strong>:
+        Silent ${target.silent}%,
+        Sparse ${target.sparse}%,
+        Resonant ${target.resonant}%,
+        Loud ${target.loud}%,
+        Overwhelming ${target.overwhelming}%.
+      `;
+    }
+
+    function buildNextLevelRecommendation(percents, role) {
+      const nextRoleMap = { L1: "L2", L2: "L3", L3: "L4", L4: "L5" };
+      const nextRole = nextRoleMap[role];
+      if (!role || !nextRole) {
+        return `<span class="muted">Select a role level below Director to see a suggested focus for progressing to the next level.</span>`;
+      }
+
+      const nextTarget = roleTargets[nextRole];
+      if (!nextTarget) {
+        return `<span class="muted">No next level profile available.</span>`;
+      }
+
+      const zones = ["silent", "sparse", "resonant", "loud", "overwhelming"];
+      const labels = {
+        silent: "Silent",
+        sparse: "Sparse",
+        resonant: "Resonant",
+        loud: "Loud",
+        overwhelming: "Overwhelming"
+      };
+
+      let bestZone = null;
+      let bestGap = 0;
+      zones.forEach(z => {
+        const actual = percents[z] ?? 0;
+        const ideal = nextTarget[z];
+        let gap = Math.abs(actual - ideal);
+
+        if (gap < 5) return;
+        if (z === "overwhelming" && actual < 5 && ideal === 0) return;
+
+        if (gap > bestGap) {
+          bestGap = gap;
+          bestZone = z;
+        }
+      });
+
+      if (!bestZone) {
+        const label = roleLabels[nextRole] || "next level";
+        return `<span class="muted">Your pattern is already close to the ideal feedback profile for a ${label}. Focus on consistency and alignment of messages.</span>`;
+      }
+
+      const actual = percents[bestZone] ?? 0;
+      const ideal = nextTarget[bestZone];
+      const label = roleLabels[nextRole] || "next level";
+      const zoneLabel = labels[bestZone];
+
+      let action;
+      if (bestZone === "silent") {
+        action = "Introduce more deliberate feedback moments so people are not guessing how they are doing.";
+      } else if (bestZone === "sparse") {
+        action = actual > ideal
+          ? "Move from occasional comments to a clear feedback rhythm that covers strengths and development."
+          : "Trim low value surface comments and invest in fewer but richer conversations.";
+      } else if (bestZone === "resonant") {
+        action = actual < ideal
+          ? "Schedule regular one to one conversations that connect feedback to impact and next steps."
+          : "Prioritise the most important topics so high quality feedback does not become overwhelming.";
+      } else if (bestZone === "loud") {
+        action = actual > ideal
+          ? "Reduce reactive or problem only feedback. Agree the top messages and follow up in calmer spaces."
+          : "Add some time bound feedback on goals and outcomes so urgency and focus increase where appropriate.";
+      } else {
+        action = "Reset how feedback is delivered. Agree ground rules, narrow the focus and protect psychological safety.";
+      }
+
+      return `
+        To move toward the profile for a <strong>${label}</strong>, focus first on <strong>${zoneLabel}</strong>
+        (now ${actual}%, ideal ${ideal}%). ${action}
+      `;
+    }
+
+    function renderOverallScale(topZone, percents, role) {
+      const zoneToScale = {
+        silent: 1,
+        sparse: 2,
+        resonant: 3,
+        loud: 4,
+        overwhelming: 5
+      };
+
+      const labels = {
+        silent: "Silent",
+        sparse: "Sparse",
+        resonant: "Resonant",
+        loud: "Loud",
+        overwhelming: "Overwhelming"
+      };
+
+      const score = zoneToScale[topZone] || 3;
+      latestScaleScore = score.toString();
+      const desc = descriptions[score];
+
+      const target = role ? roleTargets[role] : null;
+
+      let deviations = [];
+      if (target) {
+        const zones = ["silent", "sparse", "resonant", "loud", "overwhelming"];
+        zones.forEach(z => {
+          const actual = percents[z] ?? 0;
+          const ideal = target[z];
+          const diff = actual - ideal;
+          const absDiff = Math.abs(diff);
+
+          if (z === "overwhelming") {
+            if (actual >= 5 && diff >= 5) {
+              deviations.push({
+                zone: z,
+                absDiff,
+                text: `<li><strong>${labels[z]}</strong> is ${diff} points higher than expected: ${zoneNarrative(z, actual, ideal)}</li>`
+              });
+            }
+            return;
+          }
+
+          if (z === "silent") {
+            if (actual >= 15 && diff >= 5) {
+              deviations.push({
+                zone: z,
+                absDiff,
+                text: `<li><strong>${labels[z]}</strong> is ${diff} points higher than expected: ${zoneNarrative(z, actual, ideal)}</li>`
+              });
+            }
+            return;
+          }
+
+          if (absDiff >= 8) {
+            const direction = diff > 0 ? "higher" : "lower";
+            deviations.push({
+              zone: z,
+              absDiff,
+              text: `<li><strong>${labels[z]}</strong> is ${absDiff} points ${direction} than expected: ${zoneNarrative(z, actual, ideal)}</li>`
+            });
+          }
+        });
+
+        deviations.sort((a, b) => b.absDiff - a.absDiff);
+        deviations = deviations.slice(0, 3);
+      }
+
+      let deviationsHtml;
+      if (!target) {
+        deviationsHtml = `<span class="muted">Select a role level to see which zones differ most from the expected feedback profile.</span>`;
+      } else if (!deviations.length) {
+        deviationsHtml = `<span class="muted">No major deviations from the ideal feedback profile for this role. Focus on keeping messages clear, respectful and aligned.</span>`;
+      } else {
+        deviationsHtml = `<ul>${deviations.map(d => d.text).join("")}</ul>`;
+      }
+
+      const nextLevelText = buildNextLevelRecommendation(percents, role);
+
+      overallResult.innerHTML = `
+        <strong>Dominant zone:</strong> ${labels[topZone]} (score ${score} (${desc.label}))<span class="pill">Calculated</span>
+        <br><br>
+        <strong>Description:</strong> ${desc.text}<br><br>
+        <strong>Manager guidance:</strong> ${desc.manager}<br><br>
+        <strong>Other areas to notice:</strong>
+        ${deviationsHtml}
+        <br><br>
+        <strong>Next-level progression focus:</strong>
+        <div style="margin-top:0.25rem;">${nextLevelText}</div>
+      `;
+    }
+
+    function renderResults(percents, role, topZone, topScore) {
+      const zoneLabels = {
+        silent: "Silent",
+        sparse: "Sparse",
+        resonant: "Resonant",
+        loud: "Loud",
+        overwhelming: "Overwhelming"
+      };
+
+      const flags = buildFlags(percents);
+      const target = currentTarget(role);
+      const idealSummary = buildIdealSummary(role, target);
+      const comparisonTable = target
+        ? buildComparisonTable(percents, target)
+        : `<div class="muted" style="margin-top:0.5rem;">Select a role level to compare actual and ideal feedback scores.</div>`;
+
+      calculationResults.innerHTML = `
+        <div>
+          <strong>Dominant zone:</strong> ${zoneLabels[topZone]} (${topScore}%)
+          <span class="pill">Calculated</span>
+        </div>
+        <div style="margin-top: 0.65rem; font-size: 0.88rem;">
+          <strong>Ideal profile:</strong>
+          <span id="idealRow">${idealSummary}</span>
+        </div>
+        <div style="margin-top: 0.3rem; font-style: italic; font-size: 0.86rem;">
+          The table below shares out 100% of your current feedback experience across the five zones.
+        </div>
+        ${comparisonTable}
+        <div class="flags">
+          <strong>Conversation prompts:</strong>
+          ${
+            flags.length
+              ? "<ul>" + flags.map(f => `<li>${f}</li>`).join("") + "</ul>"
+              : "<div>No specific risk flags from this pattern. Still useful to discuss what is helping it work well and what you want more of.</div>"
+          }
+        </div>
+      `;
+
+      renderOverallScale(topZone, percents, role);
+      updateCharts(percents, target, role);
+    }
+
+    function handleCalculate() {
+      const responses = getResponses();
+      if (!responses) {
+        alert("Please answer all questions before calculating.");
+        return;
+      }
+
+      const { raw, percents } = calculateZoneScores(responses);
+
+      const entries = Object.entries(percents);
+      entries.sort((a, b) => b[1] - a[1]);
+      const [topZone, topScore] = entries[0] || ["resonant", 0];
+
+      latestZonePercents = percents;
+      latestZoneRaw = raw;
+      latestTopZone = topZone;
+      latestTopScore = topScore;
+      latestResponses = responses;
+
+      const role = roleLevelSelect.value || null;
+      renderResults(percents, role, topZone, topScore);
+    }
+
+    function handleRoleChange() {
+      const role = roleLevelSelect.value || null;
+
+      if (latestZonePercents) {
+        let topZone = latestTopZone;
+        let topScore = latestTopScore;
+        if (!topZone) {
+          const entries = Object.entries(latestZonePercents);
+          entries.sort((a, b) => b[1] - a[1]);
+          const top = entries[0] || ["resonant", 0];
+          topZone = top[0];
+          topScore = top[1];
+          latestTopZone = topZone;
+          latestTopScore = topScore;
+        }
+        renderResults(latestZonePercents, role, topZone, topScore);
+      } else {
+        drawRingChart(null);
+        updateRingLegend(null);
+      }
+    }
+
+    function loadEntries() {
+      const raw = localStorage.getItem("feedbackScaleEntries") || "[]";
+      return JSON.parse(raw);
+    }
+
+    function saveEntries(entries) {
+      localStorage.setItem("feedbackScaleEntries", JSON.stringify(entries));
+    }
+
+    function renderEntriesTableAndDropdown() {
+      const entries = loadEntries();
+      tableBody.innerHTML = "";
+      loadSelect.innerHTML = '<option value="">Select saved entry</option>';
+
+      entries.forEach((entry, index) => {
+        const tr = document.createElement("tr");
+        const roleLabel = roleLabels[entry.roleLevel] || entry.roleLevel || "";
+        tr.innerHTML = `
+          <td>${entry.timestamp}</td>
+          <td>${entry.name || ""}</td>
+          <td>${roleLabel}</td>
+          <td>${entry.context || ""}</td>
+          <td>${entry.score}</td>
+          <td>${descriptions[entry.score]?.label || ""}</td>
+        `;
+        tableBody.appendChild(tr);
+
+        const optLabel = `${entry.timestamp} – ${entry.name || "No name"} (${descriptions[entry.score]?.label || "Score " + entry.score})`;
+        const opt = document.createElement("option");
+        opt.value = index.toString();
+        opt.textContent = optLabel;
+        loadSelect.appendChild(opt);
+      });
+    }
+
+    function handleSave() {
+      const name = document.getElementById("personName").value.trim();
+      const roleLevel = roleLevelSelect.value;
+
+      if (!latestScaleScore) {
+        alert("Please run a calculation before saving.");
+        return;
+      }
+
+      let responses = latestResponses || getResponses() || null;
+      let zoneRaw = latestZoneRaw;
+      let zonePercents = latestZonePercents;
+
+      if (responses && (!zoneRaw || !zonePercents)) {
+        const calc = calculateZoneScores(responses);
+        zoneRaw = calc.raw;
+        zonePercents = calc.percents;
+      }
+
+      const contextValue = contextSelect.value === "User-defined"
+        ? contextCustom.value.trim()
+        : contextSelect.value || "";
+
+      const entries = loadEntries();
+      const timestamp = new Date().toLocaleString();
+      entries.push({
+        timestamp,
+        name,
+        roleLevel,
+        context: contextValue,
+        score: latestScaleScore,
+        responses,
+        zoneRaw,
+        zonePercents
+      });
+      saveEntries(entries);
+      renderEntriesTableAndDropdown();
+    }
+
+    function toCsvRow(values) {
+      return values
+        .map(v => {
+          const str = (v ?? "").toString().replace(/"/g, '""');
+          return `"${str}"`;
+        })
+        .join(",");
+    }
+
+    function handleExportCsv() {
+      const entries = loadEntries();
+      if (!entries.length) {
+        alert("No entries to export.");
+        return;
+      }
+
+      const header = [
+        "Timestamp",
+        "Name",
+        "RoleLevel",
+        "Context",
+        "Score",
+        "Zone",
+        "SilentPercent",
+        "SparsePercent",
+        "ResonantPercent",
+        "LoudPercent",
+        "OverwhelmingPercent"
+      ];
+
+      questions.forEach(q => {
+        header.push(`Q${q.id}`);
+      });
+
+      const rows = [toCsvRow(header)];
+
+      entries.forEach(e => {
+        const zp = e.zonePercents || {};
+        const responses = e.responses || {};
+
+        const row = [
+          e.timestamp,
+          e.name,
+          e.roleLevel,
+          e.context || "",
+          e.score,
+          descriptions[e.score]?.label || "",
+          zp.silent ?? "",
+          zp.sparse ?? "",
+          zp.resonant ?? "",
+          zp.loud ?? "",
+          zp.overwhelming ?? ""
+        ];
+
+        questions.forEach(q => {
+          row.push(responses ? (responses[q.id] ?? "") : "");
+        });
+
+        rows.push(toCsvRow(row));
+      });
+
+      const csvContent = rows.join("\r\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "feedback_scale_entries.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function handleClearEntries() {
+      if (!confirm("Clear all saved entries in this browser?")) return;
+      localStorage.removeItem("feedbackScaleEntries");
+      renderEntriesTableAndDropdown();
+    }
+
+    function handleLoadEntry() {
+      const idx = loadSelect.value;
+      if (idx === "") return;
+      const entries = loadEntries();
+      const entry = entries[parseInt(idx, 10)];
+      if (!entry) return;
+
+      document.getElementById("personName").value = entry.name || "";
+      roleLevelSelect.value = entry.roleLevel || "";
+
+      // Restore context
+      if (entry.context) {
+        const matchOption = Array.from(contextSelect.options).find(
+          opt => opt.value === entry.context
+        );
+        if (matchOption) {
+          contextSelect.value = entry.context;
+          contextCustom.value = "";
+          contextCustom.style.display = "none";
+        } else {
+          contextSelect.value = "User-defined";
+          contextCustom.value = entry.context;
+          contextCustom.style.display = "block";
+        }
+      } else {
+        contextSelect.value = "";
+        contextCustom.value = "";
+        contextCustom.style.display = "none";
+      }
+
+      questions.forEach(q => {
+        const radios = document.getElementsByName(`q${q.id}`);
+        Array.from(radios).forEach(r => { r.checked = false; });
+      });
+
+      if (entry.responses) {
+        Object.entries(entry.responses).forEach(([qid, val]) => {
+          const radio = document.querySelector(`input[name="q${qid}"][value="${val}"]`);
+          if (radio) radio.checked = true;
+        });
+      }
+
+      latestResponses = entry.responses || null;
+
+      let percents = entry.zonePercents;
+      let raw = entry.zoneRaw;
+
+      if (!percents && entry.responses) {
+        const calc = calculateZoneScores(entry.responses);
+        percents = calc.percents;
+        raw = calc.raw;
+      }
+
+      if (!percents) {
+        alert("This saved entry does not have enough data to reconstruct the scores.");
+        return;
+      }
+
+      latestZonePercents = percents;
+      latestZoneRaw = raw;
+      latestScaleScore = entry.score || null;
+
+      const entriesArr = Object.entries(percents);
+      entriesArr.sort((a, b) => b[1] - a[1]);
+      const [topZone, topScore] = entriesArr[0] || ["resonant", 0];
+      latestTopZone = topZone;
+      latestTopScore = topScore;
+
+      const role = roleLevelSelect.value || null;
+      renderResults(percents, role, topZone, topScore);
+    }
+
+    function setRingMode(mode) {
+      const role = roleLevelSelect.value || null;
+      const target = currentTarget(role);
+
+      if (mode === "ideal" && !target) {
+        alert("Select a role level to view the ideal feedback profile.");
+        return;
+      }
+      ringMode = mode;
+
+      ringModeCurrentBtn.classList.remove("toggle-active");
+      ringModeIdealBtn.classList.remove("toggle-active");
+      if (mode === "current") {
+        ringModeCurrentBtn.classList.add("toggle-active");
+      } else {
+        ringModeIdealBtn.classList.add("toggle-active");
+      }
+
+      if (latestZonePercents) {
+        updateCharts(latestZonePercents, target, role);
+      } else {
+        drawRingChart(null);
+        updateRingLegend(null);
+      }
+    }
+
+    async function handleExportPdf() {
+      const { jsPDF } = window.jspdf;
+      const card = document.getElementById("mainCard");
+
+      const canvas = await html2canvas(card, { scale: 2 });
+      const img = canvas.toDataURL("image/jpeg", 0.9);
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      const width = pdf.internal.pageSize.getWidth();
+      const height = (canvas.height * width) / canvas.width;
+
+      pdf.addImage(img, "JPEG", 0, 0, width, height);
+      pdf.save("Feedback_Scale_Assessment.pdf");
+    }
+
+    function handleSendFeedback() {
+      const subject = encodeURIComponent("Feedback Scale tool feedback");
+      const body = encodeURIComponent(
+        "Please add any feedback, bugs you have spotted, or feature ideas below:\n\n"
+      );
+      window.location.href = `mailto:dean@bookspeed.com?subject=${subject}&body=${body}`;
+    }
+
+    // Initial setup
+    buildQuestions();
+    renderEntriesTableAndDropdown();
+    drawRingChart(null);
+    updateRingLegend(null);
+
+    calculateButton.addEventListener("click", handleCalculate);
+    roleLevelSelect.addEventListener("change", handleRoleChange);
+    saveButton.addEventListener("click", handleSave);
+    exportButton.addEventListener("click", handleExportCsv);
+    exportPdfButton.addEventListener("click", handleExportPdf);
+    clearButton.addEventListener("click", handleClearEntries);
+    loadSelect.addEventListener("change", handleLoadEntry);
+    ringModeCurrentBtn.addEventListener("click", () => setRingMode("current"));
+    ringModeIdealBtn.addEventListener("click", () => setRingMode("ideal"));
+    sendFeedbackButton.addEventListener("click", handleSendFeedback);
+  </script>
+</body>
+</html>
