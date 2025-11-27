@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Impact vs Effort Planner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --card-bg: #0b1020;
+      --accent: #ea580c;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --border: #1f2933;
+      --danger: #ef4444;
+      --success: #ea580c;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #7c2d12 0, #020716 60%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    header {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: clamp(2rem, 3vw, 2.4rem);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #1f2937 0, #020617 55%);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 20px;
+      box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.75),
+        0 0 0 1px rgba(148, 163, 184, 0.06);
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(234, 88, 12, 0.13), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.08), transparent 55%);
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 960px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .task-input-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .task-input-row input[type="text"] {
+      flex: 1 1 220px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+    }
+
+    .task-input-row input[type="text"]::placeholder {
+      color: #6b7280;
+    }
+
+    .task-input-row input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(234, 88, 12, 0.5);
+      transform: translateY(-1px);
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 9px 16px;
+      background: linear-gradient(120deg, #ea580c, #f97316);
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 12px 25px rgba(15, 23, 42, 0.6);
+      transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.8);
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.6);
+    }
+
+    button.secondary {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    button.secondary:hover {
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.6);
+    }
+
+    button.small {
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      border-radius: 999px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.8);
+      font-size: 0.75rem;
+      color: var(--muted);
+      gap: 4px;
+    }
+
+    .chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .task-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+      margin-bottom: 4px;
+    }
+
+    .task-list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      font-size: 0.85rem;
+    }
+
+    .task-main {
+      display: flex;
+      flex: 1;
+      min-width: 0;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .task-name {
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .task-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      font-size: 0.7rem;
+      white-space: nowrap;
+    }
+
+    .pill-q1 { border-color: var(--success); color: var(--success); }
+    .pill-q2 { border-color: var(--accent); color: var(--accent); }
+    .pill-q3 { border-color: var(--warning); color: var(--warning); }
+    .pill-q4 { border-color: var(--muted); color: var(--muted); }
+
+    .pill-unassessed {
+      border-color: rgba(148, 163, 184, 0.5);
+      color: var(--muted);
+    }
+
+    .empty-state {
+      font-size: 0.8rem;
+      color: var(--muted);
+      padding-top: 6px;
+    }
+
+    /* Question panel */
+
+    .question-panel {
+      margin-top: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 12px 12px 10px;
+    }
+
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .question-task-name {
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .question-step {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .question-body {
+      margin-top: 4px;
+    }
+
+    .scale-header-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.7fr);
+      align-items: flex-end;
+      margin-bottom: 4px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .scale-header-labels {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0 4px 0 4px;
+    }
+
+    .scale-header-labels span {
+      flex: 1;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .question-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .question-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.7fr);
+      gap: 8px;
+      align-items: center;
+      padding: 4px 0;
+      border-top: 1px solid rgba(31, 41, 55, 0.8);
+    }
+
+    .question-row:first-of-type {
+      border-top: none;
+    }
+
+    .question-left {
+      padding-right: 4px;
+    }
+
+    .question-title {
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .question-text {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .question-scale {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0 4px;
+    }
+
+    .scale-option {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.7rem;
+      text-align: center;
+    }
+
+    .scale-option input[type="radio"] {
+      margin-bottom: 2px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+
+    .scale-option span {
+      white-space: nowrap;
+    }
+
+    @media (max-width: 800px) {
+      .scale-header-row,
+      .question-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .scale-header-labels {
+        justify-content: space-around;
+      }
+
+      .question-scale {
+        justify-content: space-around;
+      }
+    }
+
+    .question-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .question-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    /* Grid */
+
+    .grid-header-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--muted);
+      margin: 0 24px 4px;
+    }
+
+    .grid-header-cell {
+      text-align: center;
+    }
+
+    .grid-wrapper {
+      position: relative;
+      padding: 24px 20px 16px 40px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: conic-gradient(
+        from 180deg,
+        rgba(234, 88, 12, 0.10),
+        rgba(59, 130, 246, 0.03),
+        rgba(234, 179, 8, 0.05),
+        rgba(148, 163, 184, 0.04),
+        rgba(234, 88, 12, 0.10)
+      );
+    }
+
+    .grid-y-label {
+      position: absolute;
+      left: 4px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--muted);
+      transform: rotate(-90deg);
+      transform-origin: left top;
+    }
+
+    .grid-y-label-top {
+      top: 70px;
+    }
+
+    .grid-y-label-bottom {
+      bottom: 50px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(120px, 1fr));
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+
+    .grid-cell {
+      border-radius: 12px;
+      padding: 12px 12px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .grid-cell.do {
+      background: rgba(248, 250, 252, 0.02);
+      border: 1px solid rgba(234, 88, 12, 0.55);
+    }
+
+    .grid-cell.schedule {
+      background: rgba(248, 250, 252, 0.02);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+
+    .grid-cell.delegate {
+      background: rgba(248, 250, 252, 0.02);
+      border: 1px solid rgba(234, 179, 8, 0.4);
+    }
+
+    .grid-cell.delete {
+      background: rgba(248, 250, 252, 0.02);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .grid-cell-header {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .grid-tasks {
+      list-style: disc;
+      margin-top: 4px;
+      max-height: 120px;
+      overflow-y: auto;
+      padding-left: 18px;
+      padding-right: 4px;
+    }
+
+    .grid-tasks li {
+      font-size: 0.78rem;
+      padding: 2px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .grid-descriptions {
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px 24px;
+    }
+
+    .grid-descriptions strong {
+      color: #e5e7eb;
+    }
+
+    .priority-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+
+    .priority-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .priority-main {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .priority-rank {
+      width: 20px;
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .priority-name {
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .priority-meta {
+      font-size: 0.7rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .priority-pill {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      white-space: nowrap;
+    }
+
+    .toolbar-right {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Impact vs Effort Planner</h1>
+      <p>
+        Capture your tasks, answer a few quick questions about each one, and this tool will map them
+        onto an Impact vs Effort grid so you can spot quick wins, big bets, low-value fillers, and work to question.
+      </p>
+    </header>
+
+    <div class="layout">
+      <!-- Left side: tasks and questions -->
+      <section class="card">
+        <div class="section-title">Step 1 · Capture and assess tasks</div>
+        <p class="section-subtitle">
+          Add everything on your plate, then select a task to answer six quick questions about its impact and effort.
+        </p>
+
+        <div class="task-input-row">
+          <input
+            type="text"
+            id="taskInput"
+            placeholder="Type a task, for example: Draft Q2 strategy paper"
+            autocomplete="off"
+          />
+          <button id="addTaskButton">
+            + Add task
+          </button>
+          <button id="clearAllButton" class="secondary">
+            Clear all
+          </button>
+        </div>
+
+        <div class="chip">
+          <span class="chip-dot"></span>
+          <span>Tasks are cleaned automatically. Questions default to the middle answer.</span>
+        </div>
+
+        <ul class="task-list" id="taskList"></ul>
+        <div class="empty-state" id="noTasksMessage">
+          No tasks yet. Add a task above to get started.
+        </div>
+
+        <div id="questionPanelContainer"></div>
+      </section>
+
+      <!-- Right side: grid and priorities -->
+      <section class="card">
+        <div class="section-title">Step 2 · Map and prioritise</div>
+        <p class="section-subtitle">
+          As you assess tasks, they appear on the grid and in the list below in a suggested order.
+        </p>
+
+        <div class="toolbar-right">
+          <button id="exportPdfButton" class="secondary small">Export as PDF</button>
+        </div>
+
+        <div class="grid-wrapper" style="margin-bottom: 10px;">
+          <div class="grid-header-row">
+            <div class="grid-header-cell">Low effort</div>
+            <div class="grid-header-cell">High effort</div>
+          </div>
+
+          <div class="grid-y-label grid-y-label-top">High impact</div>
+          <div class="grid-y-label grid-y-label-bottom">Low impact</div>
+
+          <div class="grid">
+            <div class="grid-cell do">
+              <div class="grid-cell-header">Quick wins</div>
+              <ul class="grid-tasks" id="grid-q1"></ul>
+            </div>
+
+            <div class="grid-cell schedule">
+              <div class="grid-cell-header">Big bets</div>
+              <ul class="grid-tasks" id="grid-q2"></ul>
+            </div>
+
+            <div class="grid-cell delegate">
+              <div class="grid-cell-header">Fillers</div>
+              <ul class="grid-tasks" id="grid-q3"></ul>
+            </div>
+
+            <div class="grid-cell delete">
+              <div class="grid-cell-header">Avoid or question</div>
+              <ul class="grid-tasks" id="grid-q4"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-descriptions">
+          <div>
+            <strong>Quick wins</strong> · High impact, low effort. Do these first where they genuinely move the dial.
+          </div>
+          <div>
+            <strong>Big bets</strong> · High impact, high effort. Plan carefully and schedule with the right support.
+          </div>
+          <div>
+            <strong>Fillers</strong> · Low impact, low effort. Do only when you have space, or bundle them together.
+          </div>
+          <div>
+            <strong>Avoid or question</strong> · Low impact, high effort. Challenge, redesign, delegate, or drop.
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 14px;">Priority order</div>
+        <p class="section-subtitle">
+          Ordered by quadrant (Quick wins → Big bets → Fillers → Avoid or question) then by a score that favours
+          higher impact and lower effort.
+        </p>
+
+        <ul class="priority-list" id="priorityList">
+          <li class="empty-state">Assess at least one task to see a working list.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <!-- jsPDF for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    const taskInput = document.getElementById("taskInput");
+    const addTaskButton = document.getElementById("addTaskButton");
+    const clearAllButton = document.getElementById("clearAllButton");
+    const taskList = document.getElementById("taskList");
+    const noTasksMessage = document.getElementById("noTasksMessage");
+    const questionPanelContainer = document.getElementById("questionPanelContainer");
+    const exportPdfButton = document.getElementById("exportPdfButton");
+
+    const gridElements = {
+      q1: document.getElementById("grid-q1"),
+      q2: document.getElementById("grid-q2"),
+      q3: document.getElementById("grid-q3"),
+      q4: document.getElementById("grid-q4")
+    };
+
+    const priorityList = document.getElementById("priorityList");
+
+    let tasks = [];
+    let assessmentState = null;
+
+    function cleanTaskName(raw) {
+      const s = raw.trim().replace(/\s+/g, " ");
+      if (!s) return "";
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    const questions = [
+      // Impact
+      {
+        id: "impOutcome",
+        title: "Impact on goals",
+        question: "If this goes well, how much does it move your most important goals or outcomes?",
+        dimension: "impact",
+        scaleLabels: ["Barely at all", "Small nudge", "Useful step", "Big step", "Game changer"],
+        options: [
+          { value: 1 },
+          { value: 2 },
+          { value: 3 },
+          { value: 4 },
+          { value: 5 }
+        ]
+      },
+      {
+        id: "impReach",
+        title: "Who benefits",
+        question: "How many people, customers, or key stakeholders will feel the impact?",
+        dimension: "impact",
+        scaleLabels: ["Just me", "Small group", "One team", "Several teams", "Whole business / key customers"],
+        options: [
+          { value: 1 },
+          { value: 2 },
+          { value: 3 },
+          { value: 4 },
+          { value: 5 }
+        ]
+      },
+      {
+        id: "impRisk",
+        title: "Cost of not doing",
+        question: "If you never did this, how big would the long-term consequences be?",
+        dimension: "impact",
+        scaleLabels: ["None", "Minor", "Noticeable", "Significant", "Serious"],
+        options: [
+          { value: 1 },
+          { value: 2 },
+          { value: 3 },
+          { value: 4 },
+          { value: 5 }
+        ]
+      },
+      // Effort
+      {
+        id: "effTime",
+        title: "Time and energy",
+        question: "Roughly how much time and energy will this take from you and others?",
+        dimension: "effort",
+        scaleLabels: ["Under an hour", "A few hours", "One day", "Several days", "A week or more"],
+        options: [
+          { value: 1 },
+          { value: 2 },
+          { value: 3 },
+          { value: 4 },
+          { value: 5 }
+        ]
+      },
+      {
+        id: "effComplexity",
+        title: "Complexity and coordination",
+        question: "How many moving parts, approvals, or handovers are involved?",
+        dimension: "effort",
+        scaleLabels: ["Very simple", "Simple", "Some", "Complex", "Highly complex"],
+        options: [
+          { value: 1 },
+          { value: 2 },
+          { value: 3 },
+          { value: 4 },
+          { value: 5 }
+        ]
+      },
+      {
+        id: "effFocus",
+        title: "Focus and context switching",
+        question: "How much deep focus or context switching does this demand?",
+        dimension: "effort",
+        scaleLabels: ["Almost none", "Low", "Medium", "High", "Constant deep focus"],
+        options: [
+          { value: 1 },
+          { value: 2 },
+          { value: 3 },
+          { value: 4 },
+          { value: 5 }
+        ]
+      }
+    ];
+
+    function defaultAnswers(existing) {
+      const answers = {};
+      questions.forEach(q => {
+        if (existing && existing[q.id] != null) {
+          answers[q.id] = existing[q.id];
+        } else {
+          answers[q.id] = 3; // middle option
+        }
+      });
+      return answers;
+    }
+
+    function addTaskFromInput() {
+      const cleaned = cleanTaskName(taskInput.value);
+      if (!cleaned) return;
+
+      const task = {
+        id: Date.now() + Math.random().toString(16).slice(2),
+        name: cleaned,
+        impact: null,
+        effort: null,
+        answers: null
+      };
+      tasks.push(task);
+      taskInput.value = "";
+      assessmentState = null;
+      renderAll();
+      taskInput.focus();
+    }
+
+    function clearAllTasks() {
+      if (!tasks.length) return;
+      if (!confirm("Clear all tasks?")) return;
+      tasks = [];
+      assessmentState = null;
+      renderAll();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      if (assessmentState && assessmentState.taskId === id) {
+        assessmentState = null;
+      }
+      renderAll();
+    }
+
+    function startAssessment(taskId) {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      assessmentState = {
+        taskId,
+        answers: defaultAnswers(task.answers)
+      };
+
+      renderAll();
+    }
+
+    function cancelAssessment() {
+      assessmentState = null;
+      renderAll();
+    }
+
+    function handleRadioChange(questionId, value) {
+      if (!assessmentState) return;
+      assessmentState.answers[questionId] = Number(value);
+    }
+
+    function clampScore(v) {
+      if (v < 1) return 1;
+      if (v > 5) return 5;
+      return v;
+    }
+
+    function finaliseAssessment() {
+      if (!assessmentState) return;
+      const state = assessmentState;
+      const task = tasks.find(t => t.id === state.taskId);
+      if (!task) return;
+
+      const a = state.answers;
+
+      const impactValues = ["impOutcome", "impReach", "impRisk"].map(id => a[id] || 3);
+      const effortValues = ["effTime", "effComplexity", "effFocus"].map(id => a[id] || 3);
+
+      const impactAvg = impactValues.reduce((s, v) => s + v, 0) / impactValues.length;
+      const effortAvg = effortValues.reduce((s, v) => s + v, 0) / effortValues.length;
+
+      task.impact = clampScore(Math.round(impactAvg));
+      task.effort = clampScore(Math.round(effortAvg));
+      task.answers = { ...a };
+
+      assessmentState = null;
+      renderAll();
+    }
+
+    function computeQuadrant(task) {
+      if (task.impact == null || task.effort == null) return null;
+      const impactHigh = task.impact >= 3;
+      const effortHigh = task.effort >= 3;
+
+      // q1: high impact, low effort (quick wins)
+      // q2: high impact, high effort (big bets)
+      // q3: low impact, low effort (fillers)
+      // q4: low impact, high effort (avoid or question)
+      if (impactHigh && !effortHigh) return "q1";
+      if (impactHigh && effortHigh) return "q2";
+      if (!impactHigh && !effortHigh) return "q3";
+      return "q4";
+    }
+
+    function quadrantMeta(q) {
+      switch (q) {
+        case "q1":
+          return { label: "Quick win", long: "Quick win", class: "pill-q1" };
+        case "q2":
+          return { label: "Big bet", long: "Big bet", class: "pill-q2" };
+        case "q3":
+          return { label: "Filler", long: "Filler", class: "pill-q3" };
+        case "q4":
+        default:
+          return { label: "Avoid / question", long: "Avoid or question", class: "pill-q4" };
+      }
+    }
+
+    function computePriorityScore(task) {
+      // Higher impact and lower effort = better
+      return (task.impact || 0) * 2 - (task.effort || 0);
+    }
+
+    function renderTasks() {
+      taskList.innerHTML = "";
+
+      if (!tasks.length) {
+        noTasksMessage.style.display = "block";
+        return;
+      }
+
+      noTasksMessage.style.display = "none";
+
+      tasks.forEach(task => {
+        const li = document.createElement("li");
+        li.className = "task-list-item";
+
+        const main = document.createElement("div");
+        main.className = "task-main";
+
+        const nameEl = document.createElement("div");
+        nameEl.className = "task-name";
+        nameEl.textContent = task.name;
+
+        const metaEl = document.createElement("div");
+        metaEl.className = "task-meta";
+
+        if (task.impact == null || task.effort == null) {
+          metaEl.textContent = "Not assessed yet";
+        } else {
+          const q = computeQuadrant(task);
+          const qMeta = quadrantMeta(q);
+          metaEl.textContent = qMeta.long;
+        }
+
+        main.appendChild(nameEl);
+        main.appendChild(metaEl);
+
+        const right = document.createElement("div");
+        right.style.display = "flex";
+        right.style.alignItems = "center";
+        right.style.gap = "6px";
+
+        const pill = document.createElement("div");
+        if (task.impact == null || task.effort == null) {
+          pill.className = "pill pill-unassessed";
+          pill.textContent = "Needs assessment";
+        } else {
+          const qMeta = quadrantMeta(computeQuadrant(task));
+          pill.className = "pill " + qMeta.class;
+          pill.textContent = qMeta.label;
+        }
+
+        const assessBtn = document.createElement("button");
+        assessBtn.className = "secondary small";
+        assessBtn.textContent = task.impact == null || task.effort == null ? "Assess" : "Revisit";
+        assessBtn.addEventListener("click", () => startAssessment(task.id));
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "small secondary";
+        deleteBtn.textContent = "Remove";
+        deleteBtn.style.borderColor = "rgba(248,113,113,0.6)";
+        deleteBtn.style.color = "#fecaca";
+        deleteBtn.addEventListener("click", () => deleteTask(task.id));
+
+        right.appendChild(pill);
+        right.appendChild(assessBtn);
+        right.appendChild(deleteBtn);
+
+        li.appendChild(main);
+        li.appendChild(right);
+
+        taskList.appendChild(li);
+      });
+    }
+
+    function renderQuestionPanel() {
+      questionPanelContainer.innerHTML = "";
+
+      if (!assessmentState) {
+        if (tasks.length) {
+          const panel = document.createElement("div");
+          panel.className = "question-panel";
+          const text = document.createElement("div");
+          text.className = "empty-state";
+          text.textContent = "Select a task to answer the questions.";
+          panel.appendChild(text);
+          questionPanelContainer.appendChild(panel);
+        }
+        return;
+      }
+
+      const task = tasks.find(t => t.id === assessmentState.taskId);
+      const answers = assessmentState.answers;
+
+      const panel = document.createElement("div");
+      panel.className = "question-panel";
+
+      const header = document.createElement("div");
+      header.className = "question-header";
+
+      const nameEl = document.createElement("div");
+      nameEl.className = "question-task-name";
+      nameEl.textContent = task ? task.name : "";
+
+      const stepEl = document.createElement("div");
+      stepEl.className = "question-step";
+      stepEl.textContent = "Six quick questions · middle option is pre-selected";
+
+      header.appendChild(nameEl);
+      header.appendChild(stepEl);
+
+      const body = document.createElement("div");
+      body.className = "question-body";
+
+      // Shared scale headers (left to right)
+      const scaleHeaderRow = document.createElement("div");
+      scaleHeaderRow.className = "scale-header-row";
+
+      const scaleLeftLabel = document.createElement("div");
+      scaleLeftLabel.textContent = "Question";
+
+      const scaleLabels = document.createElement("div");
+      scaleLabels.className = "scale-header-labels";
+      ["1", "2", "3", "4", "5"].forEach(n => {
+        const span = document.createElement("span");
+        span.textContent = n;
+        scaleLabels.appendChild(span);
+      });
+
+      scaleHeaderRow.appendChild(scaleLeftLabel);
+      scaleHeaderRow.appendChild(scaleLabels);
+
+      const rowsContainer = document.createElement("div");
+      rowsContainer.className = "question-rows";
+
+      questions.forEach(q => {
+        const row = document.createElement("div");
+        row.className = "question-row";
+
+        const left = document.createElement("div");
+        left.className = "question-left";
+
+        const titleEl = document.createElement("div");
+        titleEl.className = "question-title";
+        titleEl.textContent = q.title;
+
+        const textEl = document.createElement("div");
+        textEl.className = "question-text";
+        textEl.textContent = q.question;
+
+        left.appendChild(titleEl);
+        left.appendChild(textEl);
+
+        const scale = document.createElement("div");
+        scale.className = "question-scale";
+
+        q.options.forEach((opt, idx) => {
+          const wrapper = document.createElement("label");
+          wrapper.className = "scale-option";
+
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = "q-" + q.id;
+          input.value = String(opt.value);
+          input.checked = answers[q.id] === opt.value;
+
+          input.addEventListener("change", () => handleRadioChange(q.id, opt.value));
+
+          const labelSpan = document.createElement("span");
+          labelSpan.textContent = q.scaleLabels[idx];
+
+          wrapper.appendChild(input);
+          wrapper.appendChild(labelSpan);
+          scale.appendChild(wrapper);
+        });
+
+        row.appendChild(left);
+        row.appendChild(scale);
+        rowsContainer.appendChild(row);
+      });
+
+      body.appendChild(scaleHeaderRow);
+      body.appendChild(rowsContainer);
+
+      const footer = document.createElement("div");
+      footer.className = "question-footer";
+
+      const hint = document.createElement("div");
+      hint.textContent = "Adjust only the answers that stand out. The rest can stay in the middle.";
+
+      const actions = document.createElement("div");
+      actions.className = "question-actions";
+
+      const cancelBtn = document.createElement("button");
+      cancelBtn.type = "button";
+      cancelBtn.className = "secondary small";
+      cancelBtn.textContent = "Cancel";
+      cancelBtn.addEventListener("click", cancelAssessment);
+
+      const saveBtn = document.createElement("button");
+      saveBtn.type = "button";
+      saveBtn.className = "small";
+      saveBtn.textContent = "Save answers";
+      saveBtn.addEventListener("click", finaliseAssessment);
+
+      actions.appendChild(cancelBtn);
+      actions.appendChild(saveBtn);
+
+      footer.appendChild(hint);
+      footer.appendChild(actions);
+
+      panel.appendChild(header);
+      panel.appendChild(body);
+      panel.appendChild(footer);
+
+      questionPanelContainer.appendChild(panel);
+    }
+
+    function renderGrid() {
+      Object.values(gridElements).forEach(el => { el.innerHTML = ""; });
+
+      const assessed = tasks.filter(t => t.impact != null && t.effort != null);
+      if (!assessed.length) {
+        // Leave quadrants visually empty
+        return;
+      }
+
+      const grouped = { q1: [], q2: [], q3: [], q4: [] };
+
+      assessed.forEach(task => {
+        const q = computeQuadrant(task);
+        grouped[q].push(task);
+      });
+
+      Object.keys(grouped).forEach(key => {
+        const ul = gridElements[key];
+        const arr = grouped[key];
+
+        if (!arr.length) {
+          return;
+        }
+
+        arr
+          .slice()
+          .sort((a, b) => computePriorityScore(b) - computePriorityScore(a))
+          .forEach(task => {
+            const li = document.createElement("li");
+            li.textContent = task.name;
+            ul.appendChild(li);
+          });
+      });
+    }
+
+    function renderPriorities() {
+      priorityList.innerHTML = "";
+
+      const assessed = tasks.filter(t => t.impact != null && t.effort != null);
+
+      if (!assessed.length) {
+        const li = document.createElement("li");
+        li.className = "empty-state";
+        li.textContent = "Assess at least one task to see a working list.";
+        priorityList.appendChild(li);
+        return;
+      }
+
+      const qOrder = { q1: 1, q2: 2, q3: 3, q4: 4 };
+
+      const sorted = assessed
+        .slice()
+        .map(t => {
+          const q = computeQuadrant(t);
+          return { ...t, quadrant: q, score: computePriorityScore(t) };
+        })
+        .sort((a, b) => {
+          const qa = qOrder[a.quadrant];
+          const qb = qOrder[b.quadrant];
+          if (qa !== qb) return qa - qb;
+          return b.score - a.score;
+        });
+
+      sorted.forEach((task, index) => {
+        const li = document.createElement("li");
+        li.className = "priority-item";
+
+        const main = document.createElement("div");
+        main.className = "priority-main";
+
+        const rank = document.createElement("div");
+        rank.className = "priority-rank";
+        rank.textContent = index + 1;
+
+        const nameEl = document.createElement("div");
+        nameEl.className = "priority-name";
+        nameEl.textContent = task.name;
+
+        const metaEl = document.createElement("div");
+        metaEl.className = "priority-meta";
+        metaEl.textContent = quadrantMeta(task.quadrant).long;
+
+        main.appendChild(rank);
+        main.appendChild(nameEl);
+        main.appendChild(metaEl);
+
+        const pill = document.createElement("div");
+        pill.className = "priority-pill";
+        pill.textContent = `Impact ${task.impact} · Effort ${task.effort}`;
+
+        li.appendChild(main);
+        li.appendChild(pill);
+
+        priorityList.appendChild(li);
+      });
+
+      const unassessed = tasks.filter(t => t.impact == null || t.effort == null);
+      if (unassessed.length) {
+        const li = document.createElement("li");
+        li.className = "empty-state";
+        li.textContent = `${unassessed.length} task${unassessed.length > 1 ? "s" : ""} not yet assessed.`;
+        priorityList.appendChild(li);
+      }
+    }
+
+    function renderAll() {
+      renderTasks();
+      renderQuestionPanel();
+      renderGrid();
+      renderPriorities();
+    }
+
+    // PDF export
+
+    function formatDateForFilename(date) {
+      const pad = n => String(n).padStart(2, "0");
+      const yyyy = date.getFullYear();
+      const mm = pad(date.getMonth() + 1);
+      const dd = pad(date.getDate());
+      const hh = pad(date.getHours());
+      const mi = pad(date.getMinutes());
+      return `${yyyy}-${mm}-${dd}_${hh}-${mi}`;
+    }
+
+    function exportAsPdf() {
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        alert("PDF export is not available in this browser.");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
+
+      const margin = 40;
+      let y = margin;
+
+      const now = new Date();
+      const title = "Impact vs Effort Planner";
+      const subtitle = now.toLocaleString();
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text(title, margin, y);
+      y += 18;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text(subtitle, margin, y);
+      y += 18;
+
+      const assessed = tasks.filter(t => t.impact != null && t.effort != null);
+      const unassessed = tasks.filter(t => t.impact == null || t.effort == null);
+
+      const sections = [
+        { key: "q1", heading: "Quick wins (high impact, low effort)" },
+        { key: "q2", heading: "Big bets (high impact, high effort)" },
+        { key: "q3", heading: "Fillers (low impact, low effort)" },
+        { key: "q4", heading: "Avoid or question (low impact, high effort)" }
+      ];
+
+      doc.setFontSize(12);
+      sections.forEach(sec => {
+        const list = assessed.filter(t => computeQuadrant(t) === sec.key);
+        doc.setFont("helvetica", "bold");
+        doc.text(sec.heading, margin, y);
+        y += 14;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+
+        if (!list.length) {
+          doc.text("No tasks in this quadrant.", margin + 14, y);
+          y += 14;
+        } else {
+          list.forEach(t => {
+            const line = `• ${t.name}`;
+            const split = doc.splitTextToSize(line, 500);
+            doc.text(split, margin + 14, y);
+            y += 14 + (split.length - 1) * 12;
+          });
+        }
+        y += 6;
+        if (y > 760) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.setFontSize(12);
+      });
+
+      if (assessed.length) {
+        if (y > 720) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.text("Priority order", margin, y);
+        y += 14;
+
+        const qOrder = { q1: 1, q2: 2, q3: 3, q4: 4 };
+        const sorted = assessed
+          .slice()
+          .map(t => {
+            const q = computeQuadrant(t);
+            return { ...t, quadrant: q, score: computePriorityScore(t) };
+          })
+          .sort((a, b) => {
+            const qa = qOrder[a.quadrant];
+            const qb = qOrder[b.quadrant];
+            if (qa !== qb) return qa - qb;
+            return b.score - a.score;
+          });
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+
+        sorted.forEach((t, idx) => {
+          const qMeta = quadrantMeta(t.quadrant);
+          const base = `${idx + 1}. ${t.name}  (${qMeta.long})`;
+          const split = doc.splitTextToSize(base, 500);
+          doc.text(split, margin, y);
+          y += 14 + (split.length - 1) * 12;
+          if (y > 760) {
+            doc.addPage();
+            y = margin;
+          }
+        });
+        y += 8;
+      }
+
+      if (unassessed.length) {
+        if (y > 740) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.text("Not yet assessed", margin, y);
+        y += 14;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        unassessed.forEach(t => {
+          const line = `• ${t.name}`;
+          const split = doc.splitTextToSize(line, 500);
+          doc.text(split, margin + 14, y);
+          y += 14 + (split.length - 1) * 12;
+          if (y > 760) {
+            doc.addPage();
+            y = margin;
+          }
+        });
+      }
+
+      const filename = `impact-vs-effort-${formatDateForFilename(now)}.pdf`;
+      doc.save(filename);
+    }
+
+    addTaskButton.addEventListener("click", addTaskFromInput);
+    clearAllButton.addEventListener("click", clearAllTasks);
+    exportPdfButton.addEventListener("click", exportAsPdf);
+
+    taskInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addTaskFromInput();
+      }
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
