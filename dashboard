@@ -1,0 +1,1282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Executive Alignment Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root {
+      --bg-page: #020617;
+      --card-bg: #0b1020;
+      --accent: #4f46e5;
+      --accent-soft: rgba(79, 70, 229, 0.35);
+      --accent-alt: #0ea5e9;
+      --border-soft: #1f2933;
+      --border-subtle: rgba(148, 163, 184, 0.32);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --danger: #ef4444;
+      --radius-lg: 16px;
+      --radius-xl: 999px;
+      --shadow-soft:
+        0 18px 45px rgba(0, 0, 0, 0.75),
+        0 0 0 1px rgba(148, 163, 184, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 24px;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #065f46 0, #020716 60%);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #1f2937 0, #020617 55%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-soft);
+      padding: 20px;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(34, 197, 94, 0.08), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.09), transparent 55%);
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 3vw, 2.4rem);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin: 0 0 0.35rem;
+      text-align: left;
+    }
+
+    .page-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-radius: var(--radius-xl);
+      padding: 0.25rem 0.75rem;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .page-kicker-pill {
+      border-radius: var(--radius-xl);
+      padding: 0.15rem 0.55rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--accent-soft);
+      color: #e0e7ff;
+      border: 1px solid rgba(79, 70, 229, 0.65);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 1.1rem;
+      max-width: 46rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .tiny {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .section-spacer {
+      margin-top: 1.3rem;
+    }
+
+    /* KPI cards */
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.9rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .kpi-card {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.85rem 1rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+    }
+
+    .kpi-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -18px auto;
+      height: 42px;
+      background: radial-gradient(circle at right, rgba(79, 70, 229, 0.6), transparent 60%);
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      color: var(--text-muted);
+      margin-bottom: 0.2rem;
+    }
+
+    .kpi-value {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 0.15rem;
+    }
+
+    .kpi-subtext {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      max-width: 18rem;
+    }
+
+    .kpi-sparkline {
+      position: absolute;
+      right: -26px;
+      bottom: -4px;
+      width: 120px;
+      height: 40px;
+      opacity: 0.26;
+      pointer-events: none;
+    }
+
+    .kpi-sparkline svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Panels */
+
+    .panels-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.5fr);
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .panels-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .panel {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      padding: 1rem 1.1rem 1.15rem;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .panel-title {
+      font-size: 0.98rem;
+      font-weight: 500;
+    }
+
+    .panel-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    /* Chart */
+
+    .chart-bars {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
+      align-items: flex-end;
+      height: 180px;
+      margin-top: 0.3rem;
+    }
+
+    .chart-bar-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .chart-bar {
+      width: 100%;
+      border-radius: 6px 6px 3px 3px;
+      background: linear-gradient(
+        to top,
+        rgba(79, 70, 229, 0.9),
+        rgba(56, 189, 248, 0.8)
+      );
+      min-height: 10px;
+      transition: height 0.35s ease;
+    }
+
+    .chart-bar-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .chart-bar-value {
+      font-size: 0.78rem;
+      color: #e5e7eb;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 0.7rem;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .legend-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(
+        to right,
+        rgba(79, 70, 229, 0.9),
+        rgba(56, 189, 248, 0.9)
+      );
+    }
+
+    .ticker {
+      margin-top: 0.6rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: var(--radius-xl);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-label {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .ticker-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+      flex-shrink: 0;
+    }
+
+    .ticker-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* API feed */
+
+    .api-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.7rem;
+      margin-top: 0.3rem;
+    }
+
+    .api-card {
+      padding: 0.65rem 0.7rem;
+      border-radius: 10px;
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 1));
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      font-size: 0.8rem;
+    }
+
+    .api-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .api-content {
+      font-size: 0.84rem;
+      line-height: 1.4;
+    }
+
+    .api-error {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* Table */
+
+    .table-panel {
+      margin-bottom: 1.5rem;
+    }
+
+    .fake-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      background: rgba(15, 23, 42, 0.97);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .fake-table th,
+    .fake-table td {
+      border: 1px solid rgba(148, 163, 184, 0.32);
+      padding: 0.4rem 0.55rem;
+      text-align: left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .fake-table th {
+      background: rgba(15, 23, 42, 0.96);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.72rem;
+    }
+
+    .fake-table tbody tr:nth-child(2n) {
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.08rem 0.45rem;
+      border-radius: var(--radius-xl);
+      font-size: 0.7rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      gap: 0.25rem;
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+    }
+
+    .badge-dot.green {
+      background: #22c55e;
+    }
+
+    .badge-dot.amber {
+      background: #eab308;
+    }
+
+    .badge-dot.red {
+      background: #ef4444;
+    }
+
+    .footer-meta {
+      margin-top: 0.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.7rem;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    /* Culture panel */
+
+    .gif-panel-inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      align-items: center;
+      margin-top: 0.3rem;
+    }
+
+    .gif-wrapper {
+      flex-shrink: 0;
+      width: 180px;
+      height: 120px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gif-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .gif-quote {
+      flex: 1;
+      font-size: 0.9rem;
+      color: #e5e7eb;
+    }
+
+    .gif-quote span {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .employee-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.9rem;
+      margin-top: 0.9rem;
+    }
+
+    .employee-card {
+      display: flex;
+      gap: 0.7rem;
+      align-items: center;
+      padding: 0.7rem 0.75rem;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .employee-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 999px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 2px solid rgba(148, 163, 184, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .employee-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .employee-avatar.happy {
+      box-shadow: 0 0 14px rgba(34, 197, 94, 0.7);
+      border-color: rgba(34, 197, 94, 0.9);
+    }
+
+    .employee-avatar.sad {
+      filter: grayscale(0.7) brightness(0.9);
+      box-shadow: 0 0 14px rgba(239, 68, 68, 0.8);
+      border-color: rgba(239, 68, 68, 0.9);
+    }
+
+    .employee-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .employee-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .employee-name {
+      font-size: 0.94rem;
+      font-weight: 600;
+    }
+
+    .employee-role {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Flag panel */
+
+    .flag-panel-content {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-top: 0.35rem;
+    }
+
+    .flag-emoji {
+      font-size: 2.1rem;
+    }
+
+    .flag-text-main {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .flag-text-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Focus */
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--accent-alt);
+      outline-offset: 3px;
+    }
+
+    /* Reduced motion */
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <div class="card" id="dashboardCard">
+      <div class="page-kicker">
+        <span class="page-kicker-pill">Experimental</span>
+        <span>Visual noise for executives who enjoy dashboards a little too much</span>
+      </div>
+
+      <h1>Executive Alignment Dashboard</h1>
+      <p class="subtitle">
+        A completely serious, allegedly data informed cockpit that looks impressive at a glance
+        and becomes steadily more suspicious the longer you read it.
+      </p>
+
+      <!-- KPI strip -->
+      <section class="kpi-grid" aria-label="Key performance indicators">
+        <article class="kpi-card">
+          <div class="kpi-label">Synergy Index</div>
+          <div class="kpi-value" id="kpi-synergy"></div>
+          <div class="kpi-subtext" id="kpi-synergy-sub"></div>
+          <div class="kpi-sparkline" aria-hidden="true">
+            <svg viewBox="0 0 140 40" preserveAspectRatio="none">
+              <polyline fill="none" stroke="currentColor" stroke-width="2"
+                        points="0,32 20,10 40,24 60,8 80,20 100,6 120,18 140,4" />
+            </svg>
+          </div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-label">Meetings Avoided</div>
+          <div class="kpi-value" id="kpi-meetings"></div>
+          <div class="kpi-subtext" id="kpi-meetings-sub"></div>
+          <div class="kpi-sparkline" aria-hidden="true">
+            <svg viewBox="0 0 140 40" preserveAspectRatio="none">
+              <polyline fill="none" stroke="currentColor" stroke-width="2"
+                        points="0,20 20,18 40,26 60,14 80,22 100,16 120,28 140,12" />
+            </svg>
+          </div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-label">Slide Deck Velocity</div>
+          <div class="kpi-value" id="kpi-slides"></div>
+          <div class="kpi-subtext" id="kpi-slides-sub"></div>
+          <div class="kpi-sparkline" aria-hidden="true">
+            <svg viewBox="0 0 140 40" preserveAspectRatio="none">
+              <polyline fill="none" stroke="currentColor" stroke-width="2"
+                        points="0,30 20,26 40,18 60,22 80,12 100,18 120,8 140,16" />
+            </svg>
+          </div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-label">Coffee to Insight Ratio</div>
+          <div class="kpi-value" id="kpi-coffee"></div>
+          <div class="kpi-subtext" id="kpi-coffee-sub"></div>
+          <div class="kpi-sparkline" aria-hidden="true">
+            <svg viewBox="0 0 140 40" preserveAspectRatio="none">
+              <polyline fill="none" stroke="currentColor" stroke-width="2"
+                        points="0,34 20,30 40,22 60,26 80,18 100,22 120,14 140,18" />
+            </svg>
+          </div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-label">Revenue Per Remaining Daylight Hour</div>
+          <div class="kpi-value" id="kpi-daylight"></div>
+          <div class="kpi-subtext" id="kpi-daylight-sub"></div>
+        </article>
+      </section>
+
+      <!-- Main panels -->
+      <section class="panels-grid section-spacer">
+        <!-- Chart panel -->
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Quarterly Strategic Buzzword Penetration</div>
+              <div class="tiny">
+                Synthetic KPI built from random numbers and good intentions.
+              </div>
+            </div>
+            <div class="panel-meta" id="chart-meta"></div>
+          </div>
+
+          <div class="chart-bars" aria-hidden="true">
+            <div class="chart-bar-group">
+              <div class="chart-bar" id="bar-q1"></div>
+              <div class="chart-bar-value" id="bar-q1-val"></div>
+              <div class="chart-bar-label">Q1</div>
+            </div>
+            <div class="chart-bar-group">
+              <div class="chart-bar" id="bar-q2"></div>
+              <div class="chart-bar-value" id="bar-q2-val"></div>
+              <div class="chart-bar-label">Q2</div>
+            </div>
+            <div class="chart-bar-group">
+              <div class="chart-bar" id="bar-q3"></div>
+              <div class="chart-bar-value" id="bar-q3-val"></div>
+              <div class="chart-bar-label">Q3</div>
+            </div>
+            <div class="chart-bar-group">
+              <div class="chart-bar" id="bar-q4"></div>
+              <div class="chart-bar-value" id="bar-q4-val"></div>
+              <div class="chart-bar-label">Q4*</div>
+            </div>
+          </div>
+
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-swatch"></span>
+              <span>Buzzwords per slide (adjusted for font size)</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch" style="opacity:0.5;"></span>
+              <span>* Q4 heavily forecast using wishful thinking</span>
+            </div>
+          </div>
+
+          <div class="ticker" aria-live="polite">
+            <span class="ticker-dot"></span>
+            <span class="ticker-label">Ticker</span>
+            <span class="ticker-text" id="buzzword-ticker"></span>
+          </div>
+        </article>
+
+        <!-- API fun panel -->
+        <article class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Real Time Executive Intelligence Feed</div>
+            <div class="panel-meta" id="api-meta">Contacting very serious data providers...</div>
+          </div>
+
+          <div class="api-grid">
+            <div class="api-card">
+              <div class="api-label">Strategic Life Advice</div>
+              <div class="api-content" id="api-advice">Loading wisdom...</div>
+            </div>
+
+            <div class="api-card">
+              <div class="api-label">Morale Indicator (Dad Joke)</div>
+              <div class="api-content" id="api-joke">Calibrating humor module...</div>
+            </div>
+
+            <div class="api-card">
+              <div class="api-label">Feline Risk Assessment</div>
+              <div class="api-content" id="api-catfact">Gathering cat related disruption metrics...</div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- Fake table -->
+      <section class="panel table-panel section-spacer">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Top Performing Initiatives</div>
+            <div class="tiny">
+              Ranked using a proprietary algorithm that nobody remembers how to justify.
+            </div>
+          </div>
+          <div class="panel-meta" id="table-meta"></div>
+        </div>
+
+        <table class="fake-table" aria-label="Top initiatives">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Initiative</th>
+              <th>Owner</th>
+              <th>Confidence</th>
+              <th>Impact</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="initiatives-body">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+
+        <div class="footer-meta">
+          <div>Numbers look convincing. Please do not attempt to audit the methodology.</div>
+          <div id="footer-updated"></div>
+        </div>
+      </section>
+
+      <!-- Gif and employees panel -->
+      <section class="panel section-spacer">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Culture Pulse</div>
+            <div class="tiny">
+              Recognition, motivation, and whatever this gif is trying to say.
+            </div>
+          </div>
+          <div class="panel-meta" id="culture-meta"></div>
+        </div>
+
+        <div class="gif-panel-inner">
+          <div class="gif-wrapper">
+            <img id="nonsense-gif" src="" alt="Very serious motivational gif">
+          </div>
+          <div class="gif-quote" id="nonsense-quote">
+            Loading unrelated corporate inspiration...
+          </div>
+        </div>
+
+        <div class="employee-grid" aria-label="Employees of the day">
+          <div class="employee-card">
+            <div class="employee-avatar happy">
+              <img id="employee-best-avatar" src="" alt="Employee of the day">
+            </div>
+            <div class="employee-info">
+              <div class="employee-title">Employee of the day</div>
+              <div class="employee-name" id="employee-best-name"></div>
+              <div class="employee-role" id="employee-best-role"></div>
+            </div>
+          </div>
+
+          <div class="employee-card">
+            <div class="employee-avatar sad">
+              <img id="employee-worst-avatar" src="" alt="Least aligned employee of the day">
+            </div>
+            <div class="employee-info">
+              <div class="employee-title">Least aligned employee of the day</div>
+              <div class="employee-name" id="employee-worst-name"></div>
+              <div class="employee-role" id="employee-worst-role"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flag panel -->
+      <section class="panel section-spacer">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Latest Territory Update</div>
+            <div class="tiny">
+              Based on the most recent imaginary order logged in our imagination.
+            </div>
+          </div>
+          <div class="panel-meta" id="flag-meta"></div>
+        </div>
+
+        <div class="flag-panel-content">
+          <div class="flag-emoji" id="flag-emoji">🏳️</div>
+          <div>
+            <div class="flag-text-main" id="flag-main"></div>
+            <div class="flag-text-sub" id="flag-sub"></div>
+          </div>
+        </div>
+      </section>
+
+      <p class="tiny" style="margin-top:1.1rem;">
+        This dashboard is for demonstration and amusement. If you are using it to run an actual business,
+        you may already be in the panic zone.
+      </p>
+      <p class="tiny">
+        No personal data is stored by this page. Some anonymous requests are sent to third party joke and fact APIs.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function randomFrom(array) {
+      return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function formatPercent(value) {
+      return value.toFixed(1) + "%";
+    }
+
+    function generateKpis() {
+      const synergy = randomInt(64, 129);
+      const meetings = randomInt(7, 42);
+      const slides = randomInt(80, 420);
+      const coffee = (Math.random() * 4 + 0.8).toFixed(1);
+
+      const synergySubs = [
+        "Cross functional alignment detected in at least two meetings this week.",
+        "Synergy elevated through strategic overuse of the word synergy.",
+        "Index calibrated against industry leading buzzword saturation levels.",
+        "Marginal gains achieved by adding value to added value."
+      ];
+
+      const meetingSubs = [
+        "Estimated number of calendar events that quietly vanished before becoming a meeting.",
+        "Based on canceled invites, vague emails, and people just not turning up.",
+        "Includes all meetings replaced by a single well written message.",
+        "Trend suggests heroic resistance to calendar bloat."
+      ];
+
+      const slideSubs = [
+        "Total slide count produced in the last 30 days, real and hypothetical.",
+        "Includes backups, alternates, and versions named final_final_v7b.",
+        "Velocity spikes whenever someone discovers a new template.",
+        "Most slides contain at least one axis that nobody asked for."
+      ];
+
+      const coffeeSubs = [
+        "Cups per actionable insight, on a rolling 7 day basis.",
+        "Calculated during core hours. Weekends omitted for legal reasons.",
+        "Ratio improves noticeably when nobody mentions a new initiative.",
+        "Currently exceeding safe levels but still within leadership norms."
+      ];
+
+      document.getElementById("kpi-synergy").textContent = synergy + " pts";
+      document.getElementById("kpi-synergy-sub").textContent = randomFrom(synergySubs);
+
+      document.getElementById("kpi-meetings").textContent = meetings;
+      document.getElementById("kpi-meetings-sub").textContent = randomFrom(meetingSubs);
+
+      document.getElementById("kpi-slides").textContent = slides + "/mo";
+      document.getElementById("kpi-slides-sub").textContent = randomFrom(slideSubs);
+
+      document.getElementById("kpi-coffee").textContent = coffee;
+      document.getElementById("kpi-coffee-sub").textContent = randomFrom(coffeeSubs);
+
+      generateDaylightKpi();
+    }
+
+    function generateDaylightKpi() {
+      const now = new Date();
+
+      // Rough assumption: pretend Edinburgh sunset is 16:00 local today
+      const sunset = new Date(now);
+      sunset.setHours(16, 0, 0, 0);
+
+      let hoursLeft = (sunset - now) / 36e5;
+      if (isNaN(hoursLeft)) {
+        hoursLeft = 4;
+      }
+      if (hoursLeft <= 0) {
+        hoursLeft = 0.5;
+      }
+
+      const nonsenseRevenue = randomInt(120000, 980000);
+      const perHour = nonsenseRevenue / hoursLeft;
+
+      const valueText = "£" + perHour.toLocaleString(undefined, {
+        maximumFractionDigits: 0
+      }) + "/hr";
+
+      const subVariants = [
+        "Total made up revenue divided by an estimated " + hoursLeft.toFixed(1) + " hours of daylight left in Edinburgh.",
+        "Indexed to the imaginary turnover per remaining sunny-ish hour above Leith.",
+        "Assumes the sun sets over Edinburgh at 16:00, regardless of season or common sense.",
+        "Calculated using complex trigonometry and a complete disregard for actual weather."
+      ];
+
+      document.getElementById("kpi-daylight").textContent = valueText;
+      document.getElementById("kpi-daylight-sub").textContent = randomFrom(subVariants);
+    }
+
+    function generateChart() {
+      const quarters = [
+        { id: "q1", growth: randomInt(18, 72) },
+        { id: "q2", growth: randomInt(32, 88) },
+        { id: "q3", growth: randomInt(24, 96) },
+        { id: "q4", growth: randomInt(40, 130) }
+      ];
+
+      const metaPhrases = [
+        "Model tuned using last years optimism as a baseline.",
+        "Derived from a mix of hard data, soft assumptions, and medium confidence.",
+        "Includes uplift from adding the word strategic to three existing projects.",
+        "Forecast accuracy estimated at somewhere between 3 and 97 percent."
+      ];
+
+      quarters.forEach((q) => {
+        const bar = document.getElementById("bar-" + q.id);
+        const val = document.getElementById("bar-" + q.id + "-val");
+
+        const height = 16 + q.growth;
+        bar.style.height = height + "px";
+        val.textContent = formatPercent(q.growth);
+      });
+
+      document.getElementById("chart-meta").textContent = randomFrom(metaPhrases);
+
+      const buzzwords = [
+        "Unlocking cross functional leverage in the hybrid value stack.",
+        "Replatforming core synergies into a more agile mindset pipeline.",
+        "Driving asynchronous alignment across the stakeholder surface area.",
+        "Operationalizing thought leadership using next wave frameworks.",
+        "Decommissioning legacy silos in favor of fully buzzword compliant squads.",
+        "Recalibrating KPIs around meaningful vibes and narrative coherence."
+      ];
+      document.getElementById("buzzword-ticker").textContent = randomFrom(buzzwords);
+    }
+
+    function generateTable() {
+      const initiatives = [
+        "Hybrid Meeting Detox Sprint",
+        "Slide Deck Reduction Program",
+        "Strategic Coffee Optimization",
+        "Inbox Triage Centre of Excellence",
+        "Proactive Alignment Standups",
+        "Zero Blame Retrospective Guild",
+        "Email Subject Line Simplification",
+        "Experimental Four Day Calendar",
+        "Passive Aggressive Status Dashboard",
+        "Continuous Improvement, Occasional Action"
+      ];
+
+      const owners = [
+        "Taylor", "Jordan", "Alex", "Sam", "Casey", "Morgan"
+      ];
+
+      const statuses = [
+        { label: "On track", color: "green" },
+        { label: "It depends", color: "amber" },
+        { label: "Conceptual", color: "amber" },
+        { label: "PowerPoint complete", color: "green" },
+        { label: "Emotionally delayed", color: "red" },
+        { label: "Awaiting alignment", color: "amber" }
+      ];
+
+      const tbody = document.getElementById("initiatives-body");
+      tbody.innerHTML = "";
+
+      const rows = randomInt(5, 7);
+      const usedIndexes = [];
+
+      for (let i = 0; i < rows; i++) {
+        let idx;
+        do {
+          idx = randomInt(0, initiatives.length - 1);
+        } while (usedIndexes.includes(idx));
+        usedIndexes.push(idx);
+
+        const confidence = randomInt(47, 103);
+        const impact = randomInt(1, 10);
+        const status = randomFrom(statuses);
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${initiatives[idx]}</td>
+          <td>${randomFrom(owners)}</td>
+          <td>${confidence}%</td>
+          <td>${impact}/10</td>
+          <td>
+            <span class="badge">
+              <span class="badge-dot ${status.color}"></span>
+              <span>${status.label}</span>
+            </span>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      }
+
+      const baselines = [
+        "Benchmarked against the top 3 percent of PowerPoint centric organizations.",
+        "Calibrated using a proprietary blend of gut feel and spreadsheet magic.",
+        "Underlying data structure last reviewed at an off site nobody recalls clearly.",
+        "Confidence scores are mostly a measure of how convincing the last meeting felt."
+      ];
+
+      document.getElementById("table-meta").textContent = randomFrom(baselines);
+
+      const now = new Date();
+      document.getElementById("footer-updated").textContent =
+        "Last regenerated at " + now.toLocaleTimeString(undefined, {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+    }
+
+    function loadGifAndQuote() {
+      const gifUrls = [
+        "https://cataas.com/cat/gif",
+        "https://cataas.com/cat/cute",
+        "https://cataas.com/cat/funny",
+        "https://cataas.com/cat/gif?type=sq"
+      ];
+
+      const quotes = [
+        "If you stare at the dashboard long enough, the dashboard starts managing you.\n\n" +
+          "<span>- Ancient Agile Proverb Probably</span>",
+        "Reach for the stars. If you miss, you will at least update the slide deck.\n\n" +
+          "<span>- Strategic Optimism Department</span>",
+        "What gets measured gets pretended to be managed.\n\n" +
+          "<span>- Anonymous KPI Enthusiast</span>",
+        "Believe in yourself. Everyone else is still waiting for the meeting invite.\n\n" +
+          "<span>- Calendar Overlord</span>",
+        "Synergy is just teamwork that has had too much coffee.\n\n" +
+          "<span>- Chief Caffeine Officer</span>"
+      ];
+
+      const gifEl = document.getElementById("nonsense-gif");
+      const quoteEl = document.getElementById("nonsense-quote");
+
+      gifEl.src = randomFrom(gifUrls);
+      quoteEl.innerHTML = randomFrom(quotes);
+
+      const cultureMetaVariants = [
+        "Motivation calibrated using cutting edge animated cat science.",
+        "All cultural insights are derived from looping gifs and vibes.",
+        "Tested on focus groups consisting entirely of people avoiding real work.",
+        "Certified 0 percent evidence based, 100 percent committed."
+      ];
+      document.getElementById("culture-meta").textContent = randomFrom(cultureMetaVariants);
+    }
+
+    async function fetchJson(url, options) {
+      try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+        return await response.json();
+      } catch (error) {
+        return { error: String(error) };
+      }
+    }
+
+    async function loadApis() {
+      const meta = document.getElementById("api-meta");
+      meta.textContent = "Connecting to high integrity joke and fact providers...";
+
+      const [adviceRes, jokeRes, catRes] = await Promise.all([
+        fetchJson("https://api.adviceslip.com/advice", { cache: "no-store" }),
+        fetchJson("https://icanhazdadjoke.com/", {
+          headers: { "Accept": "application/json" },
+          cache: "no-store"
+        }),
+        fetchJson("https://catfact.ninja/fact?max_length=120", { cache: "no-store" })
+      ]);
+
+      const adviceEl = document.getElementById("api-advice");
+      if (!adviceRes.error && adviceRes.slip && adviceRes.slip.advice) {
+        adviceEl.textContent = adviceRes.slip.advice;
+      } else {
+        adviceEl.innerHTML =
+          '<span class="api-error">Advice service unavailable. Consider trusting your instincts instead.</span>';
+      }
+
+      const jokeEl = document.getElementById("api-joke");
+      if (!jokeRes.error && jokeRes.joke) {
+        jokeEl.textContent = jokeRes.joke;
+      } else {
+        jokeEl.innerHTML =
+          '<span class="api-error">Joke API failed. Please reuse a story from three all hands ago.</span>';
+      }
+
+      const catEl = document.getElementById("api-catfact");
+      if (!catRes.error && catRes.fact) {
+        catEl.textContent = catRes.fact;
+      } else {
+        catEl.innerHTML =
+          '<span class="api-error">Could not retrieve cat data. Assume a cat is currently on at least one laptop.</span>';
+      }
+
+      meta.textContent = "Feed updated via public APIs. Scientific rigor not included.";
+    }
+
+    async function loadEmployees() {
+      const result = await fetchJson("https://randomuser.me/api/?results=2&inc=name,picture&noinfo=1", {
+        cache: "no-store"
+      });
+
+      const bestNameEl = document.getElementById("employee-best-name");
+      const bestRoleEl = document.getElementById("employee-best-role");
+      const bestAvatarEl = document.getElementById("employee-best-avatar");
+
+      const worstNameEl = document.getElementById("employee-worst-name");
+      const worstRoleEl = document.getElementById("employee-worst-role");
+      const worstAvatarEl = document.getElementById("employee-worst-avatar");
+
+      const bestRoles = [
+        "Chief Headphone Enthusiasm Officer",
+        "Director of Positive Vibes in Shared Channels",
+        "Senior Beam-From-Behind-The-Glass Specialist",
+        "Head of Smiling While Muted",
+        "Lead Synchronized Nodding Strategist"
+      ];
+
+      const worstRoles = [
+        "Vice President of Forgetting To Unmute",
+        "Director of Spreadsheet Existential Dread",
+        "Chief Passive Aggressive Reply All Architect",
+        "Head of Mic Feedback And Echo",
+        "Senior Calendar Overbooking Technician"
+      ];
+
+      if (!result.error && result.results && result.results.length >= 2) {
+        const [best, worst] = result.results;
+
+        bestNameEl.textContent = capitalizeName(best.name);
+        bestRoleEl.textContent = randomFrom(bestRoles) + " (with premium noise cancelling)";
+        bestAvatarEl.src = best.picture.medium;
+
+        worstNameEl.textContent = capitalizeName(worst.name);
+        worstRoleEl.textContent = randomFrom(worstRoles) + " (using laptop mic in a busy cafe)";
+        worstAvatarEl.src = worst.picture.medium;
+      } else {
+        bestNameEl.textContent = "Alex Placeholder";
+        bestRoleEl.textContent = randomFrom(bestRoles) + " (stock photo edition)";
+        bestAvatarEl.src = "https://cataas.com/cat/says/hi";
+
+        worstNameEl.textContent = "Jordan Fallback";
+        worstRoleEl.textContent = randomFrom(worstRoles) + " (rendered entirely from memory)";
+        worstAvatarEl.src = "https://cataas.com/cat/sad";
+      }
+    }
+
+    function capitalizeName(nameObj) {
+      if (!nameObj) return "Mystery Colleague";
+      const first = nameObj.first || "";
+      const last = nameObj.last || "";
+      return (first + " " + last).replace(/\b\w/g, function (c) {
+        return c.toUpperCase();
+      }).trim();
+    }
+
+    function loadFlagPanel() {
+      const countries = [
+        {
+          name: "Finland",
+          flag: "🇫🇮",
+          stat: "Drinks more coffee per person than any other country on Earth."
+        },
+        {
+          name: "Japan",
+          flag: "🇯🇵",
+          stat: "Has vending machines for almost everything, including hot drinks and business socks."
+        },
+        {
+          name: "New Zealand",
+          flag: "🇳🇿",
+          stat: "Has more sheep than people, which is still fewer than your unread emails."
+        },
+        {
+          name: "Canada",
+          flag: "🇨🇦",
+          stat: "Apologises so efficiently it may count as a renewable energy source."
+        },
+        {
+          name: "Italy",
+          flag: "🇮🇹",
+          stat: "Consumes espresso at a rate that would terrify most HR departments."
+        },
+        {
+          name: "Brazil",
+          flag: "🇧🇷",
+          stat: "Produces a large share of the worlds coffee, powering dashboards like this everywhere."
+        },
+        {
+          name: "Norway",
+          flag: "🇳🇴",
+          stat: "Has some of the worlds longest tunnels, yet still fewer than your folder structure."
+        }
+      ];
+
+      const chosen = randomFrom(countries);
+
+      const headlineVariants = [
+        "Most recent imaginary order came from " + chosen.name + ".",
+        "New territory acquired on a very optimistic sales slide: " + chosen.name + ".",
+        "Reported as a growth market in at least one confident conversation: " + chosen.name + ".",
+        "Flag added to the slide deck before an actual customer: " + chosen.name + "."
+      ];
+
+      document.getElementById("flag-emoji").textContent = chosen.flag;
+      document.getElementById("flag-main").textContent = chosen.name;
+      document.getElementById("flag-sub").textContent = chosen.stat;
+      document.getElementById("flag-meta").textContent = randomFrom(headlineVariants);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      generateKpis();
+      generateChart();
+      generateTable();
+      loadGifAndQuote();
+      loadApis();
+      loadEmployees();
+      loadFlagPanel();
+    });
+  </script>
+</body>
+</html>
