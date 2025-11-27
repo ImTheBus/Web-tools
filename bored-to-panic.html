@@ -3,61 +3,91 @@
 <head>
   <meta charset="UTF-8" />
   <title>Bored to Panic Assessment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg-page: #f3f4f6;
-      --card-bg: #ffffff;
-      --accent: #2563eb;
-      --accent-soft: rgba(37, 99, 235, 0.1);
-      --border-soft: #e5e7eb;
-      --text-main: #111827;
-      --text-muted: #6b7280;
+      --bg-page: #020617;
+      --card-bg: #0b1020;
+      --accent: #4f46e5;
+      --accent-soft: rgba(79, 70, 229, 0.35);
+      --border-soft: #1f2933;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --danger: #ef4444;
     }
 
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
-      padding: 2rem 0;
-      background: radial-gradient(circle at top left, #e5f0ff, #f3f4f6 55%);
+      padding: 24px;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #065f46 0, #020716 60%);
       color: var(--text-main);
+      display: flex;
+      justify-content: center;
     }
 
     .shell {
+      width: 100%;
       max-width: 1180px;
       margin: 0 auto;
-      padding: 0 1.5rem;
     }
 
     .card {
-      background: var(--card-bg);
-      border-radius: 1rem;
+      background: radial-gradient(circle at top left, #1f2937 0, #020617 55%);
+      border-radius: 16px;
+      border: 1px solid var(--border-soft);
+      padding: 20px;
       box-shadow:
-        0 18px 45px rgba(15, 23, 42, 0.08),
-        0 1px 3px rgba(15, 23, 42, 0.08);
-      padding: 1.75rem 1.75rem 2rem;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      margin-bottom: 1.75rem;
+        0 18px 45px rgba(0, 0, 0, 0.75),
+        0 0 0 1px rgba(148, 163, 184, 0.06);
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(34, 197, 94, 0.10), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.08), transparent 55%);
+      opacity: 0.6;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    #privacyCard::before {
+      display: none;
     }
 
     h1 {
-      font-size: 2rem;
-      margin: 0 0 0.5rem;
+      font-size: clamp(2rem, 3vw, 2.4rem);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin: 0 0 0.75rem;
+      text-align: center;
     }
 
     h2 {
-      margin-top: 2rem;
+      margin-top: 1.6rem;
       margin-bottom: 0.5rem;
-      font-size: 1.25rem;
+      font-size: 1.1rem;
     }
 
     .subtitle {
       color: var(--text-muted);
-      margin-bottom: 1.25rem;
+      margin-bottom: 0.9rem;
       max-width: 52rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
     }
 
     .field {
@@ -68,20 +98,27 @@
       display: block;
       font-weight: 600;
       margin-bottom: 0.25rem;
+      font-size: 0.9rem;
     }
 
     select,
     input[type="text"],
     textarea {
       font: inherit;
-      padding: 0.5rem 0.6rem;
+      padding: 8px 12px;
       width: 100%;
       max-width: 420px;
-      border-radius: 0.5rem;
+      border-radius: 999px;
       border: 1px solid var(--border-soft);
-      background: #f9fafb;
+      background: rgba(15, 23, 42, 0.95);
       color: var(--text-main);
-      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+      transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease, background 120ms ease;
+    }
+
+    textarea {
+      border-radius: 12px;
+      min-height: 80px;
+      resize: vertical;
     }
 
     select:focus,
@@ -89,53 +126,54 @@
     textarea:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent-soft);
-      background: #ffffff;
-    }
-
-    textarea {
-      min-height: 80px;
-      resize: vertical;
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.5);
+      background: rgba(15, 23, 42, 1);
+      transform: translateY(-1px);
     }
 
     .scale-description {
-      border-radius: 0.75rem;
+      border-radius: 12px;
       padding: 0.75rem 0.9rem;
       margin-top: 0.5rem;
-      background: #f9fafb;
-      border: 1px solid var(--border-soft);
-      font-size: 0.9rem;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      font-size: 0.88rem;
       line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .scale-description p + p {
+      margin-top: 0.35rem;
     }
 
     .summary {
-      margin-top: 1.75rem;
-      border-top: 1px solid var(--border-soft);
-      padding-top: 1rem;
+      margin-top: 1.4rem;
+      border-top: 1px solid rgba(148, 163, 184, 0.35);
+      padding-top: 0.9rem;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 0.75rem;
-      font-size: 0.9rem;
-      background: #ffffff;
-      border-radius: 0.75rem;
+      font-size: 0.82rem;
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 12px;
       overflow: hidden;
     }
 
     th,
     td {
-      border: 1px solid var(--border-soft);
-      padding: 0.4rem 0.5rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 0.45rem 0.5rem;
       text-align: left;
       vertical-align: middle;
     }
 
     th {
-      background: #f3f4f6;
+      background: rgba(15, 23, 42, 0.9);
       font-weight: 600;
-      color: #374151;
+      color: var(--text-muted);
     }
 
     .button-row {
@@ -146,61 +184,57 @@
     }
 
     button {
-      font: inherit;
-      padding: 0.45rem 0.9rem;
+      border: none;
       border-radius: 999px;
-      border: 1px solid transparent;
-      cursor: pointer;
-      background: var(--accent);
-      color: #ffffff;
+      padding: 9px 16px;
+      background: linear-gradient(120deg, #4f46e5, #0ea5e9);
+      color: white;
+      font-size: 0.9rem;
       font-weight: 500;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
-      transition: background 0.15s, box-shadow 0.15s, transform 0.08s;
-    }
-
-    button.secondary {
-      background: #ffffff;
-      color: #1f2933;
-      border-color: var(--border-soft);
-      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
-    }
-
-    button.danger {
-      background: #ef4444;
-      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.25);
+      gap: 6px;
+      box-shadow: 0 12px 25px rgba(15, 23, 42, 0.6);
+      transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+      white-space: nowrap;
     }
 
     button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.32);
-    }
-
-    button.secondary:hover {
-      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
-    }
-
-    button.danger:hover {
-      box-shadow: 0 10px 24px rgba(239, 68, 68, 0.32);
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.8);
     }
 
     button:active {
-      transform: translateY(0);
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.6);
+    }
+
+    button.secondary {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      border: 1px solid var(--border-soft);
       box-shadow: none;
     }
 
+    button.secondary:hover {
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.6);
+    }
+
+    button.danger {
+      background: var(--danger);
+      box-shadow: 0 12px 25px rgba(127, 29, 29, 0.7);
+    }
+
     button.small {
-      padding: 0.2rem 0.55rem;
-      font-size: 0.78rem;
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+      padding: 6px 10px;
+      font-size: 0.75rem;
     }
 
     .toggle-active {
-      background: #2563eb;
-      color: #ffffff;
-      border-color: rgba(37, 99, 235, 0.4);
+      background: linear-gradient(120deg, #4f46e5, #0ea5e9);
+      color: white;
+      border-color: rgba(79, 70, 229, 0.6);
     }
 
     .question-text {
@@ -221,18 +255,18 @@
     }
 
     .results-box {
-      border-radius: 0.75rem;
+      border-radius: 12px;
       padding: 0.85rem 1rem;
-      background: #f9fafb;
-      border: 1px solid var(--border-soft);
-      font-size: 0.9rem;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      font-size: 0.88rem;
       flex: 1 1 260px;
       min-width: 260px;
+      color: var(--text-muted);
     }
 
     .results-box strong {
-      display: inline-block;
-      min-width: 110px;
+      color: var(--text-main);
     }
 
     #chartPanel {
@@ -244,11 +278,11 @@
     }
 
     #chartContainer {
-      background: #ffffff;
-      border-radius: 0.75rem;
-      border: 1px solid var(--border-soft);
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
       padding: 0.6rem 0.6rem 0.4rem;
-      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.2);
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.8);
     }
 
     #chartContainer canvas {
@@ -257,14 +291,14 @@
     }
 
     #ringContainer {
-      background: #ffffff;
-      border-radius: 0.75rem;
-      border: 1px solid var(--border-soft);
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
       padding: 0.6rem;
-      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.2);
       display: flex;
       flex-direction: column;
       align-items: center;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.8);
     }
 
     #ringToggleRow {
@@ -314,8 +348,9 @@
     .flags {
       margin-top: 0.5rem;
       padding-top: 0.5rem;
-      border-top: 1px solid #e0e0e0;
-      font-size: 0.88rem;
+      border-top: 1px solid rgba(148, 163, 184, 0.35);
+      font-size: 0.86rem;
+      color: var(--text-muted);
     }
 
     .flags ul {
@@ -329,7 +364,7 @@
       border-radius: 999px;
       font-size: 0.76rem;
       background: var(--accent-soft);
-      color: #1d4ed8;
+      color: #c7d2fe;
       font-weight: 500;
       margin-left: 0.25rem;
     }
@@ -351,23 +386,27 @@
     .comparison-table table {
       width: 100%;
       border-collapse: collapse;
-      border-radius: 0.5rem;
+      border-radius: 8px;
       overflow: hidden;
     }
 
     .comparison-table th,
     .comparison-table td {
-      border: 1px solid #e5e7eb;
+      border: 1px solid rgba(148, 163, 184, 0.4);
       padding: 0.25rem 0.4rem;
       text-align: left;
     }
 
     .comparison-table th {
-      background: #f3f4f6;
+      background: rgba(15, 23, 42, 0.9);
       font-weight: 600;
+      color: var(--text-muted);
     }
 
     @media (max-width: 768px) {
+      body {
+        padding: 16px;
+      }
       .card {
         padding: 1.25rem 1.1rem 1.5rem;
       }
@@ -557,7 +596,7 @@
       </p>
     </div>
 
-    <div class="card" id="privacyCard" style="background:#f9fafb;">
+    <div class="card" id="privacyCard">
       <h2>Your data and privacy</h2>
       <p class="muted">
         Your responses are stored <strong>only in this browser</strong> using local storage.
@@ -566,7 +605,7 @@
         <strong>permanently deleted and cannot be recovered</strong>.
       </p>
 
-      <p style="margin-top:1rem;">
+      <p style="margin-top:1rem; color: var(--text-muted);">
         The questions, scoring model and interpretations were created for internal use and may contain
         errors or be incomplete. They are intended as a practical tool to support conversation, not as a
         diagnostic, assessment or formal evaluation system.
@@ -636,11 +675,11 @@
 
     // Colours (stronger; bored is black)
     const zoneColors = {
-      bored:   { fill: "rgba(0, 0, 0, 0.25)",   stroke: "#111827" },
-      comfort: { fill: "rgba(59, 130, 246, 0.45)", stroke: "#3b82f6" },
-      stretch: { fill: "rgba(34, 197, 94, 0.45)",  stroke: "#22c55e" },
-      stress:  { fill: "rgba(245, 158, 11, 0.45)", stroke: "#f59e0b" },
-      panic:   { fill: "rgba(239, 68, 68, 0.45)",  stroke: "#ef4444" }
+      bored:   { fill: "rgba(0, 0, 0, 0.35)",   stroke: "#111827" },
+      comfort: { fill: "rgba(59, 130, 246, 0.45)", stroke: "#60a5fa" },
+      stretch: { fill: "rgba(34, 197, 94, 0.45)",  stroke: "#4ade80" },
+      stress:  { fill: "rgba(245, 158, 11, 0.45)", stroke: "#facc15" },
+      panic:   { fill: "rgba(239, 68, 68, 0.45)",  stroke: "#f97373" }
     };
 
     // Role targets (panic ideal = 0; boredom low but non-zero)
@@ -726,8 +765,8 @@
             fill: true,
             borderWidth: 2,
             pointRadius: 3,
-            backgroundColor: "rgba(37, 99, 235, 0.15)",
-            borderColor: "rgba(37, 99, 235, 1)"
+            backgroundColor: "rgba(79, 70, 229, 0.25)",
+            borderColor: "rgba(129, 140, 248, 1)"
           },
           {
             label: "Ideal",
@@ -751,11 +790,15 @@
             ticks: {
               showLabelBackdrop: false,
               stepSize: 10,
+              color: "#9ca3af",
               callback: value => value + "%"
             },
-            angleLines: { color: "rgba(0,0,0,0.06)" },
-            grid: { color: "rgba(0,0,0,0.06)" },
-            pointLabels: { font: { size: 11 } }
+            angleLines: { color: "rgba(148, 163, 184, 0.3)" },
+            grid: { color: "rgba(55, 65, 81, 0.8)" },
+            pointLabels: {
+              font: { size: 11 },
+              color: "#e5e7eb"
+            }
           }
         },
         plugins: {
@@ -781,7 +824,7 @@
       if (!data) {
         ringCtx.beginPath();
         ringCtx.arc(cx, cy, maxRadius, 0, 2 * Math.PI);
-        ringCtx.strokeStyle = "#e5e7eb";
+        ringCtx.strokeStyle = "#4b5563";
         ringCtx.lineWidth = 2;
         ringCtx.stroke();
         return;
@@ -806,7 +849,7 @@
 
       ringCtx.beginPath();
       ringCtx.arc(cx, cy, maxRadius, 0, 2 * Math.PI);
-      ringCtx.strokeStyle = "#d1d5db";
+      ringCtx.strokeStyle = "#6b7280";
       ringCtx.lineWidth = 1.5;
       ringCtx.stroke();
     }
@@ -900,41 +943,188 @@
       updateRingLegend(ringData, labelText);
     }
 
-    function buildQuestions() {
-      questions.forEach(q => {
-        const tr = document.createElement("tr");
+    function levelLabel(actual, ideal) {
+      const diff = actual - ideal;
+      if (Math.abs(diff) <= 5) return "about right";
+      if (diff > 5) return "high";
+      return "low";
+    }
 
-        const tdNum = document.createElement("td");
-        tdNum.textContent = q.id;
-        tr.appendChild(tdNum);
+    function zoneNarrative(zone, actual, ideal) {
+      const level = levelLabel(actual, ideal);
+      switch (zone) {
+        case "bored":
+          if (level === "high") return "Boredom is high; add variety or stretch projects.";
+          if (level === "low") return "Boredom is low; no concern here, focus more on Stretch and Stress patterns.";
+          return "Boredom is about right; capability is broadly in use.";
+        case "comfort":
+          if (level === "high") return "Comfort is high; add small stretch goals or new tasks.";
+          if (level === "low") return "Comfort is low; stabilise core workload and routines.";
+          return "Comfort is close to ideal; keep the basics predictable.";
+        case "stretch":
+          if (level === "high") return "Stretch is high; make sure support and clarity are strong so it stays positive.";
+          if (level === "low") return "Stretch is low; look for development projects or new responsibilities.";
+          return "Stretch is about right; this is a healthy growth pattern.";
+        case "stress":
+          if (level === "high") return "Stress is high; re-prioritise, remove lower value work or add resource.";
+          if (level === "low") return "Stress is low; there may be more capacity if needed.";
+          return "Stress is around the expected level; keep an eye on recovery time.";
+        case "panic":
+          if (level === "high") return "Panic is higher than ideal; treat as a system issue and intervene quickly.";
+          if (level === "low") return "Panic is low; maintain good buffers and early warning conversations.";
+          return "Panic is close to the expected range; still worth exploring triggers.";
+        default:
+          return "";
+      }
+    }
 
-        const tdText = document.createElement("td");
-        tdText.className = "question-text";
-        tdText.textContent = q.text;
-        tr.appendChild(tdText);
+    function renderOverallScale(topZone, percents, role) {
+      const scoreMap = {
+        bored: 1,
+        comfort: 2,
+        stretch: 3,
+        stress: 4,
+        panic: 5
+      };
+      const score = scoreMap[topZone] || 3;
+      latestScaleScore = score;
 
-        responseOptions.forEach(opt => {
-          const td = document.createElement("td");
-          td.className = "radio-group";
-          const id = `q${q.id}_${opt.value}`;
-          const input = document.createElement("input");
-          input.type = "radio";
-          input.name = `q${q.id}`;
-          input.id = id;
-          input.value = opt.value;
-          input.className = "radio-input";
-          const label = document.createElement("label");
-          label.setAttribute("for", id);
-          label.style.display = "inline-block";
-          label.style.margin = "0";
-          label.textContent = "";
-          td.appendChild(input);
-          td.appendChild(label);
-          tr.appendChild(td);
-        });
+      const desc = descriptions[score];
+      const roleTarget = role ? roleTargets[role] : null;
 
-        questionsBody.appendChild(tr);
-      });
+      const targetSummary = roleTarget
+        ? `<p><strong>Role target pattern (${roleLabels[role]}):</strong>
+             Bored ${roleTarget.bored}% · Comfort ${roleTarget.comfort}% · Stretch ${roleTarget.stretch}% · Stress ${roleTarget.stress}% · Panic ${roleTarget.panic}%</p>`
+        : `<p class="muted">Select a role level to compare against an ideal pattern for that role.</p>`;
+
+      const deviations = roleTarget
+        ? ["bored", "comfort", "stretch", "stress", "panic"]
+            .map(z => {
+              const actual = percents[z] ?? 0;
+              const ideal = roleTarget[z] ?? 0;
+              return `<tr>
+                <td>${z.charAt(0).toUpperCase() + z.slice(1)}</td>
+                <td>${actual}%</td>
+                <td>${ideal}%</td>
+                <td>${zoneNarrative(z, actual, ideal)}</td>
+              </tr>`;
+            })
+            .join("")
+        : "";
+
+      const comparisonTable = roleTarget
+        ? `<div class="comparison-table">
+             <table>
+               <thead>
+                 <tr>
+                   <th>Zone</th>
+                   <th>Current</th>
+                   <th>Target</th>
+                   <th>Notes</th>
+                 </tr>
+               </thead>
+               <tbody>${deviations}</tbody>
+             </table>
+           </div>`
+        : "";
+
+      overallResult.innerHTML = `
+        <p><strong>Overall position:</strong> ${desc.label} (score ${score}/5)</p>
+        <p>${desc.text}</p>
+        <p><strong>Manager focus:</strong> ${desc.manager}</p>
+        ${targetSummary}
+        ${comparisonTable}
+      `;
+    }
+
+    function buildFlags(percents) {
+      const flags = [];
+
+      if (percents.panic >= 15) {
+        flags.push("Panic at or above 15%: dig into specific situations that feel overwhelming, and review workload, boundaries and support urgently.");
+      } else if (percents.panic >= 10) {
+        flags.push("Panic between 10% and 15%: agree regular check ins and watch for patterns that push things over the edge.");
+      }
+
+      if (percents.stress + percents.panic >= 35) {
+        flags.push("Combined Stress and Panic above 35%: this is a sustained high pressure pattern; consider rescoping work or adding resource.");
+      }
+
+      if (percents.bored >= 25) {
+        flags.push("Bored at or above 25%: under use of capability; explore additional responsibility, variety or development projects.");
+      }
+
+      if (percents.stretch < 30) {
+        flags.push("Stretch below 30%: growth opportunities may be limited; look for ways to introduce constructive challenge.");
+      }
+
+      if (
+        percents.stretch >= 35 &&
+        percents.stretch <= 60 &&
+        percents.panic < 15 &&
+        percents.bored < 20 &&
+        percents.stress >= 10 &&
+        percents.stress <= 25
+      ) {
+        flags.push("Overall pattern looks healthy: mostly in Stretch with manageable Stress and low Panic. Focus on keeping priorities clear and removing friction.");
+      }
+
+      return flags;
+    }
+
+    function renderResults(percents, role, topZone, topScore) {
+      const labels = {
+        bored: "Bored",
+        comfort: "Comfort",
+        stretch: "Stretch",
+        stress: "Stress",
+        panic: "Panic"
+      };
+
+      const target = role ? currentTarget(role) : null;
+
+      const lines = [
+        `<p><strong>Highest zone:</strong> ${labels[topZone]} (${topScore}%)</p>`,
+        `<p><strong>Current pattern:</strong> Bored ${percents.bored}% · Comfort ${percents.comfort}% · Stretch ${percents.stretch}% · Stress ${percents.stress}% · Panic ${percents.panic}%</p>`
+      ];
+
+      const flags = buildFlags(percents);
+      const comparisonTable = target
+        ? `<div class="comparison-table">
+             <table>
+               <thead>
+                 <tr>
+                   <th>Zone</th>
+                   <th>Current</th>
+                   <th>Target</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 <tr><td>Bored</td><td>${percents.bored}%</td><td>${target.bored}%</td></tr>
+                 <tr><td>Comfort</td><td>${percents.comfort}%</td><td>${target.comfort}%</td></tr>
+                 <tr><td>Stretch</td><td>${percents.stretch}%</td><td>${target.stretch}%</td></tr>
+                 <tr><td>Stress</td><td>${percents.stress}%</td><td>${target.stress}%</td></tr>
+                 <tr><td>Panic</td><td>${percents.panic}%</td><td>${target.panic}%</td></tr>
+               </tbody>
+             </table>
+           </div>`
+        : "";
+
+      calculationResults.innerHTML = `
+        ${lines.join("")}
+        ${comparisonTable}
+        <div class="flags">
+          <strong>Conversation prompts:</strong>
+          ${
+            flags.length
+              ? "<ul>" + flags.map(f => `<li>${f}</li>`).join("") + "</ul>"
+              : "<div>No specific risk flags from this pattern. Still useful to discuss what is helping it work well.</div>"
+          }
+        </div>
+      `;
+
+      renderOverallScale(topZone, percents, role);
+      updateCharts(percents, target, role);
     }
 
     function getResponses() {
@@ -985,339 +1175,6 @@
       return { raw, percents };
     }
 
-    function buildFlags(percents) {
-      const flags = [];
-
-      if (percents.panic >= 15) {
-        flags.push("Panic at or above 15%: dig into specific situations that feel overwhelming, and review workload, boundaries and support urgently.");
-      } else if (percents.panic >= 10) {
-        flags.push("Panic between 10% and 15%: agree regular check ins and watch for patterns that push things over the edge.");
-      }
-
-      if (percents.stress + percents.panic >= 35) {
-        flags.push("Combined Stress and Panic above 35%: this is a sustained high pressure pattern; consider rescoping work or adding resource.");
-      }
-
-      if (percents.bored >= 25) {
-        flags.push("Bored at or above 25%: under use of capability; explore additional responsibility, variety or development projects.");
-      }
-
-      if (percents.stretch < 30) {
-        flags.push("Stretch below 30%: growth opportunities may be limited; look for ways to introduce constructive challenge.");
-      }
-
-      if (
-        percents.stretch >= 35 &&
-        percents.stretch <= 60 &&
-        percents.panic < 15 &&
-        percents.bored < 20 &&
-        percents.stress >= 10 &&
-        percents.stress <= 25
-      ) {
-        flags.push("Overall pattern looks healthy: mostly in Stretch with manageable Stress and low Panic. Focus on keeping priorities clear and removing friction.");
-      }
-
-      return flags;
-    }
-
-    function levelLabel(actual, ideal) {
-      const diff = actual - ideal;
-      if (Math.abs(diff) <= 5) return "about right";
-      if (diff > 5) return "high";
-      return "low";
-    }
-
-    function zoneNarrative(zone, actual, ideal) {
-      const level = levelLabel(actual, ideal);
-      switch (zone) {
-        case "bored":
-          if (level === "high") return "Boredom is high; add variety or stretch projects.";
-          if (level === "low") return "Boredom is low; no concern here, focus more on Stretch and Stress patterns.";
-          return "Boredom is about right; capability is broadly in use.";
-        case "comfort":
-          if (level === "high") return "Comfort is high; add small stretch goals or new tasks.";
-          if (level === "low") return "Comfort is low; stabilise core workload and routines.";
-          return "Comfort is close to ideal; keep the basics predictable.";
-        case "stretch":
-          if (level === "high") return "Stretch is high; check for overload and tighten priorities.";
-          if (level === "low") return "Stretch is low; introduce deliberate development work.";
-          return "Stretch is about right; protect time for focused work.";
-        case "stress":
-          if (level === "high") return "Stress is high; remove or delay lower value work.";
-          if (level === "low") return "Stress is low; ensure some time bound goals to sharpen focus.";
-          return "Stress is near ideal; watch for spikes and manage recovery.";
-        case "panic":
-          if (level === "high") return "Panic is high; reset expectations and pull tasks out of the system.";
-          return "Panic is low; keep guardrails and escalation paths clear for busy periods.";
-        default:
-          return "";
-      }
-    }
-
-    function buildComparisonTable(percents, target) {
-      const zones = ["bored", "comfort", "stretch", "stress", "panic"];
-      const labels = {
-        bored: "Bored",
-        comfort: "Comfort",
-        stretch: "Stretch",
-        stress: "Stress",
-        panic: "Panic"
-      };
-      let rows = "";
-      zones.forEach(z => {
-        const actual = percents[z];
-        const ideal = target[z];
-        const comment = zoneNarrative(z, actual, ideal);
-        rows += `
-          <tr>
-            <td>${labels[z]}</td>
-            <td>${actual}%</td>
-            <td>${ideal}%</td>
-            <td>${comment}</td>
-          </tr>
-        `;
-      });
-      return `
-        <div class="comparison-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Zone</th>
-                <th>Actual</th>
-                <th>Ideal</th>
-                <th>Quick interpretation & action</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows}
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    function buildIdealSummary(role, target) {
-      if (!target) {
-        return `<span class="muted">Select a role level to see the ideal distribution for that role.</span>`;
-      }
-      const label = roleLabels[role] || role;
-      return `
-        Ideal for <strong>${label}</strong>:
-        Bored ${target.bored}%,
-        Comfort ${target.comfort}%,
-        Stretch ${target.stretch}%,
-        Stress ${target.stress}%,
-        Panic ${target.panic}%.
-      `;
-    }
-
-    function buildNextLevelRecommendation(percents, role) {
-      const nextRoleMap = { L1: "L2", L2: "L3", L3: "L4", L4: "L5" };
-      const nextRole = nextRoleMap[role];
-      if (!role || !nextRole) {
-        return `<span class="muted">Select a role level below Director to see a suggested focus for progressing to the next level.</span>`;
-      }
-
-      const nextTarget = roleTargets[nextRole];
-      if (!nextTarget) {
-        return `<span class="muted">No next level profile available.</span>`;
-      }
-
-      const zones = ["bored", "comfort", "stretch", "stress", "panic"];
-      const labels = {
-        bored: "Bored",
-        comfort: "Comfort",
-        stretch: "Stretch",
-        stress: "Stress",
-        panic: "Panic"
-      };
-
-      let bestZone = null;
-      let bestGap = 0;
-      zones.forEach(z => {
-        const actual = percents[z] ?? 0;
-        const ideal = nextTarget[z];
-        let gap = Math.abs(actual - ideal);
-
-        if (gap < 5) return;
-        if (z === "panic" && actual < 5 && ideal === 0) return;
-
-        if (gap > bestGap) {
-          bestGap = gap;
-          bestZone = z;
-        }
-      });
-
-      if (!bestZone) {
-        const label = roleLabels[nextRole] || "next level";
-        return `<span class="muted">Your pattern is already close to the ideal profile for a ${label}. Focus on maintaining clear priorities and clean handovers.</span>`;
-      }
-
-      const actual = percents[bestZone] ?? 0;
-      const ideal = nextTarget[bestZone];
-      const label = roleLabels[nextRole] || "next level";
-      const zoneLabel = labels[bestZone];
-
-      let action;
-      if (bestZone === "bored") {
-        action = "Introduce more varied or stretching work so less time is spent in low challenge tasks.";
-      } else if (bestZone === "comfort") {
-        action = actual > ideal
-          ? "Ring fence time each week for clearly defined stretch tasks rather than staying mostly in Comfort."
-          : "Stabilise core workload and routines so Comfort is a reliable base for higher level work.";
-      } else if (bestZone === "stretch") {
-        action = actual < ideal
-          ? "Add one deliberate development project that sits just outside the current comfort zone, with clear success criteria."
-          : "Tighten priorities and remove lower value stretch work so effort goes into the highest impact tasks.";
-      } else if (bestZone === "stress") {
-        action = actual > ideal
-          ? "Agree what can be paused, delegated or dropped so Stress becomes targeted and temporary instead of constant."
-          : "Set a few specific, time bound goals that require focus and follow through.";
-      } else {
-        action = "Reset expectations, pull work out of the system and agree clear escalation paths before adding further responsibility.";
-      }
-
-      return `
-        To move toward the profile for a <strong>${label}</strong>, focus first on <strong>${zoneLabel}</strong>
-        (now ${actual}%, ideal ${ideal}%). ${action}
-      `;
-    }
-
-    function renderOverallScale(topZone, percents, role) {
-      const zoneToScale = {
-        bored: 1,
-        comfort: 2,
-        stretch: 3,
-        stress: 4,
-        panic: 5
-      };
-
-      const labels = {
-        bored: "Bored",
-        comfort: "Comfort",
-        stretch: "Stretch",
-        stress: "Stress",
-        panic: "Panic"
-      };
-
-      const score = zoneToScale[topZone] || 3;
-      latestScaleScore = score.toString();
-      const desc = descriptions[score];
-
-      const target = role ? roleTargets[role] : null;
-
-      let deviations = [];
-      if (target) {
-        const zones = ["bored", "comfort", "stretch", "stress", "panic"];
-        zones.forEach(z => {
-          const actual = percents[z] ?? 0;
-          const ideal = target[z];
-          const diff = actual - ideal;
-          const absDiff = Math.abs(diff);
-
-          if (z === "panic") {
-            if (actual >= 5 && diff >= 5) {
-              deviations.push({
-                zone: z,
-                absDiff,
-                text: `<li><strong>${labels[z]}</strong> is ${diff} points higher than expected: ${zoneNarrative(z, actual, ideal)}</li>`
-              });
-            }
-            return;
-          }
-
-          if (z === "bored") {
-            if (actual >= 15 && diff >= 5) {
-              deviations.push({
-                zone: z,
-                absDiff,
-                text: `<li><strong>${labels[z]}</strong> is ${diff} points higher than expected: ${zoneNarrative(z, actual, ideal)}</li>`
-              });
-            }
-            return;
-          }
-
-          if (absDiff >= 8) {
-            const direction = diff > 0 ? "higher" : "lower";
-            deviations.push({
-              zone: z,
-              absDiff,
-              text: `<li><strong>${labels[z]}</strong> is ${absDiff} points ${direction} than expected: ${zoneNarrative(z, actual, ideal)}</li>`
-            });
-          }
-        });
-
-        deviations.sort((a, b) => b.absDiff - a.absDiff);
-        deviations = deviations.slice(0, 3);
-      }
-
-      let deviationsHtml;
-      if (!target) {
-        deviationsHtml = `<span class="muted">Select a role level to see which zones differ most from the expected profile.</span>`;
-      } else if (!deviations.length) {
-        deviationsHtml = `<span class="muted">No major deviations from the ideal profile for this role. Focus on keeping priorities clear and maintaining recovery time.</span>`;
-      } else {
-        deviationsHtml = `<ul>${deviations.map(d => d.text).join("")}</ul>`;
-      }
-
-      const nextLevelText = buildNextLevelRecommendation(percents, role);
-
-      overallResult.innerHTML = `
-        <strong>Dominant zone:</strong> ${labels[topZone]} (score ${score}  – ${desc.label})<span class="pill">Calculated</span>
-        <br><br>
-        <strong>Description:</strong> ${desc.text}<br><br>
-        <strong>Manager guidance:</strong> ${desc.manager}<br><br>
-        <strong>Other areas to notice:</strong>
-        ${deviationsHtml}
-        <br><br>
-        <strong>Next-level progression focus:</strong>
-        <div style="margin-top:0.25rem;">${nextLevelText}</div>
-      `;
-    }
-
-    function renderResults(percents, role, topZone, topScore) {
-      const zoneLabels = {
-        bored: "Bored",
-        comfort: "Comfort",
-        stretch: "Stretch",
-        stress: "Stress",
-        panic: "Panic"
-      };
-
-      const flags = buildFlags(percents);
-      const target = currentTarget(role);
-      const idealSummary = buildIdealSummary(role, target);
-      const comparisonTable = target
-        ? buildComparisonTable(percents, target)
-        : `<div class="muted" style="margin-top:0.5rem;">Select a role level to compare actual and ideal scores.</div>`;
-
-      calculationResults.innerHTML = `
-        <div>
-          <strong>Dominant zone:</strong> ${zoneLabels[topZone]} (${topScore}%)
-          <span class="pill">Calculated</span>
-        </div>
-        <div style="margin-top: 0.65rem; font-size: 0.88rem;">
-          <strong>Ideal profile:</strong>
-          <span id="idealRow">${idealSummary}</span>
-        </div>
-        <div style="margin-top: 0.3rem; font-style: italic; font-size: 0.86rem;">
-          The table below shares out 100% of your current experience across the five zones.
-        </div>
-        ${comparisonTable}
-        <div class="flags">
-          <strong>Conversation prompts:</strong>
-          ${
-            flags.length
-              ? "<ul>" + flags.map(f => `<li>${f}</li>`).join("") + "</ul>"
-              : "<div>No specific risk flags from this pattern. Still useful to discuss what is helping it work well.</div>"
-          }
-        </div>
-      `;
-
-      renderOverallScale(topZone, percents, role);
-      updateCharts(percents, target, role);
-    }
-
     function handleCalculate() {
       const responses = getResponses();
       if (!responses) {
@@ -1327,9 +1184,9 @@
 
       const { raw, percents } = calculateZoneScores(responses);
 
-      const entries = Object.entries(percents);
-      entries.sort((a, b) => b[1] - a[1]);
-      const [topZone, topScore] = entries[0] || ["stretch", 0];
+      const entriesArr = Object.entries(percents);
+      entriesArr.sort((a, b) => b[1] - a[1]);
+      const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
 
       latestZonePercents = percents;
       latestZoneRaw = raw;
@@ -1399,27 +1256,28 @@
     }
 
     function handleSave() {
-      const name = document.getElementById("personName").value.trim();
-      const roleLevel = roleLevelSelect.value;
-
-      if (!latestScaleScore) {
-        alert("Please run a calculation before saving.");
+      if (!latestZonePercents || !latestTopZone) {
+        alert("Please calculate your results before saving.");
         return;
       }
 
-      let responses = latestResponses || getResponses() || null;
-      let zoneRaw = latestZoneRaw;
-      let zonePercents = latestZonePercents;
-
-      if (responses && (!zoneRaw || !zonePercents)) {
-        const calc = calculateZoneScores(responses);
-        zoneRaw = calc.raw;
-        zonePercents = calc.percents;
+      const name = document.getElementById("personName").value.trim();
+      const roleLevel = roleLevelSelect.value || "";
+      let contextValue = "";
+      if (contextSelect.value === "User-defined") {
+        contextValue = contextCustom.value.trim();
+      } else {
+        contextValue = contextSelect.value;
       }
 
-      const contextValue = contextSelect.value === "User-defined"
-        ? contextCustom.value.trim()
-        : contextSelect.value || "";
+      const scoreMap = {
+        bored: 1,
+        comfort: 2,
+        stretch: 3,
+        stress: 4,
+        panic: 5
+      };
+      const score = scoreMap[latestTopZone] || latestScaleScore || 3;
 
       const entries = loadEntries();
       const timestamp = new Date().toLocaleString();
@@ -1428,20 +1286,24 @@
         name,
         roleLevel,
         context: contextValue,
-        score: latestScaleScore,
-        responses,
-        zoneRaw,
-        zonePercents
+        score,
+        zonePercents: latestZonePercents,
+        zoneRaw: latestZoneRaw,
+        responses: latestResponses
       });
       saveEntries(entries);
       renderEntriesTableAndDropdown();
+      alert("Entry saved in this browser.");
     }
 
-    function toCsvRow(values) {
-      return values
-        .map(v => {
-          const str = (v ?? "").toString().replace(/"/g, '""');
-          return `"${str}"`;
+    function toCsvRow(cells) {
+      return cells
+        .map(cell => {
+          const val = cell == null ? "" : String(cell);
+          if (val.includes(",") || val.includes("\"") || val.includes("\n")) {
+            return "\"" + val.replace(/"/g, "\"\"") + "\"";
+          }
+          return val;
         })
         .join(",");
     }
@@ -1453,37 +1315,36 @@
         return;
       }
 
-      const header = [
+      const headers = [
         "Timestamp",
         "Name",
         "RoleLevel",
         "Context",
         "Score",
-        "Zone",
-        "BoredPercent",
-        "ComfortPercent",
-        "StretchPercent",
-        "StressPercent",
-        "PanicPercent"
+        "ZoneLabel",
+        "Bored%",
+        "Comfort%",
+        "Stretch%",
+        "Stress%",
+        "Panic%"
       ];
 
       questions.forEach(q => {
-        header.push(`Q${q.id}`);
+        headers.push(`Q${q.id}`);
       });
 
-      const rows = [toCsvRow(header)];
+      const rows = [toCsvRow(headers)];
 
-      entries.forEach(e => {
-        const zp = e.zonePercents || {};
-        const responses = e.responses || {};
-
+      entries.forEach(entry => {
+        const zp = entry.zonePercents || {};
+        const responses = entry.responses || {};
         const row = [
-          e.timestamp,
-          e.name,
-          e.roleLevel,
-          e.context || "",
-          e.score,
-          descriptions[e.score]?.label || "",
+          entry.timestamp,
+          entry.name || "",
+          entry.roleLevel || "",
+          entry.context || "",
+          entry.score,
+          descriptions[entry.score]?.label || "",
           zp.bored ?? "",
           zp.comfort ?? "",
           zp.stretch ?? "",
@@ -1576,7 +1437,6 @@
 
       latestZonePercents = percents;
       latestZoneRaw = raw;
-      latestScaleScore = entry.score || null;
 
       const entriesArr = Object.entries(percents);
       entriesArr.sort((a, b) => b[1] - a[1]);
@@ -1635,6 +1495,49 @@
         "Please add any feedback, bugs you have spotted, or feature ideas below:\n\n"
       );
       window.location.href = `mailto:dean@bookspeed.com?subject=${subject}&body=${body}`;
+    }
+
+    function buildQuestions() {
+      questions.forEach(q => {
+        const tr = document.createElement("tr");
+
+        const tdNum = document.createElement("td");
+        tdNum.textContent = q.id;
+        tr.appendChild(tdNum);
+
+        const tdText = document.createElement("td");
+        tdText.className = "question-text";
+        tdText.textContent = q.text;
+        tr.appendChild(tdText);
+
+        responseOptions.forEach(opt => {
+          const td = document.createElement("td");
+          td.className = "radio-group";
+          const id = `q${q.id}_${opt.value}`;
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = `q${q.id}`;
+          input.id = id;
+          input.value = opt.value;
+          input.className = "radio-input";
+
+          // Default all radios to the middle option (value 2 = "Sometimes")
+          if (opt.value === 2) {
+            input.checked = true;
+          }
+
+          const label = document.createElement("label");
+          label.setAttribute("for", id);
+          label.style.display = "inline-block";
+          label.style.margin = "0";
+          label.textContent = "";
+          td.appendChild(input);
+          td.appendChild(label);
+          tr.appendChild(td);
+        });
+
+        questionsBody.appendChild(tr);
+      });
     }
 
     // Initial setup
