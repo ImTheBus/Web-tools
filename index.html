@@ -340,6 +340,10 @@
             }
         }
 
+        .tool-card-link {
+            display: block;
+        }
+
         .tool-card {
             border-radius: var(--radius-lg);
             padding: 0.9rem;
@@ -359,13 +363,13 @@
             animation: fadeUp 240ms ease-out forwards;
         }
 
-        .tool-card:nth-child(1) {
+        .tool-card-link:nth-child(1) .tool-card {
             animation-delay: 110ms;
         }
-        .tool-card:nth-child(2) {
+        .tool-card-link:nth-child(2) .tool-card {
             animation-delay: 150ms;
         }
-        .tool-card:nth-child(3) {
+        .tool-card-link:nth-child(3) .tool-card {
             animation-delay: 190ms;
         }
 
@@ -429,7 +433,7 @@
             font-size: 0.8rem;
         }
 
-        .tool-link {
+        .tool-link-label {
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
@@ -544,12 +548,14 @@
             color: var(--accent);
         }
 
+        /* Focus styles */
         a:focus-visible,
         button:focus-visible {
             outline: 2px solid var(--accent);
             outline-offset: 3px;
         }
 
+        /* Animations */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -590,18 +596,18 @@
     <header>
         <div class="header-inner">
             <div class="brand">
+                <!-- Replace this with your logo image when ready -->
                 <div class="logo-placeholder">
                     ITB
                 </div>
                 <div>
-                    <div class="brand-text-title"></div>
+                    <div class="brand-text-title">Toolbox</div>
                     <div class="brand-text-name">IMTHEBUS</div>
                 </div>
             </div>
             <nav class="nav">
                 <a href="#tools" class="nav-link">Tools</a>
                 <a href="#about" class="nav-link">About</a>
-                <a href="#updates" class="nav-link">Updates</a>
                 <a href="#contact" class="nav-cta">Contact</a>
             </nav>
         </div>
@@ -609,7 +615,7 @@
 
     <main>
         <div class="shell">
-
+            <!-- Hero -->
             <section class="hero" aria-labelledby="hero-title">
                 <div class="hero-tag">
                     <span class="hero-tag-badge">Live</span>
@@ -620,7 +626,7 @@
                 </h1>
                 <p class="hero-subtitle">
                     IMTHEBUS is a simple collection of browser-based tools. They are built to be used
-                    in real conversations with teams, not behind logins.
+                    in real conversations with teams, not to lock your data away behind logins.
                 </p>
                 <div class="hero-actions">
                     <button class="btn btn-primary" type="button"
@@ -649,106 +655,101 @@
                 </div>
             </section>
 
+            <!-- Tools -->
             <section id="tools" class="section" aria-labelledby="tools-title">
                 <div class="section-header">
                     <div>
                         <h2 class="section-title" id="tools-title">Tools</h2>
                         <p class="section-subtitle">
-                            Links will appear here as tools move from prototype into something stable.
+                            New tools will appear here as they are ready to use.
                         </p>
                     </div>
                 </div>
 
-                <div class="tools-grid" aria-label="Tool list">
+<div class="tools-grid" aria-label="Tool list">
 
-                    <article class="tool-card">
-                        <div class="tool-image-placeholder tool-image-bored-to-panic">
-                            <div class="tool-image-label">
-                                Bored to Panic scale
-                            </div>
-                        </div>
-                        <div class="tool-header">
-                            <h3 class="tool-title">
-                                Bored to Panic scale
-                            </h3>
-                            <span class="tool-status">Available</span>
-                        </div>
-                        <p class="tool-description">
-                            A quick self check on where you sit between boredom and overwhelm so you can adjust workload
-                            and support toward a healthy performance zone.
-                        </p>
-                        <div class="tool-footer">
-                            <a class="tool-link" href="bored-to-panic.html">
-                                Open tool
-                                <span aria-hidden="true">↗</span>
-                            </a>
-                            <div class="tool-meta">
-                                Best used in 1:1s and coaching sessions
-                            </div>
-                        </div>
-                    </article>
+    <!-- Bored to Panic -->
+    <a class="tool-card-link" href="bored-to-panic.html">
+        <article class="tool-card">
+            <div class="tool-image-placeholder tool-image-bored-to-panic">
+                <div class="tool-image-label">Bored to Panic scale</div>
+            </div>
+            <div class="tool-header">
+                <h3 class="tool-title">Bored to Panic scale</h3>
+                <span class="tool-status">Available</span>
+            </div>
+            <p class="tool-description">
+                A quick self check on where you sit between boredom and overwhelm to help maintain a healthy performance zone.
+            </p>
+            <div class="tool-footer">
+                <span class="tool-link-label">Open tool ↗</span>
+                <div class="tool-meta">Best used in 1:1s and coaching sessions</div>
+            </div>
+        </article>
+    </a>
 
-                    <article class="tool-card">
-                        <div class="tool-image-placeholder">
-                            <div class="tool-image-label">
-                                Tool image goes here
-                            </div>
-                        </div>
-                        <div class="tool-header">
-                            <h3 class="tool-title">
-                                Feedback Scale
-                            </h3>
-                            <span class="tool-status">In development</span>
-                        </div>
-                        <p class="tool-description">
-                            Coming soon. Detailed feedback calibration tool.
-                        </p>
-                        <div class="tool-footer">
-                            <a class="tool-link" href="feedback-scale.html">
-                                Open tool
-                                <span aria-hidden="true">↗</span>
-                            </a>
-                            <div class="tool-meta">
-                                Status: work in progress
-                            </div>
-                        </div>
-                    </article>
+    <!-- Feedback Scale -->
+    <a class="tool-card-link" href="feedback-scale.html">
+        <article class="tool-card">
+            <div class="tool-image-placeholder tool-image-feedback-scale">
+                <div class="tool-image-label">Feedback Scale</div>
+            </div>
+            <div class="tool-header">
+                <h3 class="tool-title">Feedback Scale</h3>
+                <span class="tool-status">In development</span>
+            </div>
+            <p class="tool-description">
+                A calibration tool to understand whether feedback is sparse, resonant, loud, or excessive.
+            </p>
+            <div class="tool-footer">
+                <span class="tool-link-label">Open tool ↗</span>
+                <div class="tool-meta">Status: work in progress</div>
+            </div>
+        </article>
+    </a>
 
-                    <article class="tool-card">
-                        <div class="tool-image-placeholder">
-                            <div class="tool-image-label">
-                                Tool image goes here
-                            </div>
-                        </div>
-                        <div class="tool-header">
-                            <h3 class="tool-title">
-                                Important vs Urgent
-                            </h3>
-                            <span class="tool-status">Prototype</span>
-                        </div>
-                        <p class="tool-description">
-                            Prioritisation tool based on the classic 2×2 matrix.
-                        </p>
-                        <div class="tool-footer">
-                            <a class="tool-link" href="important-vs-urgent.html">
-                                Open tool
-                                <span aria-hidden="true">↗</span>
-                            </a>
-                            <div class="tool-meta">
-                                Status: internal testing
-                            </div>
-                        </div>
-                    </article>
+    <!-- Important vs Urgent -->
+    <a class="tool-card-link" href="important-vs-urgent.html">
+        <article class="tool-card">
+            <div class="tool-image-placeholder tool-image-important-urgent">
+                <div class="tool-image-label">Important vs Urgent</div>
+            </div>
+            <div class="tool-header">
+                <h3 class="tool-title">Important vs Urgent</h3>
+                <span class="tool-status">Prototype</span>
+            </div>
+            <p class="tool-description">
+                A classic 2×2 prioritisation tool to help identify what to do, schedule, delegate, or drop.
+            </p>
+            <div class="tool-footer">
+                <span class="tool-link-label">Open tool ↗</span>
+                <div class="tool-meta">Status: internal testing</div>
+            </div>
+        </article>
+    </a>
 
-                </div>
+    <!-- Impact vs Effort -->
+    <a class="tool-card-link" href="impact-vs-effort.html">
+        <article class="tool-card">
+            <div class="tool-image-placeholder tool-image-impact-effort">
+                <div class="tool-image-label">Impact vs Effort</div>
+            </div>
+            <div class="tool-header">
+                <h3 class="tool-title">Impact vs Effort</h3>
+                <span class="tool-status">Available</span>
+            </div>
+            <p class="tool-description">
+
+
             </section>
 
+            <!-- About this site -->
             <section id="about" class="section" aria-labelledby="about-title">
                 <div class="section-header">
                     <div>
                         <h2 class="section-title" id="about-title">About this site</h2>
                         <p class="section-subtitle">
-                            Why IMTHEBUS exists and what it offers.
+                            Why IMTHEBUS exists and what you can expect.
                         </p>
                     </div>
                 </div>
@@ -758,15 +759,16 @@
                         The aim is to make it easier to run better conversations, make clearer decisions, and support
                         development without needing a full platform or a new login.
                     </p>
-                    <p>Each tool is designed to be:</p>
+                    <p>
+                        Each tool is designed to be:
+                    </p>
                     <ul>
-                        <li><strong>Lightweight</strong> - open it and use it immediately.</li>
-                        <li><strong>Focused</strong> - one tool, one purpose.</li>
-                        <li><strong>Conversation-first</strong> - built to use with people, not alone.</li>
+                        <li><strong>Lightweight</strong> - open it in a browser and you are ready to go.</li>
+                        <li><strong>Focused</strong> - each tool solves one problem instead of trying to do everything.</li>
+                        <li><strong>Conversation-first</strong> - intended to be used with other people, not just alone.</li>
                     </ul>
                 </div>
             </section>
-
         </div>
     </main>
 
@@ -774,7 +776,9 @@
         <div class="footer-inner">
             <div class="footer-brand">
                 <div>© <span id="year"></span> IMTHEBUS. All rights reserved.</div>
-                <div>Built as a small, evolving collection of tools.</div>
+                <div>
+                    Built as a small, evolving collection of tools to support real work.
+                </div>
             </div>
             <div class="footer-links">
                 <div class="footer-link-group">
@@ -803,8 +807,8 @@
 </div>
 
 <script>
+    // Footer year
     document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 </body>
 </html>
-
