@@ -36,10 +36,10 @@
       margin: 0;
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        url("whiteboard-texture.jpg") repeat,
         url("assets/whiteboard-noise.png") repeat,
+        url("assets/whiteboard-texture.jpg") repeat,
         var(--bg-board);
-      background-size: 900px, 600px;
+      background-size: 600px, 1200px;
       color: var(--ink);
     }
 
@@ -54,7 +54,11 @@
       justify-content: space-between;
       gap: 24px;
       padding: 10px 20px;
-      background: #ffffff;
+      background:
+        url("assets/whiteboard-noise.png") repeat,
+        url("assets/whiteboard-texture.jpg") repeat,
+        #ffffff;
+      background-size: 600px, 1200px;
       border-bottom: 3px solid var(--border-strong);
       font-family: "Permanent Marker", system-ui, sans-serif;
       font-size: 0.95rem;
@@ -101,11 +105,15 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      background: rgba(255, 255, 255, 0.96);
       border-radius: 10px;
       border: 2px solid #000000;
       padding: 14px 14px 16px;
       box-shadow: 0 8px 14px rgba(0, 0, 0, 0.22);
+      background:
+        url("assets/whiteboard-noise.png") repeat,
+        url("assets/whiteboard-texture.jpg") repeat,
+        rgba(255, 255, 255, 0.95);
+      background-size: 600px, 1200px;
     }
 
     .field-label {
@@ -218,7 +226,13 @@
       max-height: 260px;
     }
 
-    /* CAPTURE PANEL */
+    /* CAPTURE PANEL (STRIPPED DOWN) */
+
+    .current-quadrant-label {
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
 
     .quadrant-selector {
       display: flex;
@@ -256,15 +270,9 @@
       background: var(--threat-tag);
     }
 
-    .current-quadrant-label {
-      font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 1rem;
-      margin-bottom: 4px;
-    }
-
     .capture-input {
       width: 100%;
-      min-height: 60px;
+      min-height: 80px;
       border-radius: 8px;
       border: 1px solid #000000;
       padding: 6px 8px;
@@ -272,72 +280,8 @@
       resize: vertical;
     }
 
-    .capture-actions {
-      margin-top: 6px;
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .btn-primary {
-      flex: 1;
-      padding: 6px 8px;
-      border-radius: 999px;
-      border: 1px solid #000000;
-      background: #000000;
-      color: #ffffff;
-      font-size: 0.85rem;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .btn-primary:hover {
-      filter: brightness(1.05);
-    }
-
-    .capture-meta {
-      font-size: 0.75rem;
-      color: #444;
-      text-align: right;
-    }
-
-    .small-checkbox {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.75rem;
+    .capture-hint {
       margin-top: 4px;
-    }
-
-    .board-controls {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .board-controls button {
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid #000000;
-      background: #ffffff;
-      font-size: 0.75rem;
-      cursor: pointer;
-    }
-
-    .board-controls button:hover {
-      background: #000000;
-      color: #ffffff;
-    }
-
-    .board-controls button.active {
-      background: #000000;
-      color: #ffffff;
-    }
-
-    .info-text {
-      margin-top: 8px;
       font-size: 0.75rem;
       color: #555;
     }
@@ -361,7 +305,11 @@
     .session-overlay-panel {
       width: 360px;
       max-height: 70vh;
-      background: #ffffff;
+      background:
+        url("assets/whiteboard-noise.png") repeat,
+        url("assets/whiteboard-texture.jpg") repeat,
+        #ffffff;
+      background-size: 600px, 1200px;
       border-radius: 10px;
       border: 2px solid #000000;
       box-shadow: 0 12px 22px rgba(0, 0, 0, 0.4);
@@ -449,10 +397,14 @@
       align-self: flex-start;
       border-radius: 12px;
       border: 2px solid #000000;
-      background: rgba(255, 255, 255, 0.96);
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
       overflow: hidden;
       height: 620px;
+      background:
+        url("assets/whiteboard-noise.png") repeat,
+        url("assets/whiteboard-texture.jpg") repeat,
+        rgba(255, 255, 255, 0.96);
+      background-size: 600px, 1200px;
     }
 
     .board-title-display {
@@ -471,7 +423,7 @@
       gap: 4px;
       padding: 4px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       border: 1px solid #000000;
       font-size: 0.75rem;
     }
@@ -497,13 +449,10 @@
     .board-meta-bar {
       font-size: 0.8rem;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
       margin: 4px 16px 6px;
       gap: 8px;
-    }
-
-    .board-meta-bar small {
       color: #555;
     }
 
@@ -511,7 +460,7 @@
       position: relative;
       width: 100%;
       height: calc(100% - 46px);
-      padding: 4px 18px 40px;
+      padding: 4px 18px 55px; /* extra bottom padding so focus bar is always visible */
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -696,7 +645,7 @@
 
     .board-focus-bar {
       position: absolute;
-      bottom: 4px;
+      bottom: 6px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -800,7 +749,6 @@
     <div class="section-divider"></div>
 
     <div>
-      <div class="field-label">Currently entering</div>
       <div class="current-quadrant-label" id="currentQuadrantText">Strengths</div>
       <div class="quadrant-selector">
         <button class="quadrant-button active" data-q="strength">S</button>
@@ -814,31 +762,9 @@
         placeholder="Capture ideas as people talk. Press Enter to add."
         spellcheck="true"
       ></textarea>
-      <div class="capture-actions">
-        <button class="btn-primary" id="addNoteBtn">Add note</button>
-        <div class="capture-meta">
-          S <span id="countStrength">0</span> /
-          W <span id="countWeakness">0</span> /
-          O <span id="countOpportunity">0</span> /
-          T <span id="countThreat">0</span>
-        </div>
+      <div class="capture-hint">
+        Press Enter to pin a note to the board. 1–4 switch between S / W / O / T.
       </div>
-      <label class="small-checkbox">
-        <input type="checkbox" id="autoCapCheckbox" checked />
-        Auto capitalise first letter
-      </label>
-    </div>
-
-    <div class="section-divider"></div>
-
-    <div class="board-controls">
-      <button id="toggleFullscreenBtn">Fullscreen board</button>
-      <button id="exportImageBtn">Export image</button>
-      <button id="exportTextBtn">Export summary</button>
-    </div>
-
-    <div class="info-text" id="hotkeyInfo">
-      Keyboard: 1 2 3 4 switch S W O T. Enter adds a note. Drag notes to move them. Double click to edit.
     </div>
   </aside>
 
@@ -847,13 +773,13 @@
     <div class="board-title-display" id="boardTitleDisplay">Untitled SWOT</div>
 
     <div class="board-toolbar">
-      <button id="toolbarFullscreenBtn" title="Toggle fullscreen">⤢</button>
+      <button id="toolbarFullscreenBtn" title="Fullscreen board">⤢</button>
+      <button id="toolbarImageBtn" title="Export image">Img</button>
       <button id="toolbarExportBtn" title="Export summary">Txt</button>
     </div>
 
     <div class="board-meta-bar">
-      <span><small id="metaSessionName">Untitled SWOT</small></span>
-      <span><small id="metaLastSaved">Not saved yet</small></span>
+      <small id="metaLastSaved">Not saved yet</small>
     </div>
 
     <div class="board" id="board">
@@ -923,8 +849,6 @@
   let topZ = 10;
 
   const captureInput = document.getElementById("captureInput");
-  const addNoteBtn = document.getElementById("addNoteBtn");
-  const autoCapCheckbox = document.getElementById("autoCapCheckbox");
 
   const titleInput = document.getElementById("titleInput");
   const dateInput = document.getElementById("dateInput");
@@ -944,23 +868,18 @@
   const boardInner = document.getElementById("boardInner");
 
   const sessionTitleLabel = document.getElementById("sessionTitleLabel");
-  const metaSessionName = document.getElementById("metaSessionName");
   const metaLastSaved = document.getElementById("metaLastSaved");
   const boardTitleDisplay = document.getElementById("boardTitleDisplay");
   const currentQuadrantText = document.getElementById("currentQuadrantText");
-
-  const countStrength = document.getElementById("countStrength");
-  const countWeakness = document.getElementById("countWeakness");
-  const countOpportunity = document.getElementById("countOpportunity");
-  const countThreat = document.getElementById("countThreat");
 
   const labelCountStrength = document.getElementById("labelCountStrength");
   const labelCountWeakness = document.getElementById("labelCountWeakness");
   const labelCountOpportunity = document.getElementById("labelCountOpportunity");
   const labelCountThreat = document.getElementById("labelCountThreat");
 
-  const toggleFullscreenBtn = document.getElementById("toggleFullscreenBtn");
   const toolbarFullscreenBtn = document.getElementById("toolbarFullscreenBtn");
+  const toolbarImageBtn = document.getElementById("toolbarImageBtn");
+  const toolbarExportBtn = document.getElementById("toolbarExportBtn");
 
   const focusStrengthBtn = document.getElementById("focusStrengthBtn");
   const focusWeaknessBtn = document.getElementById("focusWeaknessBtn");
@@ -968,16 +887,9 @@
   const focusThreatBtn = document.getElementById("focusThreatBtn");
   const resetFocusBtn = document.getElementById("resetFocusBtn");
 
-  const exportImageBtn = document.getElementById("exportImageBtn");
-  const exportTextBtn = document.getElementById("exportTextBtn");
-  const toolbarExportBtn = document.getElementById("toolbarExportBtn");
-
-  const hotkeyInfo = document.getElementById("hotkeyInfo");
-  const HOTKEY_TIP = "Keyboard: 1 2 3 4 switch S W O T. Enter adds a note. Drag notes to move them. Double click to edit.";
-
+  const HOTKEY_TIP = "Enter adds a note. 1–4 switch S / W / O / T. Drag notes. Double click to edit.";
   captureInput.title = HOTKEY_TIP;
   boardWrapper.title = HOTKEY_TIP;
-  hotkeyInfo.title = HOTKEY_TIP;
 
   function uuid() {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
@@ -1013,7 +925,7 @@
   }
 
   function createNewSession() {
-    const id = `swot_${Date.now()}`;
+    const id = "swot_" + Date.now();
     const today = new Date().toISOString().slice(0, 10);
     const session = {
       id,
@@ -1037,7 +949,7 @@
       return;
     }
     const copy = JSON.parse(JSON.stringify(session));
-    copy.id = `swot_${Date.now()}`;
+    copy.id = "swot_" + Date.now();
     copy.title = session.title + " (copy)";
     copy.createdAt = nowIso();
     copy.updatedAt = nowIso();
@@ -1101,12 +1013,11 @@
     if (!session) return;
     let text = captureInput.value;
     if (!text.trim()) return;
-    if (autoCapCheckbox.checked) {
-      text = autoCap(text);
-    }
 
-    const offsetX = (Math.random() * 0.6 + 0.2);
-    const offsetY = (Math.random() * 0.6 + 0.2);
+    text = autoCap(text);
+
+    const offsetX = Math.random() * 0.6 + 0.2;
+    const offsetY = Math.random() * 0.6 + 0.2;
 
     let xNorm, yNorm;
     switch (currentQuadrant) {
@@ -1133,9 +1044,9 @@
 
     topZ += 1;
 
-    const width = 140 + Math.random() * 40;   // 140–180
-    const height = 70 + Math.random() * 25;   // 70–95
-    const rotation = (Math.random() * 8 - 4).toFixed(2); // -4 to 4 degrees
+    const width = 140 + Math.random() * 40;
+    const height = 70 + Math.random() * 25;
+    const rotation = (Math.random() * 8 - 4).toFixed(2);
 
     const note = {
       id: uuid(),
@@ -1166,11 +1077,6 @@
         if (counts[n.quadrant] !== undefined) counts[n.quadrant] += 1;
       });
     }
-    countStrength.textContent = counts.strength;
-    countWeakness.textContent = counts.weakness;
-    countOpportunity.textContent = counts.opportunity;
-    countThreat.textContent = counts.threat;
-
     labelCountStrength.textContent = counts.strength;
     labelCountWeakness.textContent = counts.weakness;
     labelCountOpportunity.textContent = counts.opportunity;
@@ -1205,23 +1111,21 @@
       el.className = "note note-new";
       el.dataset.id = note.id;
       el.dataset.quadrant = note.quadrant;
-      el.style.width = `${note.width}px`;
-      el.style.minHeight = `${note.height}px`;
-      el.style.setProperty("--note-rot", `${note.rotation}deg`);
+      el.style.width = note.width + "px";
+      el.style.minHeight = note.height + "px";
+      el.style.setProperty("--note-rot", note.rotation + "deg");
 
       const textEl = document.createElement("div");
       textEl.className = "note-text";
       textEl.textContent = note.text;
       el.appendChild(textEl);
 
-      const noteWidth = note.width;
-      const noteHeight = note.height;
-      const x = note.x * boardRect.width - noteWidth / 2;
-      const y = note.y * boardRect.height - noteHeight / 2 + (Math.random() * 4 - 2);
+      const x = note.x * boardRect.width - note.width / 2;
+      const y = note.y * boardRect.height - note.height / 2 + (Math.random() * 4 - 2);
 
-      el.style.left = `${x}px`;
-      el.style.top = `${y}px`;
-      el.style.transform = `rotate(${note.rotation}deg)`;
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      el.style.transform = "rotate(" + note.rotation + "deg)";
       el.style.zIndex = note.z || 1;
 
       setTimeout(() => {
@@ -1242,8 +1146,16 @@
     dateInput.value = session.date || "";
     contextInput.value = session.context || "";
     sessionTitleLabel.textContent = session.title || "Untitled SWOT";
-    metaSessionName.textContent = session.title || "Untitled SWOT";
     boardTitleDisplay.textContent = session.title || "Untitled SWOT";
+  }
+
+  function formatUKDateTime(isoString) {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return "Not saved yet";
+    return d.toLocaleString("en-GB", {
+      dateStyle: "medium",
+      timeStyle: "short"
+    });
   }
 
   function updateLastSavedMeta() {
@@ -1252,8 +1164,7 @@
       metaLastSaved.textContent = "Not saved yet";
       return;
     }
-    const d = new Date(session.updatedAt || session.createdAt);
-    metaLastSaved.textContent = `Last saved ${d.toLocaleString()}`;
+    metaLastSaved.textContent = "Last saved " + formatUKDateTime(session.updatedAt || session.createdAt);
   }
 
   function renderSessionListOverlay() {
@@ -1273,8 +1184,9 @@
 
         const right = document.createElement("div");
         right.className = "session-item-meta";
-        const d = new Date(session.updatedAt || session.createdAt);
-        right.innerHTML = `${d.toLocaleDateString()}<br>${session.notes.length} notes`;
+        right.innerHTML =
+          `${new Date(session.updatedAt || session.createdAt).toLocaleDateString("en-GB")}<br>` +
+          `${session.notes.length} notes`;
 
         item.appendChild(left);
         item.appendChild(right);
@@ -1381,8 +1293,8 @@
         boardRect.bottom - noteHeight
       );
 
-      el.style.left = `${clampedLeft - boardRect.left}px`;
-      el.style.top = `${clampedTop - boardRect.top}px`;
+      el.style.left = clampedLeft - boardRect.left + "px";
+      el.style.top = clampedTop - boardRect.top + "px";
 
       const centerX = clampedLeft - boardRect.left + noteWidth / 2;
       const centerY = clampedTop - boardRect.top + noteHeight / 2;
@@ -1479,7 +1391,7 @@
       const link = document.createElement("a");
       const date = (session.date || new Date().toISOString().slice(0, 10)).replace(/-/g, "");
       const slug = (session.title || "SWOT").replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_]/g, "");
-      link.download = `SWOT_${slug}_${date}.png`;
+      link.download = "SWOT_" + slug + "_" + date + ".png";
       link.href = canvas.toDataURL("image/png");
       link.click();
     }).catch(() => {
@@ -1505,10 +1417,10 @@
     const date = session.date || new Date().toISOString().slice(0, 10);
 
     let text = "";
-    text += `Title: ${title}\n`;
-    text += `Date: ${date}\n`;
+    text += "Title: " + title + "\n";
+    text += "Date: " + new Date(date).toLocaleDateString("en-GB") + "\n";
     if (session.context && session.context.trim()) {
-      text += `Context: ${session.context.trim()}\n`;
+      text += "Context: " + session.context.trim() + "\n";
     }
     text += "\n";
 
@@ -1519,7 +1431,7 @@
         return;
       }
       byQuadrant[key].forEach(item => {
-        text += `- ${item}\n`;
+        text += "- " + item + "\n";
       });
       text += "\n";
     }
@@ -1535,9 +1447,9 @@
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     const slug = title.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_]/g, "");
-    const dateSlug = date.replace(/-/g, "");
+    const dateSlug = new Date(date).toISOString().slice(0, 10).replace(/-/g, "");
     link.href = url;
-    link.download = `SWOT_${slug}_${dateSlug}.txt`;
+    link.download = "SWOT_" + slug + "_" + dateSlug + ".txt";
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -1561,8 +1473,6 @@
   }
 
   // Event wiring
-
-  addNoteBtn.addEventListener("click", addNoteFromCapture);
 
   document.querySelectorAll(".quadrant-button").forEach(btn => {
     btn.addEventListener("click", () => setQuadrant(btn.dataset.q));
@@ -1593,18 +1503,15 @@
     saveAllSessions();
   });
 
-  toggleFullscreenBtn.addEventListener("click", toggleFullscreen);
   toolbarFullscreenBtn.addEventListener("click", toggleFullscreen);
+  toolbarImageBtn.addEventListener("click", exportBoardAsImage);
+  toolbarExportBtn.addEventListener("click", exportSummaryText);
 
   focusStrengthBtn.addEventListener("click", () => setBoardFocus("strength"));
   focusWeaknessBtn.addEventListener("click", () => setBoardFocus("weakness"));
   focusOpportunityBtn.addEventListener("click", () => setBoardFocus("opportunity"));
   focusThreatBtn.addEventListener("click", () => setBoardFocus("threat"));
   resetFocusBtn.addEventListener("click", () => setBoardFocus(null));
-
-  exportImageBtn.addEventListener("click", exportBoardAsImage);
-  exportTextBtn.addEventListener("click", exportSummaryText);
-  toolbarExportBtn.addEventListener("click", exportSummaryText);
 
   sessionPickerBtn.addEventListener("click", () => {
     renderSessionListOverlay();
