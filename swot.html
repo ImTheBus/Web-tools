@@ -1,0 +1,1650 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SWOT Board – IMTHEBUS Toolbox</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Marker style font -->
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- html2canvas for image export -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+
+  <style>
+    :root {
+      --bg-board: #fdfdfd;
+      --ink: #111111;
+      --border-strong: #000000;
+
+      --strength-bg: #c7f9cc;
+      --weakness-bg: #ffb3c1;
+      --opportunity-bg: #bde0fe;
+      --threat-bg: #ffeaa7;
+
+      --strength-tag: #15803d;
+      --weakness-tag: #b91c1c;
+      --opportunity-tag: #1d4ed8;
+      --threat-tag: #b45309;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        url("assets/whiteboard-texture.png") repeat,
+        url("assets/whiteboard-noise.png") repeat,
+        var(--bg-board);
+      background-size: 900px, 600px;
+      color: var(--ink);
+    }
+
+    /* NAVIGATION */
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 10px 20px;
+      background: #ffffff;
+      border-bottom: 3px solid var(--border-strong);
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 0.95rem;
+    }
+
+    .nav-left {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .nav-left a {
+      text-decoration: none;
+      color: var(--ink);
+      padding: 2px 4px;
+    }
+
+    .nav-left a:hover {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    .nav-right {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+      display: grid;
+      grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+      gap: 20px;
+      align-items: flex-start;
+      position: relative;
+    }
+
+    /* SIDEBAR */
+
+    .sidebar {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 10px;
+      border: 2px solid #000000;
+      padding: 14px 14px 16px;
+      box-shadow: 0 8px 14px rgba(0, 0, 0, 0.22);
+    }
+
+    .field-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 3px;
+    }
+
+    .title-input {
+      width: 100%;
+      border-radius: 6px;
+      border: 1px solid #000000;
+      padding: 6px 8px;
+      font-size: 0.9rem;
+    }
+
+    .date-input {
+      width: 100%;
+      border-radius: 6px;
+      border: 1px solid #000000;
+      padding: 4px 8px;
+      font-size: 0.85rem;
+    }
+
+    .context-input {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 6px;
+      border: 1px solid #000000;
+      padding: 6px 8px;
+      font-size: 0.85rem;
+      resize: vertical;
+    }
+
+    .section-divider {
+      height: 1px;
+      margin: 8px 0;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.2);
+    }
+
+    .session-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+
+    .session-title-button {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid #000000;
+      background: #ffffff;
+      font-size: 0.8rem;
+      cursor: pointer;
+      max-width: 70%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .session-title-button span {
+      font-weight: 600;
+    }
+
+    .session-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .session-actions button {
+      padding: 3px 6px;
+      border-radius: 999px;
+      border: 1px solid #000000;
+      background: #ffffff;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .session-actions button:hover,
+    .session-title-button:hover {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    /* COLLAPSIBLE DETAILS (TITLE / DATE / CONTEXT) */
+
+    .sidebar-details {
+      margin-bottom: 6px;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.25);
+      padding-bottom: 6px;
+    }
+
+    .sidebar-details-summary {
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      margin-bottom: 4px;
+    }
+
+    .sidebar-details-body {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.2s ease;
+    }
+
+    .sidebar-details:hover .sidebar-details-body {
+      max-height: 260px;
+    }
+
+    /* CAPTURE PANEL */
+
+    .quadrant-selector {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .quadrant-button {
+      flex: 1;
+      padding: 4px 6px;
+      border-radius: 999px;
+      border: 1px solid #000000;
+      background: #ffffff;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .quadrant-button.active {
+      color: #ffffff;
+    }
+
+    .quadrant-button[data-q="strength"].active {
+      background: var(--strength-tag);
+    }
+
+    .quadrant-button[data-q="weakness"].active {
+      background: var(--weakness-tag);
+    }
+
+    .quadrant-button[data-q="opportunity"].active {
+      background: var(--opportunity-tag);
+    }
+
+    .quadrant-button[data-q="threat"].active {
+      background: var(--threat-tag);
+    }
+
+    .current-quadrant-label {
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .capture-input {
+      width: 100%;
+      min-height: 60px;
+      border-radius: 8px;
+      border: 1px solid #000000;
+      padding: 6px 8px;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+
+    .capture-actions {
+      margin-top: 6px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .btn-primary {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid #000000;
+      background: #000000;
+      color: #ffffff;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.05);
+    }
+
+    .capture-meta {
+      font-size: 0.75rem;
+      color: #444;
+      text-align: right;
+    }
+
+    .small-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      margin-top: 4px;
+    }
+
+    .board-controls {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .board-controls button {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid #000000;
+      background: #ffffff;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .board-controls button:hover {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    .board-controls button.active {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    .info-text {
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: #555;
+    }
+
+    /* SESSION OVERLAY */
+
+    .session-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .session-overlay.open {
+      display: flex;
+    }
+
+    .session-overlay-panel {
+      width: 360px;
+      max-height: 70vh;
+      background: #ffffff;
+      border-radius: 10px;
+      border: 2px solid #000000;
+      box-shadow: 0 12px 22px rgba(0, 0, 0, 0.4);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+
+    .session-overlay-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .session-overlay-header h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-family: "Permanent Marker", system-ui, sans-serif;
+    }
+
+    .session-overlay-list {
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      padding-top: 6px;
+      margin-top: 2px;
+      overflow: auto;
+    }
+
+    .session-item {
+      padding: 6px 4px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .session-item:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .session-item-title {
+      font-weight: 500;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 180px;
+    }
+
+    .session-item-meta {
+      font-size: 0.7rem;
+      color: #555;
+      text-align: right;
+    }
+
+    .session-overlay-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .session-overlay-footer button {
+      flex: 1;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid #000000;
+      background: #ffffff;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .session-overlay-footer button:hover {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    /* BOARD */
+
+    .board-wrapper {
+      position: relative;
+      align-self: flex-start;
+      border-radius: 12px;
+      border: 2px solid #000000;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
+      overflow: hidden;
+      height: 620px;
+    }
+
+    .board-title-display {
+      padding: 10px 16px 0;
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: -0.03em;
+    }
+
+    .board-toolbar {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 10;
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #000000;
+      font-size: 0.75rem;
+    }
+
+    .board-toolbar button {
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid #000000;
+      background: #ffffff;
+      cursor: pointer;
+    }
+
+    .board-toolbar button:hover {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    .board-toolbar button.active {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    .board-meta-bar {
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 4px 16px 6px;
+      gap: 8px;
+    }
+
+    .board-meta-bar small {
+      color: #555;
+    }
+
+    .board {
+      position: relative;
+      width: 100%;
+      height: calc(100% - 46px);
+      padding: 4px 18px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .quadrant-grid {
+      position: relative;
+      flex: 1;
+      border-radius: 10px;
+      border: 1px solid #000000;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    .quadrant-lines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .quadrant-lines::before,
+    .quadrant-lines::after {
+      content: "";
+      position: absolute;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .quadrant-lines::before {
+      width: 1px;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-0.5px);
+    }
+
+    .quadrant-lines::after {
+      height: 1px;
+      left: 0;
+      right: 0;
+      top: 50%;
+      transform: translateY(-0.5px);
+    }
+
+    .quadrant-labels {
+      position: absolute;
+      inset: 6px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      pointer-events: none;
+      font-size: 0.8rem;
+    }
+
+    .quadrant-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 2px 4px;
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 1rem;
+    }
+
+    .quadrant-pill {
+      padding: 0;
+      border-radius: 0;
+      background: none;
+      color: #000;
+    }
+
+    .quadrant-pill.strength { color: var(--strength-tag); }
+    .quadrant-pill.weakness { color: var(--weakness-tag); }
+    .quadrant-pill.opportunity { color: var(--opportunity-tag); }
+    .quadrant-pill.threat { color: var(--threat-tag); }
+
+    .quadrant-count {
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: 0.75rem;
+      color: #333;
+      padding-top: 4px;
+    }
+
+    .board-inner {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* POST-ITS */
+
+    .note {
+      position: absolute;
+      min-height: 70px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      box-shadow:
+        0 10px 12px rgba(0, 0, 0, 0.28),
+        0 1px 0 rgba(255, 255, 255, 0.9) inset;
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 0.9rem;
+      cursor: grab;
+      transform-origin: center top;
+      user-select: none;
+      word-wrap: break-word;
+      background-image:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.65), transparent 30%);
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+    }
+
+    .note[data-quadrant="strength"]   { background-color: var(--strength-bg); }
+    .note[data-quadrant="weakness"]   { background-color: var(--weakness-bg); }
+    .note[data-quadrant="opportunity"]{ background-color: var(--opportunity-bg); }
+    .note[data-quadrant="threat"]     { background-color: var(--threat-bg); }
+
+    .note.dragging {
+      opacity: 0.95;
+      cursor: grabbing;
+      box-shadow:
+        0 16px 20px rgba(0, 0, 0, 0.45),
+        0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    }
+
+    .note:hover:not(.dragging):not(.editing) {
+      transform: translateY(-1px) scale(1.01) rotate(var(--note-rot, 0deg));
+      box-shadow:
+        0 12px 16px rgba(0, 0, 0, 0.38),
+        0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    }
+
+    .note-new {
+      animation: noteDrop 0.35s ease-out;
+    }
+
+    @keyframes noteDrop {
+      0% {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.9) rotate(-4deg);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0deg);
+      }
+    }
+
+    .note-text {
+      white-space: pre-wrap;
+    }
+
+    .note.editing {
+      cursor: default;
+    }
+
+    .note textarea {
+      width: 100%;
+      border: none;
+      background: transparent;
+      resize: none;
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    /* Focus modes */
+
+    .board-focus-strength .note[data-quadrant="strength"],
+    .board-focus-weakness .note[data-quadrant="weakness"],
+    .board-focus-opportunity .note[data-quadrant="opportunity"],
+    .board-focus-threat .note[data-quadrant="threat"] {
+      transform: translateY(-1px) scale(1.03) rotate(var(--note-rot, 0deg));
+      box-shadow:
+        0 14px 18px rgba(0, 0, 0, 0.4),
+        0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    }
+
+    .board-focus-strength .note:not([data-quadrant="strength"]),
+    .board-focus-weakness .note:not([data-quadrant="weakness"]),
+    .board-focus-opportunity .note:not([data-quadrant="opportunity"]),
+    .board-focus-threat .note:not([data-quadrant="threat"]) {
+      opacity: 0.16;
+      pointer-events: none;
+    }
+
+    /* Focus bar */
+
+    .board-focus-bar {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #000000;
+      font-size: 0.75rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .board-focus-bar button {
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid #000000;
+      background: #ffffff;
+      cursor: pointer;
+    }
+
+    .board-focus-bar button:hover {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    .board-focus-bar button.active {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 900px) {
+      .page {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .board-wrapper {
+        height: 520px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      nav {
+        gap: 12px;
+        font-size: 0.8rem;
+      }
+      .sidebar {
+        padding: 10px 10px 12px;
+      }
+      .board-wrapper {
+        height: 440px;
+      }
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="swot.html">SWOT</a>
+    <a href="index.html#tools">Tools</a>
+    <a href="index.html#about">About</a>
+  </div>
+  <div class="nav-right">IMTHEBUS tools</div>
+</nav>
+
+<div class="page">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="session-row">
+      <button class="session-title-button" id="sessionPickerBtn">
+        Session: <span id="sessionTitleLabel">Untitled SWOT</span>
+      </button>
+      <div class="session-actions">
+        <button id="newSessionBtn" title="New SWOT session">New</button>
+        <button id="duplicateSessionBtn" title="Duplicate this session">Copy</button>
+      </div>
+    </div>
+
+    <div class="sidebar-details">
+      <div class="sidebar-details-summary">Session details ▾</div>
+      <div class="sidebar-details-body">
+        <div>
+          <div class="field-label">Title</div>
+          <input type="text" id="titleInput" class="title-input" placeholder="Example: Bookspeed FY26 SWOT" />
+        </div>
+
+        <div style="display:flex; gap:6px; margin-top:6px;">
+          <div style="flex:1;">
+            <div class="field-label">Date</div>
+            <input type="date" id="dateInput" class="date-input" />
+          </div>
+        </div>
+
+        <div style="margin-top:6px;">
+          <div class="field-label">Context (optional)</div>
+          <textarea id="contextInput" class="context-input" placeholder="Scope, team, or question driving this SWOT."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div>
+      <div class="field-label">Currently entering</div>
+      <div class="current-quadrant-label" id="currentQuadrantText">Strengths</div>
+      <div class="quadrant-selector">
+        <button class="quadrant-button active" data-q="strength">S</button>
+        <button class="quadrant-button" data-q="weakness">W</button>
+        <button class="quadrant-button" data-q="opportunity">O</button>
+        <button class="quadrant-button" data-q="threat">T</button>
+      </div>
+      <textarea
+        id="captureInput"
+        class="capture-input"
+        placeholder="Capture ideas as people talk. Press Enter to add."
+        spellcheck="true"
+      ></textarea>
+      <div class="capture-actions">
+        <button class="btn-primary" id="addNoteBtn">Add note</button>
+        <div class="capture-meta">
+          S <span id="countStrength">0</span> /
+          W <span id="countWeakness">0</span> /
+          O <span id="countOpportunity">0</span> /
+          T <span id="countThreat">0</span>
+        </div>
+      </div>
+      <label class="small-checkbox">
+        <input type="checkbox" id="autoCapCheckbox" checked />
+        Auto capitalise first letter
+      </label>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="board-controls">
+      <button id="toggleFullscreenBtn">Fullscreen board</button>
+      <button id="exportImageBtn">Export image</button>
+      <button id="exportTextBtn">Export summary</button>
+    </div>
+
+    <div class="info-text" id="hotkeyInfo">
+      Keyboard: 1 2 3 4 switch S W O T. Enter adds a note. Drag notes to move them. Double click to edit.
+    </div>
+  </aside>
+
+  <!-- Board -->
+  <section class="board-wrapper" id="boardWrapper">
+    <div class="board-title-display" id="boardTitleDisplay">Untitled SWOT</div>
+
+    <div class="board-toolbar">
+      <button id="toolbarFullscreenBtn" title="Toggle fullscreen">⤢</button>
+      <button id="toolbarExportBtn" title="Export summary">Txt</button>
+    </div>
+
+    <div class="board-meta-bar">
+      <span><small id="metaSessionName">Untitled SWOT</small></span>
+      <span><small id="metaLastSaved">Not saved yet</small></span>
+    </div>
+
+    <div class="board" id="board">
+      <div class="quadrant-grid" id="quadrantGrid">
+        <div class="quadrant-lines"></div>
+
+        <div class="quadrant-labels">
+          <div class="quadrant-label" data-q="strength">
+            <span class="quadrant-pill strength">Strengths</span>
+            <span class="quadrant-count" id="labelCountStrength">0</span>
+          </div>
+          <div class="quadrant-label" data-q="weakness">
+            <span class="quadrant-pill weakness">Weaknesses</span>
+            <span class="quadrant-count" id="labelCountWeakness">0</span>
+          </div>
+          <div class="quadrant-label" data-q="opportunity">
+            <span class="quadrant-pill opportunity">Opportunities</span>
+            <span class="quadrant-count" id="labelCountOpportunity">0</span>
+          </div>
+          <div class="quadrant-label" data-q="threat">
+            <span class="quadrant-pill threat">Threats</span>
+            <span class="quadrant-count" id="labelCountThreat">0</span>
+          </div>
+        </div>
+
+        <div class="board-inner" id="boardInner">
+          <!-- Notes injected here -->
+        </div>
+      </div>
+
+      <div class="board-focus-bar">
+        <button id="focusStrengthBtn">Focus S</button>
+        <button id="focusWeaknessBtn">Focus W</button>
+        <button id="focusOpportunityBtn">Focus O</button>
+        <button id="focusThreatBtn">Focus T</button>
+        <button id="resetFocusBtn">Reset</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Session picker overlay -->
+<div class="session-overlay" id="sessionOverlay">
+  <div class="session-overlay-panel">
+    <div class="session-overlay-header">
+      <h2>SWOT sessions</h2>
+      <button id="closeSessionOverlayBtn">Close</button>
+    </div>
+    <div class="session-overlay-list" id="sessionList"></div>
+    <div class="session-overlay-footer">
+      <button id="overlayNewSessionBtn">New</button>
+      <button id="overlayDeleteSessionBtn">Delete current</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const STORAGE_KEY = "imthebus-swot-sessions";
+
+  let appState = {
+    sessions: [],
+    currentSessionId: null
+  };
+
+  let currentQuadrant = "strength";
+  let topZ = 10;
+
+  const captureInput = document.getElementById("captureInput");
+  const addNoteBtn = document.getElementById("addNoteBtn");
+  const autoCapCheckbox = document.getElementById("autoCapCheckbox");
+
+  const titleInput = document.getElementById("titleInput");
+  const dateInput = document.getElementById("dateInput");
+  const contextInput = document.getElementById("contextInput");
+
+  const sessionPickerBtn = document.getElementById("sessionPickerBtn");
+  const newSessionBtn = document.getElementById("newSessionBtn");
+  const duplicateSessionBtn = document.getElementById("duplicateSessionBtn");
+  const sessionOverlay = document.getElementById("sessionOverlay");
+  const sessionList = document.getElementById("sessionList");
+  const overlayNewSessionBtn = document.getElementById("overlayNewSessionBtn");
+  const overlayDeleteSessionBtn = document.getElementById("overlayDeleteSessionBtn");
+  const closeSessionOverlayBtn = document.getElementById("closeSessionOverlayBtn");
+
+  const boardWrapper = document.getElementById("boardWrapper");
+  const quadrantGrid = document.getElementById("quadrantGrid");
+  const boardInner = document.getElementById("boardInner");
+
+  const sessionTitleLabel = document.getElementById("sessionTitleLabel");
+  const metaSessionName = document.getElementById("metaSessionName");
+  const metaLastSaved = document.getElementById("metaLastSaved");
+  const boardTitleDisplay = document.getElementById("boardTitleDisplay");
+  const currentQuadrantText = document.getElementById("currentQuadrantText");
+
+  const countStrength = document.getElementById("countStrength");
+  const countWeakness = document.getElementById("countWeakness");
+  const countOpportunity = document.getElementById("countOpportunity");
+  const countThreat = document.getElementById("countThreat");
+
+  const labelCountStrength = document.getElementById("labelCountStrength");
+  const labelCountWeakness = document.getElementById("labelCountWeakness");
+  const labelCountOpportunity = document.getElementById("labelCountOpportunity");
+  const labelCountThreat = document.getElementById("labelCountThreat");
+
+  const toggleFullscreenBtn = document.getElementById("toggleFullscreenBtn");
+  const toolbarFullscreenBtn = document.getElementById("toolbarFullscreenBtn");
+
+  const focusStrengthBtn = document.getElementById("focusStrengthBtn");
+  const focusWeaknessBtn = document.getElementById("focusWeaknessBtn");
+  const focusOpportunityBtn = document.getElementById("focusOpportunityBtn");
+  const focusThreatBtn = document.getElementById("focusThreatBtn");
+  const resetFocusBtn = document.getElementById("resetFocusBtn");
+
+  const exportImageBtn = document.getElementById("exportImageBtn");
+  const exportTextBtn = document.getElementById("exportTextBtn");
+  const toolbarExportBtn = document.getElementById("toolbarExportBtn");
+
+  const hotkeyInfo = document.getElementById("hotkeyInfo");
+  const HOTKEY_TIP = "Keyboard: 1 2 3 4 switch S W O T. Enter adds a note. Drag notes to move them. Double click to edit.";
+
+  captureInput.title = HOTKEY_TIP;
+  boardWrapper.title = HOTKEY_TIP;
+  hotkeyInfo.title = HOTKEY_TIP;
+
+  function uuid() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
+  function nowIso() {
+    return new Date().toISOString();
+  }
+
+  function loadAllSessions() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { sessions: [], currentSessionId: null };
+    try {
+      const parsed = JSON.parse(raw);
+      if (!parsed.sessions) throw new Error("Invalid structure");
+      return parsed;
+    } catch {
+      return { sessions: [], currentSessionId: null };
+    }
+  }
+
+  function saveAllSessions() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    updateLastSavedMeta();
+  }
+
+  function getCurrentSession() {
+    return appState.sessions.find(s => s.id === appState.currentSessionId) || null;
+  }
+
+  function createNewSession() {
+    const id = `swot_${Date.now()}`;
+    const today = new Date().toISOString().slice(0, 10);
+    const session = {
+      id,
+      title: "Untitled SWOT",
+      date: today,
+      context: "",
+      createdAt: nowIso(),
+      updatedAt: nowIso(),
+      notes: []
+    };
+    appState.sessions.push(session);
+    appState.currentSessionId = id;
+    saveAllSessions();
+    renderSession();
+  }
+
+  function duplicateCurrentSession() {
+    const session = getCurrentSession();
+    if (!session) {
+      createNewSession();
+      return;
+    }
+    const copy = JSON.parse(JSON.stringify(session));
+    copy.id = `swot_${Date.now()}`;
+    copy.title = session.title + " (copy)";
+    copy.createdAt = nowIso();
+    copy.updatedAt = nowIso();
+    appState.sessions.push(copy);
+    appState.currentSessionId = copy.id;
+    saveAllSessions();
+    renderSession();
+  }
+
+  function deleteCurrentSession() {
+    const session = getCurrentSession();
+    if (!session) return;
+    if (!confirm("Delete this SWOT session? This cannot be undone.")) return;
+    appState.sessions = appState.sessions.filter(s => s.id !== session.id);
+    if (!appState.sessions.length) {
+      appState.currentSessionId = null;
+      createNewSession();
+    } else {
+      appState.currentSessionId = appState.sessions[0].id;
+      saveAllSessions();
+      renderSession();
+    }
+  }
+
+  function setQuadrant(q) {
+    currentQuadrant = q;
+    document.querySelectorAll(".quadrant-button").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.q === q);
+    });
+    const labelMap = {
+      strength: "Strengths",
+      weakness: "Weaknesses",
+      opportunity: "Opportunities",
+      threat: "Threats"
+    };
+    currentQuadrantText.textContent = labelMap[q] || "Strengths";
+    captureInput.focus();
+  }
+
+  function autoCap(text) {
+    const trimmed = text.trim();
+    if (!trimmed) return "";
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+  }
+
+  function computeBoardRect() {
+    return quadrantGrid.getBoundingClientRect();
+  }
+
+  function quadrantFromPosition(xNorm, yNorm) {
+    const horiz = xNorm < 0.5 ? "left" : "right";
+    const vert = yNorm < 0.5 ? "top" : "bottom";
+    if (horiz === "left" && vert === "top") return "strength";
+    if (horiz === "right" && vert === "top") return "weakness";
+    if (horiz === "left" && vert === "bottom") return "opportunity";
+    return "threat";
+  }
+
+  function addNoteFromCapture() {
+    const session = getCurrentSession();
+    if (!session) return;
+    let text = captureInput.value;
+    if (!text.trim()) return;
+    if (autoCapCheckbox.checked) {
+      text = autoCap(text);
+    }
+
+    const offsetX = (Math.random() * 0.6 + 0.2);
+    const offsetY = (Math.random() * 0.6 + 0.2);
+
+    let xNorm, yNorm;
+    switch (currentQuadrant) {
+      case "strength":
+        xNorm = offsetX * 0.5;
+        yNorm = offsetY * 0.5;
+        break;
+      case "weakness":
+        xNorm = 0.5 + offsetX * 0.5;
+        yNorm = offsetY * 0.5;
+        break;
+      case "opportunity":
+        xNorm = offsetX * 0.5;
+        yNorm = 0.5 + offsetY * 0.5;
+        break;
+      case "threat":
+        xNorm = 0.5 + offsetX * 0.5;
+        yNorm = 0.5 + offsetY * 0.5;
+        break;
+      default:
+        xNorm = 0.25;
+        yNorm = 0.25;
+    }
+
+    topZ += 1;
+
+    const width = 140 + Math.random() * 40;   // 140–180
+    const height = 70 + Math.random() * 25;   // 70–95
+    const rotation = (Math.random() * 8 - 4).toFixed(2); // -4 to 4 degrees
+
+    const note = {
+      id: uuid(),
+      quadrant: currentQuadrant,
+      text,
+      x: xNorm,
+      y: yNorm,
+      rotation,
+      width,
+      height,
+      z: topZ,
+      createdAt: nowIso(),
+      updatedAt: nowIso()
+    };
+
+    session.notes.push(note);
+    session.updatedAt = nowIso();
+    saveAllSessions();
+    captureInput.value = "";
+    renderNotes();
+  }
+
+  function updateCounts() {
+    const session = getCurrentSession();
+    const counts = { strength: 0, weakness: 0, opportunity: 0, threat: 0 };
+    if (session) {
+      session.notes.forEach(n => {
+        if (counts[n.quadrant] !== undefined) counts[n.quadrant] += 1;
+      });
+    }
+    countStrength.textContent = counts.strength;
+    countWeakness.textContent = counts.weakness;
+    countOpportunity.textContent = counts.opportunity;
+    countThreat.textContent = counts.threat;
+
+    labelCountStrength.textContent = counts.strength;
+    labelCountWeakness.textContent = counts.weakness;
+    labelCountOpportunity.textContent = counts.opportunity;
+    labelCountThreat.textContent = counts.threat;
+  }
+
+  function renderNotes() {
+    const session = getCurrentSession();
+    boardInner.querySelectorAll(".note").forEach(n => n.remove());
+    if (!session) return;
+
+    const boardRect = computeBoardRect();
+
+    session.notes.forEach(note => {
+      if (note.rotation === undefined || note.rotation === null) {
+        note.rotation = (Math.random() * 8 - 4).toFixed(2);
+      }
+      if (!note.width) {
+        note.width = 140 + Math.random() * 40;
+      }
+      if (!note.height) {
+        note.height = 70 + Math.random() * 25;
+      }
+      if (!note.z) {
+        topZ += 1;
+        note.z = topZ;
+      } else {
+        topZ = Math.max(topZ, note.z);
+      }
+
+      const el = document.createElement("div");
+      el.className = "note note-new";
+      el.dataset.id = note.id;
+      el.dataset.quadrant = note.quadrant;
+      el.style.width = `${note.width}px`;
+      el.style.minHeight = `${note.height}px`;
+      el.style.setProperty("--note-rot", `${note.rotation}deg`);
+
+      const textEl = document.createElement("div");
+      textEl.className = "note-text";
+      textEl.textContent = note.text;
+      el.appendChild(textEl);
+
+      const noteWidth = note.width;
+      const noteHeight = note.height;
+      const x = note.x * boardRect.width - noteWidth / 2;
+      const y = note.y * boardRect.height - noteHeight / 2 + (Math.random() * 4 - 2);
+
+      el.style.left = `${x}px`;
+      el.style.top = `${y}px`;
+      el.style.transform = `rotate(${note.rotation}deg)`;
+      el.style.zIndex = note.z || 1;
+
+      setTimeout(() => {
+        el.classList.remove("note-new");
+      }, 400);
+
+      boardInner.appendChild(el);
+
+      makeNoteDraggable(el, note);
+      attachNoteEvents(el, note);
+    });
+
+    updateCounts();
+  }
+
+  function updateSessionMetaFields(session) {
+    titleInput.value = session.title || "";
+    dateInput.value = session.date || "";
+    contextInput.value = session.context || "";
+    sessionTitleLabel.textContent = session.title || "Untitled SWOT";
+    metaSessionName.textContent = session.title || "Untitled SWOT";
+    boardTitleDisplay.textContent = session.title || "Untitled SWOT";
+  }
+
+  function updateLastSavedMeta() {
+    const session = getCurrentSession();
+    if (!session) {
+      metaLastSaved.textContent = "Not saved yet";
+      return;
+    }
+    const d = new Date(session.updatedAt || session.createdAt);
+    metaLastSaved.textContent = `Last saved ${d.toLocaleString()}`;
+  }
+
+  function renderSessionListOverlay() {
+    sessionList.innerHTML = "";
+    if (!appState.sessions.length) return;
+    appState.sessions
+      .slice()
+      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      .forEach(session => {
+        const item = document.createElement("div");
+        item.className = "session-item";
+        item.dataset.id = session.id;
+
+        const left = document.createElement("div");
+        left.className = "session-item-title";
+        left.textContent = session.title || "Untitled";
+
+        const right = document.createElement("div");
+        right.className = "session-item-meta";
+        const d = new Date(session.updatedAt || session.createdAt);
+        right.innerHTML = `${d.toLocaleDateString()}<br>${session.notes.length} notes`;
+
+        item.appendChild(left);
+        item.appendChild(right);
+
+        item.addEventListener("click", () => {
+          appState.currentSessionId = session.id;
+          saveAllSessions();
+          renderSession();
+          sessionOverlay.classList.remove("open");
+        });
+
+        sessionList.appendChild(item);
+      });
+  }
+
+  function renderSession() {
+    const session = getCurrentSession();
+    if (!session) return;
+    updateSessionMetaFields(session);
+    updateLastSavedMeta();
+    renderNotes();
+  }
+
+  function setBoardFocus(q) {
+    boardWrapper.classList.remove(
+      "board-focus-strength",
+      "board-focus-weakness",
+      "board-focus-opportunity",
+      "board-focus-threat"
+    );
+    focusStrengthBtn.classList.remove("active");
+    focusWeaknessBtn.classList.remove("active");
+    focusOpportunityBtn.classList.remove("active");
+    focusThreatBtn.classList.remove("active");
+
+    if (!q) return;
+    const classMap = {
+      strength: "board-focus-strength",
+      weakness: "board-focus-weakness",
+      opportunity: "board-focus-opportunity",
+      threat: "board-focus-threat"
+    };
+    boardWrapper.classList.add(classMap[q]);
+    const btnMap = {
+      strength: focusStrengthBtn,
+      weakness: focusWeaknessBtn,
+      opportunity: focusOpportunityBtn,
+      threat: focusThreatBtn
+    };
+    const btn = btnMap[q];
+    if (btn) btn.classList.add("active");
+  }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      if (boardWrapper.requestFullscreen) {
+        boardWrapper.requestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }
+
+  function makeNoteDraggable(el, note) {
+    let dragging = false;
+    let startX, startY, originLeft, originTop;
+
+    function onMouseDown(e) {
+      if (e.button !== 0) return;
+      if (el.classList.contains("editing")) return;
+      dragging = true;
+      topZ += 1;
+      note.z = topZ;
+      el.style.zIndex = topZ;
+      el.classList.add("dragging");
+      const rect = el.getBoundingClientRect();
+      startX = e.clientX;
+      startY = e.clientY;
+      originLeft = rect.left;
+      originTop = rect.top;
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    }
+
+    function onMouseMove(e) {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      const newLeft = originLeft + dx;
+      const newTop = originTop + dy;
+
+      const boardRect = computeBoardRect();
+      const noteWidth = el.offsetWidth;
+      const noteHeight = el.offsetHeight;
+
+      const clampedLeft = Math.min(
+        Math.max(newLeft, boardRect.left),
+        boardRect.right - noteWidth
+      );
+      const clampedTop = Math.min(
+        Math.max(newTop, boardRect.top),
+        boardRect.bottom - noteHeight
+      );
+
+      el.style.left = `${clampedLeft - boardRect.left}px`;
+      el.style.top = `${clampedTop - boardRect.top}px`;
+
+      const centerX = clampedLeft - boardRect.left + noteWidth / 2;
+      const centerY = clampedTop - boardRect.top + noteHeight / 2;
+      note.x = centerX / boardRect.width;
+      note.y = centerY / boardRect.height;
+    }
+
+    function onMouseUp() {
+      if (!dragging) return;
+      dragging = false;
+      el.classList.remove("dragging");
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+
+      const newQuadrant = quadrantFromPosition(note.x, note.y);
+      if (newQuadrant !== note.quadrant) {
+        note.quadrant = newQuadrant;
+        el.dataset.quadrant = newQuadrant;
+      }
+      const session = getCurrentSession();
+      if (session) {
+        note.updatedAt = nowIso();
+        session.updatedAt = nowIso();
+        saveAllSessions();
+      }
+      updateCounts();
+    }
+
+    el.addEventListener("mousedown", onMouseDown);
+  }
+
+  function attachNoteEvents(el, note) {
+    el.addEventListener("dblclick", () => {
+      startNoteEdit(el, note);
+    });
+  }
+
+  function startNoteEdit(el, note) {
+    el.classList.add("editing");
+    const textEl = el.querySelector(".note-text");
+    const currentText = textEl.textContent;
+    const textarea = document.createElement("textarea");
+    textarea.value = currentText;
+    textEl.textContent = "";
+    textEl.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    function finishEdit(commit) {
+      if (!el.classList.contains("editing")) return;
+      el.classList.remove("editing");
+      const newText = commit ? textarea.value.trim() : currentText;
+      textEl.innerHTML = "";
+      textEl.textContent = newText || currentText;
+      note.text = newText || currentText;
+      const session = getCurrentSession();
+      if (session) {
+        note.updatedAt = nowIso();
+        session.updatedAt = nowIso();
+        saveAllSessions();
+      }
+      textarea.removeEventListener("blur", onBlur);
+      textarea.removeEventListener("keydown", onKeydown);
+    }
+
+    function onBlur() {
+      finishEdit(true);
+    }
+
+    function onKeydown(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        finishEdit(true);
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        finishEdit(false);
+      }
+    }
+
+    textarea.addEventListener("blur", onBlur);
+    textarea.addEventListener("keydown", onKeydown);
+  }
+
+  function exportBoardAsImage() {
+    if (typeof html2canvas === "undefined") {
+      alert("html2canvas is not loaded yet. Please try again in a moment.");
+      return;
+    }
+    const session = getCurrentSession();
+    if (!session) return;
+    html2canvas(quadrantGrid, {
+      backgroundColor: "#ffffff"
+    }).then(canvas => {
+      const link = document.createElement("a");
+      const date = (session.date || new Date().toISOString().slice(0, 10)).replace(/-/g, "");
+      const slug = (session.title || "SWOT").replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_]/g, "");
+      link.download = `SWOT_${slug}_${date}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }).catch(() => {
+      alert("Could not export image.");
+    });
+  }
+
+  function exportSummaryText() {
+    const session = getCurrentSession();
+    if (!session) return;
+
+    const byQuadrant = {
+      strength: [],
+      weakness: [],
+      opportunity: [],
+      threat: []
+    };
+    session.notes.forEach(n => {
+      if (byQuadrant[n.quadrant]) byQuadrant[n.quadrant].push(n.text);
+    });
+
+    const title = session.title || "Untitled SWOT";
+    const date = session.date || new Date().toISOString().slice(0, 10);
+
+    let text = "";
+    text += `Title: ${title}\n`;
+    text += `Date: ${date}\n`;
+    if (session.context && session.context.trim()) {
+      text += `Context: ${session.context.trim()}\n`;
+    }
+    text += "\n";
+
+    function section(name, key) {
+      text += name + "\n";
+      if (!byQuadrant[key].length) {
+        text += "- (none)\n\n";
+        return;
+      }
+      byQuadrant[key].forEach(item => {
+        text += `- ${item}\n`;
+      });
+      text += "\n";
+    }
+
+    section("STRENGTHS", "strength");
+    section("WEAKNESSES", "weakness");
+    section("OPPORTUNITIES", "opportunity");
+    section("THREATS", "threat");
+
+    text += "Created using SWOT tools from IMTHEBUS Toolbox.\n";
+
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const slug = title.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_]/g, "");
+    const dateSlug = date.replace(/-/g, "");
+    link.href = url;
+    link.download = `SWOT_${slug}_${dateSlug}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleKeydown(e) {
+    if (document.activeElement === captureInput) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        addNoteFromCapture();
+        return;
+      }
+    }
+    if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") return;
+
+    if (e.key === "1") setQuadrant("strength");
+    if (e.key === "2") setQuadrant("weakness");
+    if (e.key === "3") setQuadrant("opportunity");
+    if (e.key === "4") setQuadrant("threat");
+    if (e.key === "f" || e.key === "F") toggleFullscreen();
+    if (e.key === "Escape") setBoardFocus(null);
+  }
+
+  // Event wiring
+
+  addNoteBtn.addEventListener("click", addNoteFromCapture);
+
+  document.querySelectorAll(".quadrant-button").forEach(btn => {
+    btn.addEventListener("click", () => setQuadrant(btn.dataset.q));
+  });
+
+  titleInput.addEventListener("input", () => {
+    const session = getCurrentSession();
+    if (!session) return;
+    session.title = titleInput.value || "Untitled SWOT";
+    session.updatedAt = nowIso();
+    saveAllSessions();
+    updateSessionMetaFields(session);
+  });
+
+  dateInput.addEventListener("change", () => {
+    const session = getCurrentSession();
+    if (!session) return;
+    session.date = dateInput.value;
+    session.updatedAt = nowIso();
+    saveAllSessions();
+  });
+
+  contextInput.addEventListener("input", () => {
+    const session = getCurrentSession();
+    if (!session) return;
+    session.context = contextInput.value;
+    session.updatedAt = nowIso();
+    saveAllSessions();
+  });
+
+  toggleFullscreenBtn.addEventListener("click", toggleFullscreen);
+  toolbarFullscreenBtn.addEventListener("click", toggleFullscreen);
+
+  focusStrengthBtn.addEventListener("click", () => setBoardFocus("strength"));
+  focusWeaknessBtn.addEventListener("click", () => setBoardFocus("weakness"));
+  focusOpportunityBtn.addEventListener("click", () => setBoardFocus("opportunity"));
+  focusThreatBtn.addEventListener("click", () => setBoardFocus("threat"));
+  resetFocusBtn.addEventListener("click", () => setBoardFocus(null));
+
+  exportImageBtn.addEventListener("click", exportBoardAsImage);
+  exportTextBtn.addEventListener("click", exportSummaryText);
+  toolbarExportBtn.addEventListener("click", exportSummaryText);
+
+  sessionPickerBtn.addEventListener("click", () => {
+    renderSessionListOverlay();
+    sessionOverlay.classList.add("open");
+  });
+  newSessionBtn.addEventListener("click", createNewSession);
+  duplicateSessionBtn.addEventListener("click", duplicateCurrentSession);
+  overlayNewSessionBtn.addEventListener("click", createNewSession);
+  overlayDeleteSessionBtn.addEventListener("click", deleteCurrentSession);
+  closeSessionOverlayBtn.addEventListener("click", () => {
+    sessionOverlay.classList.remove("open");
+  });
+  sessionOverlay.addEventListener("click", e => {
+    if (e.target === sessionOverlay) sessionOverlay.classList.remove("open");
+  });
+
+  window.addEventListener("keydown", handleKeydown);
+  window.addEventListener("resize", () => {
+    renderNotes();
+  });
+
+  // Init
+
+  function init() {
+    appState = loadAllSessions();
+    if (!appState.sessions.length) {
+      createNewSession();
+    } else {
+      if (!appState.currentSessionId) {
+        appState.currentSessionId = appState.sessions[0].id;
+      }
+      saveAllSessions();
+      renderSession();
+    }
+    setQuadrant("strength");
+    captureInput.focus();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
