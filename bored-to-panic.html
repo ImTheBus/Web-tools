@@ -18,6 +18,16 @@
       --bg-board: #fdfdfd;
       --ink: #111111;
       --border-strong: #000000;
+
+      --strength-bg: #c7f9cc;
+      --weakness-bg: #ffb3c1;
+      --opportunity-bg: #bde0fe;
+      --threat-bg: #ffeaa7;
+
+      --strength-tag: #15803d;
+      --weakness-tag: #b91c1c;
+      --opportunity-tag: #1d4ed8;
+      --threat-tag: #b45309;
     }
 
     * {
@@ -173,11 +183,6 @@
       background: #fff;
     }
 
-    .sidebar-field select.role-missing {
-      border-color: #f97316;
-      box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.4);
-    }
-
     .sidebar-note {
       margin-top: 0.5rem;
       font-size: 0.78rem;
@@ -195,6 +200,7 @@
       justify-content: space-between;
       align-items: baseline;
       font-size: 0.9rem;
+      cursor: pointer;
     }
 
     .sidebar-section-header span.label {
@@ -207,13 +213,15 @@
     }
 
     .sidebar-section-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease-out;
       font-size: 0.82rem;
       color: #444;
-      max-height: 220px;
     }
 
-    .sidebar-section.static .sidebar-section-body {
-      max-height: none;
+    .sidebar-section.open .sidebar-section-body {
+      max-height: 260px;
     }
 
     .sidebar-section-body p {
@@ -235,7 +243,7 @@
       transition: max-height 0.25s ease-out;
     }
 
-    .sidebar-section.sidebar-export:hover .sidebar-export-body {
+    .sidebar-section.sidebar-export.open .sidebar-export-body {
       max-height: 260px;
     }
 
@@ -291,10 +299,15 @@
       padding: 1rem 1.15rem 1.35rem;
       position: relative;
       overflow: hidden;
+      transition: box-shadow 0.2s ease-out;
     }
 
     .board-wrapper:fullscreen {
       overflow-y: auto;
+    }
+
+    .board-wrapper.calculated {
+      box-shadow: 0 0 0 3px #111 inset, 0 14px 0 rgba(0, 0, 0, 0.14);
     }
 
     .board-inner {
@@ -330,25 +343,6 @@
       cursor: pointer;
     }
 
-    .board-intro {
-      font-size: 0.9rem;
-      max-width: 40rem;
-    }
-
-    .board-about {
-      margin-top: 0.25rem;
-      padding: 0.6rem 0.75rem;
-      border-radius: 14px;
-      border: 2px dashed #000;
-      background: #fffef0;
-      font-size: 0.86rem;
-      line-height: 1.5;
-    }
-
-    .board-about strong {
-      font-weight: 600;
-    }
-
     .board-body {
       display: grid;
       grid-template-columns: minmax(0, 1.4fr) minmax(260px, 1fr);
@@ -372,7 +366,28 @@
       min-width: 0;
     }
 
+    /* Highlight / about card inside board */
+
+    .board-highlight {
+      border-radius: 18px;
+      border: 2px solid #000;
+      background: #fffbe6;
+      padding: 0.65rem 0.8rem;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .board-highlight strong {
+      font-weight: 600;
+    }
+
     /* Question sections */
+
+    .question-sections-note {
+      font-size: 0.78rem;
+      color: #555;
+      margin-bottom: 0.45rem;
+    }
 
     .question-section {
       border-radius: 16px;
@@ -408,7 +423,8 @@
     .question-section-toggle {
       font-size: 1.1rem;
       font-weight: 600;
-      transition: transform 0.2s;
+      transform-origin: center;
+      transition: transform 0.18s ease-out;
     }
 
     .question-section-body {
@@ -531,17 +547,15 @@
       color: #fff;
       padding: 0.45rem 1.1rem;
       cursor: pointer;
-      transition: box-shadow 0.15s, transform 0.1s, background 0.15s, border-color 0.15s;
+      transition: background 0.15s ease-out, transform 0.08s ease-out;
     }
 
-    .calculate-row button.calculated {
-      background: #16a34a;
-      border-color: #16a34a;
-      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.35);
-      transform: translateY(-1px);
+    .calculate-row button.calculating {
+      background: #1f2937;
+      transform: translateY(1px);
     }
 
-    /* Right column: ring and results */
+    /* Right column: donut and results */
 
     .donut-panel {
       border-radius: 16px;
@@ -659,16 +673,12 @@
     .entries-panel td {
       border: 1px solid #000;
       padding: 0.25rem 0.3rem;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
     }
 
-    .entries-chart-container {
+    #entriesChart {
       margin-top: 0.5rem;
-      display: none;
-    }
-
-    #entriesTrend {
-      width: 100%;
-      height: 220px;
     }
 
     /* Export header/footer inside board for PDF */
@@ -698,6 +708,17 @@
       color: #444;
     }
 
+    .export-highlight {
+      margin-top: 0.45rem;
+      font-size: 0.8rem;
+    }
+
+    .export-suggestion {
+      margin-top: 0.25rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
     /* Site footer */
 
     footer.site-footer {
@@ -714,6 +735,7 @@
       flex-wrap: wrap;
       justify-content: space-between;
       gap: 1rem;
+      align-items: flex-end;
     }
 
     .footer-links {
@@ -739,6 +761,16 @@
     .footer-group a:hover {
       text-decoration: underline;
     }
+
+    .footer-meta-line {
+      margin-top: 0.15rem;
+    }
+
+    .footer-counter {
+      margin-top: 0.25rem;
+      font-size: 0.78rem;
+      color: #444;
+    }
   </style>
 </head>
 
@@ -761,16 +793,18 @@
         <aside class="sidebar">
           <h1 class="sidebar-title">Bored to Panic scale</h1>
           <p class="sidebar-subtitle">
-            A shared language for how work feels, from bored through comfort and stretch, into stress and panic.
+            A shared language for how work feels. This tool helps you and your manager turn day to day
+            workload into five zones: Bored, Comfort, Stretch, Stress and Panic, so you can talk about how
+            work is landing rather than guessing.
           </p>
 
           <div class="sidebar-field">
-            <label for="personName">Name (optional)</label>
+            <label for="personName">Name</label>
             <input id="personName" type="text" placeholder="e.g. Alex Smith" />
           </div>
 
           <div class="sidebar-field">
-            <label for="roleLevel">Role level (optional)</label>
+            <label for="roleLevel">Role level</label>
             <select id="roleLevel">
               <option value="">Select role level</option>
               <option value="L1">Operator</option>
@@ -802,35 +836,38 @@
             Use this once per check-in to capture how the last few days or weeks have actually felt.
           </p>
 
-          <!-- How it works (always visible) -->
-          <div class="sidebar-section static">
+          <!-- About this tool / Yerkes–Dodson -->
+          <div class="sidebar-section" id="aboutSection">
             <div class="sidebar-section-header">
               <span class="label">About this tool</span>
+              <span class="hint">tap or click to expand</span>
             </div>
             <div class="sidebar-section-body">
               <p>
-                The Bored → Comfort → Stretch → Stress → Panic scale is based on the Yerkes–Dodson law and
-                turns it into a simple conversational tool.
+                The Bored → Comfort → Stretch → Stress → Panic scale is based on the Yerkes–Dodson law,
+                which links performance to arousal or pressure. Too little pressure and we drift into Bored;
+                too much and we drop into Stress and Panic. In the middle, particularly in Stretch, we do
+                our best learning and growth.
               </p>
               <p>
-                Over time, spending more time in <strong>Stretch</strong> makes that work feel easier.
-                Your comfort zone grows, so you visit Stress less often and Panic becomes rarer
-                and less intense. You also get used to seeing yourself succeed or learning from
-                failures without treating them as disasters.
+                Over time, spending more time in Stretch makes that work feel easier. Your Comfort zone
+                grows, so you visit Stress less often and Panic becomes rarer and less intense. You also get
+                used to seeing yourself succeed, or learning from failures without treating them as
+                disasters.
               </p>
               <p>
-                This tool focuses on where your time and energy sit now. It does not label people as
-                good or bad performers. It asks whether the “exercise” you do each day is helping you
-                grow a bigger Comfort zone, or pushing you toward Boredom or Panic.
+                This tool focuses on where your time and energy sit now. It does not label people as good or
+                bad performers. It asks whether the “exercise” you do each day is helping you grow a bigger
+                Comfort zone, or pushing you toward Boredom or Panic.
               </p>
             </div>
           </div>
 
           <!-- Data and privacy -->
-          <div class="sidebar-section">
+          <div class="sidebar-section" id="privacySection">
             <div class="sidebar-section-header">
               <span class="label">Data and privacy</span>
-              <span class="hint">hover to expand</span>
+              <span class="hint">tap or click to expand</span>
             </div>
             <div class="sidebar-section-body">
               <p>
@@ -838,16 +875,17 @@
                 Nothing is uploaded, shared or sent anywhere.
               </p>
               <p>
-                Clearing browser storage, switching device or pressing “Clear all saved entries” deletes the data permanently.
+                Clearing browser storage, switching device or pressing “Clear all saved entries” deletes the
+                data permanently.
               </p>
             </div>
           </div>
 
           <!-- Saved / export -->
-          <div class="sidebar-section sidebar-export">
+          <div class="sidebar-section sidebar-export" id="exportSection">
             <div class="sidebar-section-header">
-              <span class="label">Saved results &amp; export</span>
-              <span class="hint">hover to expand</span>
+              <span class="label">Saved results and export</span>
+              <span class="hint">tap or click to expand</span>
             </div>
             <div class="sidebar-export-body">
               <div class="sidebar-field" style="margin-top:0.4rem;">
@@ -858,14 +896,14 @@
               </div>
 
               <div class="sidebar-buttons">
-                <button id="saveEntry" type="button" class="primary">Save entry</button>
+                <button id="saveEntry" type="button" class="primary">Save current view</button>
                 <button id="exportCsv" type="button">Export CSV</button>
                 <button id="exportPdf" type="button">Save as PDF</button>
                 <button id="clearEntries" type="button" class="danger">Clear all</button>
               </div>
 
               <p class="sidebar-note" style="margin-top:0.35rem;">
-                Saved entries stay in this browser only. Use CSV or PDF to keep a record elsewhere.
+                Entries stay in this browser only. Use CSV or PDF to keep a record elsewhere.
               </p>
             </div>
           </div>
@@ -875,40 +913,41 @@
         <section class="board-wrapper" id="boardWrapper">
           <div class="board-inner" id="boardInner">
             <div class="board-header">
-              <div class="board-title-display">Bored to Panic assessment</div>
+              <div class="board-title-display">Bored to Panic assessment board</div>
               <div class="board-toolbar">
                 <button type="button" id="fullscreenToggle">Fullscreen board</button>
               </div>
             </div>
-            <p class="board-intro">
-              This tool helps you and your manager understand how work feels at the moment.
-              It maps your answers to five zones: Bored, Comfort, Stretch, Stress and Panic.
-            </p>
-            <div class="board-about" id="boardAbout">
-              <strong>Why Bored and Panic matter:</strong>
-              Both Bored and Panic are zones we do not enjoy. They are not places where we feel
-              safely challenged or comfortable, and they rarely support learning. We spend time in
-              <strong>Stretch</strong> to expand our Comfort zone, and we learn how to recover when we have
-              to visit Stress. This tool is about understanding where you currently spend your time and
-              whether the “exercise” you do each day is helping or hindering that growth.
+
+            <div class="board-highlight" id="onScreenHighlight">
+              <strong>Why Bored and Panic matter.</strong> Both Bored and Panic are zones we do not enjoy.
+              They are not places where we feel safely challenged or comfortable, and they rarely support
+              learning. We spend time in <strong>Stretch</strong> to expand our Comfort zone, and we learn
+              how to recover when we have to visit <strong>Stress</strong>. This assessment is about
+              understanding where you currently spend your time and whether the daily “exercise” of work is
+              helping or hindering that growth.
             </div>
 
             <div class="board-body" id="boardBody">
               <!-- Left: questions -->
               <div class="board-column">
+                <p class="question-sections-note">
+                  For each section, select how often each statement reflects your recent experience.
+                  1 = never, 3 = sometimes, 5 = always.
+                </p>
                 <div id="questionSections"></div>
                 <div class="calculate-row">
                   <button id="calculateFromQuestions" type="button">Calculate from answers</button>
                 </div>
               </div>
 
-              <!-- Right: ring and results -->
+              <!-- Right: donut and results -->
               <div class="board-column">
                 <div class="donut-panel">
                   <div class="donut-header">
                     <div class="donut-header-title">Zone pattern</div>
                     <div class="donut-header-note" id="donutLabel">
-                      Equal starting pattern. Update after calculation.
+                      Equal starting pattern. Updates after calculation.
                     </div>
                   </div>
                   <canvas id="zoneRing" width="260" height="220"></canvas>
@@ -918,8 +957,8 @@
                 <div class="results-panel">
                   <h3>Calculated zone and scores</h3>
                   <div id="calculationResults">
-                    Answer the questions and click <strong>Calculate from answers</strong> to see the pattern and
-                    suggested prompts.
+                    Answer the questions and click <strong>Calculate from answers</strong> to see your
+                    distribution across Bored, Comfort, Stretch, Stress and Panic.
                   </div>
                 </div>
 
@@ -932,23 +971,23 @@
 
                 <div class="entries-panel">
                   <h3>Recorded entries (this browser)</h3>
-                  <p style="margin:0 0 0.3rem;">Use this to track how your pattern changes over time.</p>
+                  <p style="margin:0 0 0.3rem;">
+                    Use this to track how your pattern changes over time.
+                  </p>
                   <table id="entriesTable">
                     <thead>
                     <tr>
                       <th>Date</th>
-                      <th>Bored %</th>
-                      <th>Comfort %</th>
-                      <th>Stretch %</th>
-                      <th>Stress %</th>
-                      <th>Panic %</th>
+                      <th>Bored&nbsp;%</th>
+                      <th>Comfort&nbsp;%</th>
+                      <th>Stretch&nbsp;%</th>
+                      <th>Stress&nbsp;%</th>
+                      <th>Panic&nbsp;%</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
                   </table>
-                  <div class="entries-chart-container" id="entriesChartContainer">
-                    <canvas id="entriesTrend"></canvas>
-                  </div>
+                  <canvas id="entriesChart" height="140" style="display:none;"></canvas>
                 </div>
               </div>
             </div>
@@ -963,9 +1002,12 @@
     <div class="footer-inner">
       <div>
         <div>© <span id="year"></span> IMTHEBUS. All rights reserved.</div>
-        <div>
+        <div class="footer-meta-line">
           Tool design, questions, scoring model and interpretation framework created by Dean Rougvie.
           All calculations are experimental and may contain errors.
+        </div>
+        <div class="footer-counter">
+          Assessments completed in this browser: <span id="assessmentCount">0</span>
         </div>
       </div>
       <div class="footer-links">
@@ -989,13 +1031,22 @@
   // Footer year
   document.getElementById("year").textContent = new Date().getFullYear();
 
+  // Sidebar collapsible sections
+  document.querySelectorAll(".sidebar-section").forEach(section => {
+    const header = section.querySelector(".sidebar-section-header");
+    if (!header) return;
+    header.addEventListener("click", () => {
+      section.classList.toggle("open");
+    });
+  });
+
   const contextSelect = document.getElementById("context");
   const contextCustom = document.getElementById("contextCustom");
   contextSelect.addEventListener("change", () => {
     contextCustom.style.display = contextSelect.value === "User-defined" ? "block" : "none";
   });
 
-  // Questions definition (same wording as before)
+  // Questions definition
   const questions = [
     { id: 1,  text: "I regularly handle tasks that feel new or unfamiliar." },
     { id: 2,  text: "I complete many tasks automatically, without conscious effort." },
@@ -1024,7 +1075,7 @@
     { id: 25, text: "I avoid tasks that feel too overwhelming." }
   ];
 
-  // Group questions into sections (matching your screenshot)
+  // Sections
   const sections = [
     {
       id: "workload",
@@ -1087,11 +1138,11 @@
   };
 
   const zoneColors = {
-    bored:   { fill: "#111827", stroke: "#111827" },
-    comfort: { fill: "#60a5fa", stroke: "#1d4ed8" },
-    stretch: { fill: "#4ade80", stroke: "#15803d" },
-    stress:  { fill: "#fbbf24", stroke: "#b45309" },
-    panic:   { fill: "#f97373", stroke: "#b91c1c" }
+    bored:   { fill: "rgba(17,24,39,0.25)", stroke: "#111827" },
+    comfort: { fill: "rgba(96,165,250,0.45)", stroke: "#1d4ed8" },
+    stretch: { fill: "rgba(74,222,128,0.45)", stroke: "#15803d" },
+    stress:  { fill: "rgba(251,191,36,0.45)", stroke: "#b45309" },
+    panic:   { fill: "rgba(248,113,113,0.45)", stroke: "#b91c1c" }
   };
 
   const roleTargets = {
@@ -1151,8 +1202,8 @@
   const donutLabel = document.getElementById("donutLabel");
   const boardWrapper = document.getElementById("boardWrapper");
   const boardInner = document.getElementById("boardInner");
-  const entriesChartContainer = document.getElementById("entriesChartContainer");
-  const entriesTrendCanvas = document.getElementById("entriesTrend");
+  const assessmentCountSpan = document.getElementById("assessmentCount");
+  const entriesChartCanvas = document.getElementById("entriesChart");
 
   let latestZonePercents = null;
   let latestZoneRaw = null;
@@ -1160,23 +1211,30 @@
   let latestTopScore = null;
   let latestResponses = null;
   let latestScaleScore = null;
-  let latestReviewText = "";
-  let trendChart = null;
+  let latestFollowupText = "";
+  let entriesChart = null;
+
+  /* ---------- Assessment counter ---------- */
+
+  function loadAssessmentCount() {
+    const raw = localStorage.getItem("boredToPanicCount");
+    const n = raw ? parseInt(raw, 10) || 0 : 0;
+    assessmentCountSpan.textContent = n;
+    return n;
+  }
+
+  function incrementAssessmentCount() {
+    const n = loadAssessmentCount() + 1;
+    localStorage.setItem("boredToPanicCount", String(n));
+    assessmentCountSpan.textContent = n;
+  }
+
+  loadAssessmentCount();
 
   /* ---------- Build questions UI ---------- */
 
   const questionSectionsContainer = document.getElementById("questionSections");
   const questionMap = new Map(questions.map(q => [q.id, q]));
-
-  function openSection(wrapper) {
-    document.querySelectorAll(".question-section").forEach(sec => {
-      if (sec === wrapper) {
-        sec.classList.add("open");
-      } else {
-        sec.classList.remove("open");
-      }
-    });
-  }
 
   function buildQuestions() {
     sections.forEach(section => {
@@ -1268,7 +1326,13 @@
       questionSectionsContainer.appendChild(wrapper);
 
       headerBtn.addEventListener("click", () => {
-        openSection(wrapper);
+        const isOpen = wrapper.classList.contains("open");
+        if (isOpen) {
+          wrapper.classList.remove("open");
+        } else {
+          document.querySelectorAll(".question-section").forEach(sec => sec.classList.remove("open"));
+          wrapper.classList.add("open");
+        }
       });
     });
 
@@ -1279,7 +1343,7 @@
 
   buildQuestions();
 
-  /* ---------- Ring chart (concentric bands, not pie) ---------- */
+  /* ---------- Concentric ring chart ---------- */
 
   const ringCanvas = document.getElementById("zoneRing");
   const ringCtx = ringCanvas.getContext("2d");
@@ -1312,7 +1376,6 @@
       innerR = outerR;
     });
 
-    // Outer ring
     ringCtx.beginPath();
     ringCtx.arc(cx, cy, maxRadius, 0, 2 * Math.PI);
     ringCtx.strokeStyle = "#000";
@@ -1339,9 +1402,9 @@
   }
 
   drawRingChart(null);
-  updateRingLegend(null, "Equal starting pattern. Update after calculation.");
+  updateRingLegend(null, "Equal starting pattern. Updates after calculation.");
 
-  /* ---------- Scoring logic (averages into percentages) ---------- */
+  /* ---------- Scoring logic (averages) ---------- */
 
   function getResponses() {
     const responses = {};
@@ -1407,132 +1470,135 @@
     const level = levelLabel(actual, ideal);
     switch (zone) {
       case "bored":
-        if (level === "higher than target") return "Boredom is high; explore extra responsibility, variety or clearer goals.";
+        if (level === "higher than target") return "Boredom is high; explore extra responsibility or variety.";
         if (level === "lower than target") return "Boredom is low; capability is broadly in use.";
         return "Boredom is close to target; look at other zones for focus.";
       case "comfort":
-        if (level === "higher than target") return "Comfort is high; add some stretch work so learning continues.";
-        if (level === "lower than target") return "Comfort is low; stabilise core workload, routines and support.";
+        if (level === "higher than target") return "Comfort is high; consider adding some stretch work.";
+        if (level === "lower than target") return "Comfort is low; stabilise core workload and routines.";
         return "Comfort is about right; keep the basics predictable.";
       case "stretch":
-        if (level === "higher than target") return "Stretch is high; check that support, clarity and recovery time are strong.";
-        if (level === "lower than target") return "Stretch is low; development and learning may be limited.";
+        if (level === "higher than target") return "Stretch is high; make sure support and clarity are strong.";
+        if (level === "lower than target") return "Stretch is low; development work may be limited.";
         return "Stretch is on target; protect time for this.";
       case "stress":
-        if (level === "higher than target") return "Stress is high; review priorities, capacity and decision bottlenecks.";
-        if (level === "lower than target") return "Stress is low; there may be spare capacity if needed for short bursts.";
+        if (level === "higher than target") return "Stress is high; review priorities and capacity.";
+        if (level === "lower than target") return "Stress is low; there may be spare capacity if needed.";
         return "Stress is close to target; keep an eye on recovery time.";
       case "panic":
-        if (level === "higher than target") return "Panic is higher than expected; treat this as a system issue, not an individual failing.";
-        if (level === "lower than target") return "Panic is low; keep clear boundaries and buffers in place.";
-        return "Panic is around expected; still useful to understand triggers and early warning signs.";
+        if (level === "higher than target") return "Panic is higher than expected; treat as a system issue.";
+        if (level === "lower than target") return "Panic is low; keep boundaries and buffers in place.";
+        return "Panic is around expected; still worth understanding triggers.";
       default:
         return "";
     }
   }
 
-  function buildFlags(percents) {
+  function buildPatternCommentary(percents) {
     const flags = [];
-    const b = percents.bored;
-    const c = percents.comfort;
-    const st = percents.stretch;
-    const sr = percents.stress;
-    const p = percents.panic;
+    const praise = [];
 
-    // Praise patterns
-    if (st >= 35 && st <= 60 && p < 10 && sr >= 5 && sr <= 25 && b < 20) {
-      flags.push("You are spending a healthy amount of time in Stretch with manageable Stress and low Panic. Protect this pattern by keeping priorities clear and making recovery time explicit.");
+    // Individual flags
+    if (percents.panic >= 15) {
+      flags.push("Panic at or above 15%: dig into specific situations that feel overwhelming and agree changes to workload, boundaries and support.");
+    } else if (percents.panic >= 10) {
+      flags.push("Panic between 10% and 15%: track patterns that tip things over the edge and agree how to spot them earlier.");
     }
 
-    if (c >= 30 && c <= 50 && b < 25 && p < 10) {
-      flags.push("Comfort looks solid without drifting into boredom or panic. Keep core routines predictable and communication clear.");
+    if (percents.stress + percents.panic >= 35) {
+      flags.push("Combined Stress and Panic above 35%: this is a sustained high-pressure pattern. Consider rescoping work, changing priorities or adding resource.");
     }
 
-    // Risk patterns
-    if (p >= 15) {
-      flags.push("Panic at or above 15%: review specific situations that feel overwhelming and adjust workload, support or decision routes urgently.");
-    } else if (p >= 10) {
-      flags.push("Panic between 10–15%: agree regular check-ins, spot triggers early and treat this as a system pattern, not an individual weakness.");
+    if (percents.bored >= 25) {
+      flags.push("Bored at or above 25%: capability may be under-used. Look for extra responsibility, variety or projects that draw more from your strengths.");
     }
 
-    if (sr + p >= 35) {
-      flags.push("Combined Stress and Panic above 35%: this suggests a sustained high-pressure pattern. Consider rescoping work, adding resource or changing how priorities are set.");
+    if (percents.stretch < 30) {
+      flags.push("Stretch below 30%: development and learning time may be limited. Agree one or two practical ways to add constructive challenge.");
     }
 
-    if (b >= 25 && st < 30) {
-      flags.push("Bored is high and Stretch is low: capability may be under-used and development slowing. Explore new responsibilities, projects or skills to practise.");
+    // Combined patterns
+    if (percents.bored >= 20 && percents.panic >= 10) {
+      flags.push("High Bored and high Panic: the work may swing between under-use and overload. Look for structural causes such as uneven work distribution, unclear priorities or stop–start projects.");
     }
 
-    if (b >= 20 && p >= 10) {
-      flags.push("High Bored and Panic together suggests the role swings between under-used and overwhelming. Review how work is distributed, where decisions pile up and how urgent work interrupts the basics.");
+    if (percents.comfort >= 35 && percents.stretch >= 30 && percents.panic < 10 && percents.stress >= 10 && percents.stress <= 25) {
+      praise.push("Comfort and Stretch are carrying most of the load with manageable Stress and low Panic. This is a broadly healthy pattern. Focus on keeping priorities clear and recovery time protected.");
     }
 
-    if (st < 25 && (b + c) > 60) {
-      flags.push("Most of your time is in Bored and Comfort with limited Stretch. Learning may be flattening off; agree a small number of realistic growth tasks.");
+    if (percents.bored < 15 && percents.panic < 5) {
+      praise.push("Boredom and Panic are both low. Day to day, you are mostly working in zones that support performance and learning.");
     }
 
-    if (sr < 5 && st < 30 && p === 0 && b < 10) {
-      flags.push("Very low Stress and Panic with modest Stretch may mean there is spare capacity. Check whether this is intentional or whether more responsibility could be delegated safely.");
+    if (!flags.length && !praise.length) {
+      praise.push("No strong risk signals from this pattern. Still useful to ask what is helping it work well and what you would like more of.");
     }
 
-    if (!flags.length) {
-      flags.push("No strong risk flags from this pattern. Use the results to ask what is helping it work well and what you would like more of or less of.");
-    }
-
-    return flags;
+    return { flags, praise };
   }
 
-  function computeReviewRecommendation(percents, role) {
-    const zones = ["bored", "comfort", "stretch", "stress", "panic"];
-    const target = role ? roleTargets[role] : null;
-    let avgDiff = null;
-    let days = 0;
-    let label = "";
+  function buildConversationPromptsHtml(percents) {
+    const { flags, praise } = buildPatternCommentary(percents);
+    let html = "<div class=\"conversation-prompts\">";
+    if (praise.length) {
+      html += "<strong>What seems to be working:</strong><ul>";
+      praise.forEach(p => { html += `<li>${p}</li>`; });
+      html += "</ul>";
+    }
+    if (flags.length) {
+      html += "<strong>Things to watch or adjust:</strong><ul>";
+      flags.forEach(f => { html += `<li>${f}</li>`; });
+      html += "</ul>";
+    }
+    html += "</div>";
+    return html;
+  }
 
-    if (target) {
-      let totalDiff = 0;
-      zones.forEach(z => {
-        const actual = percents[z] ?? 0;
-        const ideal = target[z] ?? 0;
-        totalDiff += Math.abs(actual - ideal);
-      });
-      avgDiff = totalDiff / zones.length;
-
-      if (avgDiff >= 20) {
-        label = "about 6 weeks";
-        days = 42;
-      } else if (avgDiff >= 15) {
-        label = "about 2 months";
-        days = 60;
-      } else if (avgDiff >= 10) {
-        label = "around 3 months";
-        days = 90;
-      } else if (avgDiff >= 5) {
-        label = "around 6 months";
-        days = 180;
-      } else {
-        label = "around 12 months";
-        days = 365;
-      }
-    } else {
-      label = "around 3 months";
-      days = 90;
+  function getFollowupSuggestion(percents, role) {
+    const target = currentTarget(role);
+    const now = new Date();
+    if (!target) {
+      const weeks = 12;
+      const future = new Date(now.getTime() + weeks * 7 * 24 * 60 * 60 * 1000);
+      return {
+        text: `Suggested time to redo this assessment: around ${weeks === 12 ? "3 months" : weeks + " weeks"}, around ${future.toLocaleDateString()}.`,
+        dateLabel: future.toLocaleDateString()
+      };
     }
 
-    const now = new Date();
-    const reviewDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
-    const dateString = reviewDate.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    const zones = ["bored","comfort","stretch","stress","panic"];
+    let sumDiff = 0;
+    zones.forEach(z => {
+      sumDiff += Math.abs((percents[z] ?? 0) - target[z]);
+    });
+    const avgDiff = sumDiff / zones.length;
 
-    return { label, dateString, avgDiff };
+    let weeks;
+    if (avgDiff >= 18) weeks = 6;
+    else if (avgDiff >= 14) weeks = 8;
+    else if (avgDiff >= 10) weeks = 12;
+    else if (avgDiff >= 6) weeks = 24;
+    else weeks = 52;
+
+    const future = new Date(now.getTime() + weeks * 7 * 24 * 60 * 60 * 1000);
+    const label =
+      weeks === 52 ? "about a year" :
+      weeks === 24 ? "about 6 months" :
+      weeks === 12 ? "about 3 months" :
+      `${weeks} weeks`;
+
+    return {
+      text: `Suggested time to redo this assessment: around ${label}, around ${future.toLocaleDateString()}.`,
+      dateLabel: future.toLocaleDateString()
+    };
   }
 
   function renderResults(percents, role, topZone, topScore) {
     const target = currentTarget(role);
 
-    const flags = buildFlags(percents);
-
     calculationResults.innerHTML = `
       <p><strong>Highest zone:</strong> ${zoneLabels[topZone]} (${topScore}%)</p>
+      <p><strong>Pattern:</strong> Bored ${percents.bored}% · Comfort ${percents.comfort}% · Stretch ${percents.stretch}% · Stress ${percents.stress}% · Panic ${percents.panic}%</p>
       ${
         target
           ? `<table>
@@ -1547,12 +1613,9 @@
                  <tr><td>Panic</td><td>${percents.panic}%</td><td>${target.panic}%</td></tr>
                </tbody>
              </table>`
-          : `<p><strong>Pattern:</strong> Bored ${percents.bored}% · Comfort ${percents.comfort}% · Stretch ${percents.stretch}% · Stress ${percents.stress}% · Panic ${percents.panic}%</p>`
+          : ""
       }
-      <div class="conversation-prompts">
-        <strong>Feedback and conversation prompts:</strong>
-        <ul>${flags.map(f => `<li>${f}</li>`).join("")}</ul>
-      </div>
+      ${buildConversationPromptsHtml(percents)}
     `;
 
     renderOverallScale(percents, role, topZone);
@@ -1574,6 +1637,7 @@
     `;
 
     if (target) {
+      html += `<p><strong>Role pattern (${roleLabels[role]}):</strong> Bored ${target.bored}%, Comfort ${target.comfort}%, Stretch ${target.stretch}%, Stress ${target.stress}%, Panic ${target.panic}%.</p>`;
       html += `<table>
         <thead><tr><th>Zone</th><th>Comment</th></tr></thead>
         <tbody>
@@ -1586,62 +1650,12 @@
       </table>`;
     }
 
-    const rec = computeReviewRecommendation(percents, role);
-    latestReviewText = `Suggested time to redo this assessment: ${rec.label}, around ${rec.dateString}.`;
-    html += `<p><strong>When to revisit:</strong> ${latestReviewText}</p>`;
+    const follow = getFollowupSuggestion(percents, role);
+    latestFollowupText = follow.text;
+    html += `<p style="margin-top:0.4rem;"><strong>${follow.text}</strong></p>`;
 
     overallResult.innerHTML = html;
   }
-
-  function handleCalculate() {
-    const responses = getResponses();
-    if (!responses) {
-      alert("Please answer all questions before calculating.");
-      return;
-    }
-    const { raw, percents } = calculateZoneScores(responses);
-    const entriesArr = Object.entries(percents).sort((a, b) => b[1] - a[1]);
-    const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
-
-    latestZonePercents = percents;
-    latestZoneRaw = raw;
-    latestTopZone = topZone;
-    latestTopScore = topScore;
-    latestResponses = responses;
-
-    const role = roleLevelSelect.value || null;
-
-    if (!role) {
-      roleLevelSelect.classList.add("role-missing");
-      roleLevelSelect.focus();
-      document.querySelector(".sidebar").scrollIntoView({ behavior: "smooth", block: "start" });
-      setTimeout(() => roleLevelSelect.classList.remove("role-missing"), 2000);
-    }
-
-    renderResults(percents, role, topZone, topScore);
-
-    // Visual feedback on button and scroll to results column
-    calculateButton.classList.add("calculated");
-    calculateButton.textContent = "Calculated – see results on the right";
-    const rightColumn = document.querySelector(".board-column:nth-child(2)");
-    if (rightColumn) {
-      rightColumn.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-    setTimeout(() => {
-      calculateButton.classList.remove("calculated");
-      calculateButton.textContent = "Calculate from answers";
-    }, 2500);
-  }
-
-  calculateButton.addEventListener("click", handleCalculate);
-
-  roleLevelSelect.addEventListener("change", () => {
-    if (!latestZonePercents) return;
-    const role = roleLevelSelect.value || null;
-    const entriesArr = Object.entries(latestZonePercents).sort((a, b) => b[1] - a[1]);
-    const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
-    renderResults(latestZonePercents, role, topZone, topScore);
-  });
 
   /* ---------- Local storage for entries ---------- */
 
@@ -1655,57 +1669,6 @@
 
   function saveEntries(entries) {
     localStorage.setItem("boredToPanicEntries", JSON.stringify(entries));
-  }
-
-  function renderTrendChart() {
-    const entries = loadEntries();
-    if (!entriesTrendCanvas || !entriesChartContainer) return;
-
-    if (entries.length <= 1) {
-      if (trendChart) {
-        trendChart.destroy();
-        trendChart = null;
-      }
-      entriesChartContainer.style.display = "none";
-      return;
-    }
-
-    const labels = entries.map(e => e.timestamp);
-    const zones = ["bored", "comfort", "stretch", "stress", "panic"];
-
-    const datasets = zones.map(z => ({
-      label: zoneLabels[z],
-      data: entries.map(e => (e.zonePercents ? e.zonePercents[z] ?? null : null)),
-      borderColor: zoneColors[z].stroke,
-      backgroundColor: "transparent",
-      tension: 0.25,
-      spanGaps: true
-    }));
-
-    if (trendChart) {
-      trendChart.destroy();
-    }
-
-    trendChart = new Chart(entriesTrendCanvas.getContext("2d"), {
-      type: "line",
-      data: { labels, datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            max: 100,
-            ticks: { callback: v => v + "%" }
-          }
-        },
-        plugins: {
-          legend: { position: "bottom" }
-        }
-      }
-    });
-
-    entriesChartContainer.style.display = "block";
   }
 
   function renderEntriesTableAndDropdown() {
@@ -1727,22 +1690,80 @@
       entriesTableBody.appendChild(tr);
 
       const opt = document.createElement("option");
-      const label = descriptions[entry.score]?.label || `Score ${entry.score}`;
       opt.value = index.toString();
-      opt.textContent = `${entry.timestamp} – ${entry.name || "No name"} (${label})`;
+      opt.textContent = `${entry.timestamp}`;
       loadSelect.appendChild(opt);
     });
 
-    renderTrendChart();
+    updateEntriesChart(entries);
+  }
+
+  function updateEntriesChart(entries) {
+    entries = entries || loadEntries();
+    if (!entries || entries.length < 2) {
+      if (entriesChart) {
+        entriesChart.destroy();
+        entriesChart = null;
+      }
+      entriesChartCanvas.style.display = "none";
+      return;
+    }
+
+    const labels = entries.map(e => e.timestamp);
+    const boredData = entries.map(e => (e.zonePercents?.bored ?? null));
+    const comfortData = entries.map(e => (e.zonePercents?.comfort ?? null));
+    const stretchData = entries.map(e => (e.zonePercents?.stretch ?? null));
+    const stressData = entries.map(e => (e.zonePercents?.stress ?? null));
+    const panicData = entries.map(e => (e.zonePercents?.panic ?? null));
+
+    const datasets = [
+      { label: "Bored", data: boredData, borderColor: zoneColors.bored.stroke },
+      { label: "Comfort", data: comfortData, borderColor: zoneColors.comfort.stroke },
+      { label: "Stretch", data: stretchData, borderColor: zoneColors.stretch.stroke },
+      { label: "Stress", data: stressData, borderColor: zoneColors.stress.stroke },
+      { label: "Panic", data: panicData, borderColor: zoneColors.panic.stroke }
+    ].map(ds => ({
+      ...ds,
+      fill: false,
+      tension: 0.2,
+      pointRadius: 2,
+      borderWidth: 1.5
+    }));
+
+    const ctx = entriesChartCanvas.getContext("2d");
+    entriesChartCanvas.style.display = "block";
+
+    if (entriesChart) {
+      entriesChart.data.labels = labels;
+      entriesChart.data.datasets.forEach((ds, i) => {
+        ds.data = datasets[i].data;
+      });
+      entriesChart.update();
+    } else {
+      entriesChart = new Chart(ctx, {
+        type: "line",
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: true, position: "bottom" } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: { stepSize: 20 }
+            }
+          }
+        }
+      });
+    }
   }
 
   renderEntriesTableAndDropdown();
 
-  function handleSave() {
-    if (!latestZonePercents || !latestTopZone) {
-      alert("Please calculate your results before saving.");
-      return;
-    }
+  function storeEntry(autoSave) {
+    if (!latestZonePercents || !latestTopZone) return;
+
     const name = document.getElementById("personName").value.trim();
     const roleLevel = roleLevelSelect.value || "";
     let contextValue = "";
@@ -1768,8 +1789,12 @@
     });
     saveEntries(entries);
     renderEntriesTableAndDropdown();
-    alert("Entry saved in this browser.");
+    if (!autoSave) {
+      // No popup, but we could add a subtle visual cue later if needed
+    }
   }
+
+  /* ---------- CSV export ---------- */
 
   function toCsvRow(cells) {
     return cells.map(cell => {
@@ -1901,10 +1926,64 @@
     renderResults(percents, role, topZone, topScore);
   }
 
-  saveButton.addEventListener("click", handleSave);
+  saveButton.addEventListener("click", () => storeEntry(false));
   exportButton.addEventListener("click", handleExportCsv);
   clearButton.addEventListener("click", handleClearEntries);
   loadSelect.addEventListener("change", handleLoadEntry);
+
+  /* ---------- Calculation ---------- */
+
+  function handleCalculate() {
+    // Role is required
+    if (!roleLevelSelect.value) {
+      roleLevelSelect.focus();
+      roleLevelSelect.scrollIntoView({ behavior: "smooth", block: "center" });
+      roleLevelSelect.style.borderColor = "#b91c1c";
+      setTimeout(() => { roleLevelSelect.style.borderColor = "#000000"; }, 1200);
+      return;
+    }
+
+    const responses = getResponses();
+    if (!responses) {
+      alert("Please answer all questions before calculating.");
+      return;
+    }
+
+    calculateButton.classList.add("calculating");
+    boardWrapper.classList.add("calculated");
+
+    const { raw, percents } = calculateZoneScores(responses);
+    const entriesArr = Object.entries(percents).sort((a, b) => b[1] - a[1]);
+    const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
+
+    latestZonePercents = percents;
+    latestZoneRaw = raw;
+    latestTopZone = topZone;
+    latestTopScore = topScore;
+    latestResponses = responses;
+
+    const role = roleLevelSelect.value || null;
+    renderResults(percents, role, topZone, topScore);
+
+    // Auto-save entry
+    storeEntry(true);
+    incrementAssessmentCount();
+
+    setTimeout(() => {
+      calculateButton.classList.remove("calculating");
+      boardWrapper.classList.remove("calculated");
+    }, 1200);
+  }
+
+  calculateButton.addEventListener("click", handleCalculate);
+
+  roleLevelSelect.addEventListener("change", () => {
+    if (!latestZonePercents) return;
+    const role = roleLevelSelect.value || null;
+    const entriesArr = Object.entries(latestZonePercents).sort((a, b) => b[1] - a[1]);
+    const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
+    renderResults(latestZonePercents, role, topZone, topScore);
+  });
 
   /* ---------- Fullscreen ---------- */
 
@@ -1921,17 +2000,12 @@
   async function handleExportPdf() {
     const { jsPDF } = window.jspdf;
 
-    // Capture currently open sections
     const sectionEls = Array.from(document.querySelectorAll(".question-section"));
     const openState = sectionEls.map(el => el.classList.contains("open"));
-
-    // Expand all sections
     sectionEls.forEach(el => el.classList.add("open"));
 
-    // Switch to export layout
     boardInner.classList.add("export-mode");
 
-    // Add export header
     const exportHeader = document.createElement("div");
     exportHeader.className = "export-header";
     const name = document.getElementById("personName").value.trim() || "Not specified";
@@ -1946,44 +2020,70 @@
     const now = new Date();
     const dateString = now.toLocaleString();
 
-    const aboutExport = "Both Bored and Panic are zones that feel negative and rarely support learning. We spend time in Stretch to grow our Comfort zone, and to learn how to recover when we have to visit Stress. This assessment is about understanding where that time is spent and whether the daily \"exercise\" of work is helping or hindering that growth.";
-
-    const reviewExport = latestReviewText || "Suggested time to redo this assessment will appear here once you have calculated your results.";
-
     exportHeader.innerHTML = `
       <div class="export-header-title">Bored to Panic assessment</div>
       <div class="export-header-meta">
         Name: ${name} · Role: ${role} · Context: ${contextLabel} · Date: ${dateString}
       </div>
-      <div style="margin-top:0.35rem;font-size:0.8rem;">
-        ${aboutExport}
+      <div class="export-highlight">
+        Both Bored and Panic are zones that feel negative and rarely support learning. We spend time in
+        Stretch to grow our Comfort zone, and to learn how to recover when we have to visit Stress. This
+        assessment is about understanding where that time is spent and whether the daily “exercise” of work
+        is helping or hindering that growth.
       </div>
-      <div style="margin-top:0.25rem;font-size:0.8rem;"><strong>${reviewExport}</strong></div>
+      <div class="export-suggestion">
+        ${latestFollowupText || ""}
+      </div>
     `;
     boardInner.insertBefore(exportHeader, boardInner.firstChild);
 
-    // Add export footer
     const exportFooter = document.createElement("div");
     exportFooter.className = "export-footer";
     const url = "https://imthebus.co.uk/web-tools/bored-to-panic.html";
     exportFooter.textContent = `Generated from IMTHEBUS Bored to Panic tool (${url}) on ${dateString}`;
     boardInner.appendChild(exportFooter);
 
-    // Render to canvas and PDF
+    // Hide board header for export to avoid duplication
+    const originalBoardHeaderDisplay = document.querySelector(".board-header").style.display;
+    document.querySelector(".board-header").style.display = "none";
+
     const canvas = await html2canvas(boardWrapper, { scale: 2 });
     const img = canvas.toDataURL("image/jpeg", 0.9);
+
     const pdf = new jsPDF("p", "mm", "a4");
-    const width = pdf.internal.pageSize.getWidth();
-    const height = (canvas.height * width) / canvas.width;
-    pdf.addImage(img, "JPEG", 0, 0, width, height);
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const imgWidth = pageWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let yPos = 0;
+    let page = 0;
+    while (yPos < canvas.height) {
+      if (page > 0) pdf.addPage();
+      const pageCanvas = document.createElement("canvas");
+      const pageCtx = pageCanvas.getContext("2d");
+      pageCanvas.width = canvas.width;
+      const pagePixelHeight = Math.min(
+        canvas.height - yPos,
+        Math.round((pageHeight * canvas.width) / pageWidth)
+      );
+      pageCanvas.height = pagePixelHeight;
+      pageCtx.drawImage(canvas, 0, yPos, canvas.width, pagePixelHeight, 0, 0, canvas.width, pagePixelHeight);
+      const pageImg = pageCanvas.toDataURL("image/jpeg", 0.9);
+      const pageImgHeight = (pagePixelHeight * imgWidth) / canvas.width;
+      pdf.addImage(pageImg, "JPEG", 0, 0, imgWidth, pageImgHeight);
+      yPos += pagePixelHeight;
+      page += 1;
+    }
+
     pdf.save("Bored_to_Panic_Assessment.pdf");
 
-    // Cleanup: remove header/footer and restore layout
     exportHeader.remove();
     exportFooter.remove();
     boardInner.classList.remove("export-mode");
+    document.querySelector(".board-header").style.display = originalBoardHeaderDisplay || "";
 
-    // Restore section open state
     sectionEls.forEach((el, idx) => {
       el.classList.toggle("open", openState[idx]);
     });
