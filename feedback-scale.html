@@ -188,7 +188,7 @@
       justify-content: space-between;
       align-items: baseline;
       font-size: 0.9rem;
-      cursor: default;
+      cursor: pointer;
     }
 
     .sidebar-section-header span.label {
@@ -208,15 +208,24 @@
       color: #444;
     }
 
-    .sidebar-section:hover .sidebar-section-body {
-      max-height: 220px;
+    .sidebar-section.open .sidebar-section-body {
+      max-height: 260px;
     }
 
     .sidebar-section-body p {
       margin: 0.45rem 0;
     }
 
-    .sidebar-section.sidebar-export:hover .sidebar-section-body {
+    .sidebar-section-body ul {
+      margin: 0.3rem 0 0.3rem 1.1rem;
+      padding: 0;
+    }
+
+    .sidebar-section-body li {
+      margin-bottom: 0.2rem;
+    }
+
+    .sidebar-section.sidebar-export.open .sidebar-section-body {
       max-height: 260px;
     }
 
@@ -270,10 +279,15 @@
       padding: 1rem 1.15rem 1.35rem;
       position: relative;
       overflow: hidden;
+      transition: box-shadow 0.2s ease-out;
     }
 
     .board-wrapper:fullscreen {
       overflow-y: auto;
+    }
+
+    .board-wrapper.calculated {
+      box-shadow: 0 0 0 3px #111 inset, 0 14px 0 rgba(0, 0, 0, 0.14);
     }
 
     .board-inner {
@@ -309,9 +323,17 @@
       cursor: pointer;
     }
 
-    .board-intro {
-      font-size: 0.9rem;
-      max-width: 40rem;
+    .board-highlight {
+      border-radius: 18px;
+      border: 2px solid #000;
+      background: #fffbe6;
+      padding: 0.65rem 0.8rem;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .board-highlight strong {
+      font-weight: 600;
     }
 
     .board-body {
@@ -472,6 +494,12 @@
       color: #fff;
       padding: 0.45rem 1.1rem;
       cursor: pointer;
+      transition: background 0.15s ease-out, transform 0.08s ease-out;
+    }
+
+    .calculate-row button.calculating {
+      background: #1f2937;
+      transform: translateY(1px);
     }
 
     /* Donut and results */
@@ -721,7 +749,7 @@
           <div class="sidebar-section">
             <div class="sidebar-section-header">
               <span class="label">How this tool works</span>
-              <span class="hint">hover to expand</span>
+              <span class="hint">tap or click to expand</span>
             </div>
             <div class="sidebar-section-body">
               <p>
@@ -740,7 +768,7 @@
           <div class="sidebar-section">
             <div class="sidebar-section-header">
               <span class="label">Data and privacy</span>
-              <span class="hint">hover to expand</span>
+              <span class="hint">tap or click to expand</span>
             </div>
             <div class="sidebar-section-body">
               <p>
@@ -755,8 +783,8 @@
 
           <div class="sidebar-section sidebar-export">
             <div class="sidebar-section-header">
-              <span class="label">Saved results &amp; export</span>
-              <span class="hint">hover to expand</span>
+              <span class="label">Saved results and export</span>
+              <span class="hint">tap or click to expand</span>
             </div>
             <div class="sidebar-section-body">
               <div class="sidebar-field" style="margin-top:0.4rem;">
@@ -788,10 +816,12 @@
               </div>
             </div>
 
-            <p class="board-intro">
+            <div class="board-highlight">
+              <strong>Why feedback patterns matter.</strong>
               This tool helps you and your manager understand what feedback looks and feels like in your role.
-              It maps your answers to five zones: Silent, Sparse, Resonant, Loud and Overwhelming.
-            </p>
+              It maps your answers to five zones: Silent, Sparse, Resonant, Loud and Overwhelming, so you can
+              talk about the environment rather than guessing or relying only on formal reviews.
+            </div>
 
             <div class="board-body" id="boardBody">
               <!-- Left: questions -->
@@ -911,6 +941,15 @@
 
 <script>
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  // Sidebar collapsible sections (click to open/close, like Bored to Panic)
+  document.querySelectorAll(".sidebar-section").forEach(section => {
+    const header = section.querySelector(".sidebar-section-header");
+    if (!header) return;
+    header.addEventListener("click", () => {
+      section.classList.toggle("open");
+    });
+  });
 
   const contextSelect = document.getElementById("context");
   const contextCustom = document.getElementById("contextCustom");
@@ -1049,7 +1088,7 @@
   let latestResponses = null;
   let latestScaleScore = null;
 
-  /* Build questions */
+  /* Build questions (with default 3 selected, like earlier version) */
 
   function buildQuestions() {
     questions.forEach(q => {
@@ -1103,7 +1142,7 @@
 
   buildQuestions();
 
-  /* Donut chart */
+  /* Donut chart (wedge style preserved) */
 
   const ringCanvas = document.getElementById("zoneRing");
   const ringCtx = ringCanvas.getContext("2d");
@@ -1505,6 +1544,11 @@
       alert("Please answer all questions before calculating.");
       return;
     }
+
+    // Visual feedback like Bored to Panic
+    calculateButton.classList.add("calculating");
+    boardWrapper.classList.add("calculated");
+
     const { raw, percents } = calculateZoneScores(responses);
     const entriesArr = Object.entries(percents).sort((a, b) => b[1] - a[1]);
     const [topZone, topScore] = entriesArr[0] || ["resonant", 0];
@@ -1517,6 +1561,11 @@
 
     const role = roleLevelSelect.value || null;
     renderResults(percents, role, topZone, topScore);
+
+    setTimeout(() => {
+      calculateButton.classList.remove("calculating");
+      boardWrapper.classList.remove("calculated");
+    }, 1200);
   }
 
   calculateButton.addEventListener("click", handleCalculate);
