@@ -2,324 +2,662 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bored to Panic Assessment</title>
+  <title>Bored to Panic – IMTHEBUS tools</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Permanent+Marker&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Whiteboard + tool styling -->
   <style>
     :root {
-      --bg-page: #020617;
-      --card-bg: #0b1020;
-      --accent: #4f46e5;
-      --accent-soft: rgba(79, 70, 229, 0.35);
-      --border-soft: #1f2933;
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
-      --danger: #ef4444;
+      --bg-board: #fdfdfd;
+      --ink: #111111;
+      --border-strong: #000000;
+
+      --strength-bg: #c7f9cc;
+      --weakness-bg: #ffb3c1;
+      --opportunity-bg: #bde0fe;
+      --threat-bg: #ffeaa7;
+
+      --strength-tag: #15803d;
+      --weakness-tag: #b91c1c;
+      --opportunity-tag: #1d4ed8;
+      --threat-tag: #b45309;
+
+      --sidebar-bg: #ffffff;
+      --sidebar-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      --note-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
+      --note-shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.22);
     }
 
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
-      padding: 24px;
+      padding: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background-color: #f5f5f5;
+      background-image:
+        url("assets/whiteboard.jpg"),
+        url("assets/whiteboard-texture.jpg");
+      background-repeat: repeat, repeat;
+      background-size: 480px 480px, 320px 320px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible {
+      outline: 2px solid #000000;
+      outline-offset: 3px;
+    }
+
+    /* Global layout */
+
+    .page {
       min-height: 100vh;
-      background: radial-gradient(circle at top, #065f46 0, #020716 60%);
-      color: var(--text-main);
       display: flex;
-      justify-content: center;
+      flex-direction: column;
     }
 
-    .shell {
-      width: 100%;
-      max-width: 1180px;
+    .page-main {
+      flex: 1;
+      padding: 1.25rem;
+    }
+
+    .page-inner {
+      max-width: 1200px;
       margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: flex-start;
     }
 
-    .card {
-      background: radial-gradient(circle at top left, #1f2937 0, #020617 55%);
-      border-radius: 16px;
-      border: 1px solid var(--border-soft);
-      padding: 20px;
-      box-shadow:
-        0 18px 45px rgba(0, 0, 0, 0.75),
-        0 0 0 1px rgba(148, 163, 184, 0.06);
-      margin-bottom: 20px;
+    @media (max-width: 840px) {
+      .page-main {
+        padding: 0.75rem;
+      }
+      .page-inner {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    /* Navigation */
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background-color: #ffffff;
+      border-bottom: 2px solid #000000;
+      padding: 0.5rem 1.25rem;
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .nav-left {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .nav-left a {
+      padding: 0.15rem 0;
+      border-bottom: 2px solid transparent;
+    }
+
+    .nav-left a:hover {
+      border-bottom-color: #000000;
+    }
+
+    .nav-right {
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 1.15rem;
+      letter-spacing: 0.04em;
+    }
+
+    @media (max-width: 720px) {
+      .nav-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* Sidebar clipboard */
+
+    .sidebar {
+      background-color: var(--sidebar-bg);
+      border: 2px solid #000000;
+      border-radius: 18px;
+      box-shadow: var(--sidebar-shadow);
+      padding: 1.1rem 1rem 1.4rem;
+      position: relative;
+    }
+
+    .sidebar::before {
+      content: "";
+      position: absolute;
+      left: 1.2rem;
+      right: 1.2rem;
+      top: 0.6rem;
+      height: 10px;
+      border-radius: 999px;
+      border: 2px solid #000000;
+      background: #f5f5f5;
+    }
+
+    .sidebar-inner {
+      margin-top: 0.9rem;
+    }
+
+    .sidebar-title {
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 1.5rem;
+      margin: 0 0 0.3rem;
+    }
+
+    .sidebar-tagline {
+      font-size: 0.9rem;
+      color: #444444;
+      margin: 0 0 1rem;
+    }
+
+    .sidebar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      padding: 0.5rem 0.9rem;
+      border-radius: 999px;
+      border: 2px solid #000000;
+      background-color: #ffffff;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background-color: #111111;
+      color: #ffffff;
+    }
+
+    .btn-secondary {
+      background-color: #f5f5f5;
+    }
+
+    .btn-small {
+      font-size: 0.78rem;
+      padding: 0.35rem 0.7rem;
+    }
+
+    .sidebar-section {
+      border-top: 1px solid #dddddd;
+      padding-top: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .sidebar-section-header {
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: default;
+    }
+
+    .sidebar-section-header span {
+      font-size: 0.75rem;
+      color: #777777;
+    }
+
+    .sidebar-section-body {
+      font-size: 0.85rem;
+      color: #444444;
+      margin-top: 0.4rem;
+      max-height: 260px;
+      overflow: hidden;
+      transition: max-height 160ms ease-out;
+    }
+
+    .sidebar-section:hover .sidebar-section-body {
+      max-height: 480px;
+    }
+
+    .sidebar-section-body p {
+      margin: 0 0 0.4rem;
+    }
+
+    .sidebar-section-body ul {
+      margin: 0.4rem 0 0.2rem;
+      padding-left: 1.1rem;
+    }
+
+    .sidebar-section-body li {
+      margin-bottom: 0.25rem;
+    }
+
+    /* Whiteboard frame */
+
+    .board-wrapper {
+      background-color: var(--bg-board);
+      border-radius: 22px;
+      border: 3px solid var(--border-strong);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
+      padding: 0.75rem 0.85rem 1.1rem;
       position: relative;
       overflow: hidden;
     }
 
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      background:
-        radial-gradient(circle at 0% 0%, rgba(34, 197, 94, 0.10), transparent 55%),
-        radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.08), transparent 55%);
-      opacity: 0.6;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    #privacyCard::before {
-      display: none;
-    }
-
-    h1 {
-      font-size: clamp(2rem, 3vw, 2.4rem);
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin: 0 0 0.75rem;
-      text-align: center;
-    }
-
-    h2 {
-      margin-top: 1.6rem;
-      margin-bottom: 0.5rem;
-      font-size: 1.1rem;
-    }
-
-    .subtitle {
-      color: var(--text-muted);
-      margin-bottom: 0.9rem;
-      max-width: 52rem;
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-
-    .field {
-      margin-bottom: 1rem;
-    }
-
-    label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-      font-size: 0.9rem;
-    }
-
-    select,
-    input[type="text"],
-    textarea {
-      font: inherit;
-      padding: 8px 12px;
-      width: 100%;
-      max-width: 420px;
-      border-radius: 999px;
-      border: 1px solid var(--border-soft);
-      background: rgba(15, 23, 42, 0.95);
-      color: var(--text-main);
-      transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease, background 120ms ease;
-    }
-
-    textarea {
-      border-radius: 12px;
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    select:focus,
-    input[type="text"]:focus,
-    textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.5);
-      background: rgba(15, 23, 42, 1);
-      transform: translateY(-1px);
-    }
-
-    .scale-description {
-      border-radius: 12px;
-      padding: 0.75rem 0.9rem;
-      margin-top: 0.5rem;
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      font-size: 0.88rem;
-      line-height: 1.5;
-      color: var(--text-muted);
-    }
-
-    .scale-description p + p {
-      margin-top: 0.35rem;
-    }
-
-    .summary {
-      margin-top: 1.4rem;
-      border-top: 1px solid rgba(148, 163, 184, 0.35);
-      padding-top: 0.9rem;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 0.75rem;
-      font-size: 0.82rem;
-      background: rgba(15, 23, 42, 0.95);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    th,
-    td {
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      padding: 0.45rem 0.5rem;
-      text-align: left;
-      vertical-align: middle;
-    }
-
-    th {
-      background: rgba(15, 23, 42, 0.9);
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .button-row {
+    .board-header {
       display: flex;
-      gap: 0.75rem;
-      margin-top: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    button {
-      border: none;
-      border-radius: 999px;
-      padding: 9px 16px;
-      background: linear-gradient(120deg, #4f46e5, #0ea5e9);
-      color: white;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
       align-items: center;
-      gap: 6px;
-      box-shadow: 0 12px 25px rgba(15, 23, 42, 0.6);
-      transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
-      white-space: nowrap;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.4rem;
     }
 
-    button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.8);
+    .board-title-display {
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 1.4rem;
+      margin: 0;
     }
 
-    button:active {
-      transform: translateY(1px) scale(0.99);
-      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.6);
-    }
-
-    button.secondary {
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text-muted);
-      border: 1px solid var(--border-soft);
-      box-shadow: none;
-    }
-
-    button.secondary:hover {
-      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.6);
-    }
-
-    button.danger {
-      background: var(--danger);
-      box-shadow: 0 12px 25px rgba(127, 29, 29, 0.7);
-    }
-
-    button.small {
-      padding: 6px 10px;
+    .board-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
       font-size: 0.75rem;
     }
 
-    .toggle-active {
-      background: linear-gradient(120deg, #4f46e5, #0ea5e9);
-      color: white;
-      border-color: rgba(79, 70, 229, 0.6);
+    .board-toolbar button {
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
+      border: 2px solid #000000;
+      background-color: #ffffff;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .board-meta {
+      font-size: 0.78rem;
+      color: #555555;
+      margin-bottom: 0.6rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    /* Board content layout */
+
+    #mainCard {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 960px) {
+      #mainCard {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .b2p-left,
+    .b2p-right {
+      padding: 0.4rem 0.35rem 0.4rem;
+    }
+
+    .b2p-left h1 {
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 1.45rem;
+      margin: 0 0 0.4rem;
+      letter-spacing: 0.02em;
+    }
+
+    .b2p-subtitle {
+      font-size: 0.86rem;
+      color: #444444;
+      margin-bottom: 0.4rem;
+    }
+
+    .b2p-subtitle strong {
+      font-weight: 600;
+    }
+
+    .b2p-scale-note {
+      margin-top: 0.3rem;
+      font-size: 0.78rem;
+      color: #555555;
+    }
+
+    .b2p-scale-note span {
+      font-weight: 600;
+    }
+
+    .field-row {
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    .field-row label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.15rem;
+    }
+
+    .field-row input,
+    .field-row select {
+      width: 100%;
+      max-width: 260px;
+      padding: 0.35rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid #000000;
+      background-color: #ffffff;
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+
+    .field-row input::placeholder {
+      color: #999999;
+    }
+
+    .field-row small {
+      display: block;
+      margin-top: 0.15rem;
+      color: #666666;
+      font-size: 0.78rem;
+    }
+
+    /* Question groups */
+
+    .question-groups {
+      margin-top: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .question-group {
+      border-radius: 14px;
+      border: 2px solid #000000;
+      background-color: #ffffff;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+    }
+
+    .question-group-header {
+      width: 100%;
+      border: none;
+      background: none;
+      padding: 0.45rem 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .question-group-title {
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 1rem;
+    }
+
+    .question-group-summary {
+      font-size: 0.78rem;
+      color: #555555;
+      margin-left: 0.4rem;
+    }
+
+    .question-group-header-icon {
+      font-size: 0.9rem;
+      margin-left: 0.4rem;
+    }
+
+    .question-group-body {
+      max-height: 0;
+      overflow: hidden;
+      padding: 0 0.7rem;
+      transition:
+        max-height 180ms ease-out,
+        padding-top 160ms ease-out,
+        padding-bottom 160ms ease-out;
+    }
+
+    .question-group.open .question-group-body {
+      max-height: 1000px;
+      padding-top: 0.4rem;
+      padding-bottom: 0.6rem;
+    }
+
+    .question-row {
+      display: flex;
+      gap: 0.45rem;
+      padding: 0.32rem 0;
+      border-top: 1px dashed #dddddd;
+    }
+
+    .question-row:first-of-type {
+      border-top: none;
+    }
+
+    .question-number {
+      width: 1.4rem;
+      font-size: 0.78rem;
+      color: #666666;
+      padding-top: 0.05rem;
     }
 
     .question-text {
-      max-width: 520px;
+      flex: 1;
+      font-size: 0.83rem;
     }
 
-    .radio-group {
-      text-align: center;
+    .question-scale {
+      display: flex;
+      gap: 0.18rem;
+      font-size: 0.7rem;
+      align-items: center;
       white-space: nowrap;
+    }
+
+    .scale-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 999px;
+      border: 1px solid #000000;
+      background-color: #ffffff;
+      cursor: pointer;
+    }
+
+    .scale-pill input[type="radio"] {
+      display: none;
+    }
+
+    .scale-pill span {
+      pointer-events: none;
+    }
+
+    .scale-pill.selected {
+      background-color: #111111;
+      color: #ffffff;
+    }
+
+    .scale-legend {
+      margin-top: 0.4rem;
+      font-size: 0.74rem;
+      color: #555555;
+    }
+
+    .scale-legend span {
+      font-weight: 600;
+    }
+
+    /* Results side */
+
+    .results-panel {
+      font-size: 0.85rem;
+    }
+
+    .results-field-label {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
     }
 
     .results-layout {
       display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      align-items: flex-start;
-      margin-top: 0.5rem;
+      flex-direction: column;
+      gap: 0.7rem;
     }
 
-    .results-box {
+    #calculationResults,
+    #overallResult {
       border-radius: 12px;
-      padding: 0.85rem 1rem;
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      font-size: 0.88rem;
-      flex: 1 1 260px;
-      min-width: 260px;
-      color: var(--text-muted);
+      padding: 0.7rem 0.7rem 0.75rem;
+      background-color: #ffffff;
+      border: 2px solid #000000;
+      font-size: 0.82rem;
     }
 
-    .results-box strong {
-      color: var(--text-main);
+    #calculationResults p,
+    #overallResult p {
+      margin: 0 0 0.35rem;
     }
+
+    #calculationResults p:last-child,
+    #overallResult p:last-child {
+      margin-bottom: 0;
+    }
+
+    .comparison-table {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .comparison-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      border: 1px solid #000000;
+      padding: 0.25rem 0.3rem;
+      text-align: left;
+    }
+
+    .comparison-table th {
+      background-color: #f3f3f3;
+    }
+
+    .flags {
+      margin-top: 0.5rem;
+      padding-top: 0.45rem;
+      border-top: 1px solid #dddddd;
+      font-size: 0.8rem;
+    }
+
+    .flags ul {
+      margin: 0.25rem 0 0 1.1rem;
+      padding: 0;
+    }
+
+    .flags li {
+      margin-bottom: 0.25rem;
+    }
+
+    .results-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+    }
+
+    .btn-danger {
+      background-color: #b91c1c;
+      color: #ffffff;
+    }
+
+    /* Charts */
 
     #chartPanel {
-      flex: 0 0 360px;
-      max-width: 380px;
+      margin-top: 0.5rem;
       display: flex;
       flex-direction: column;
-      gap: 0.6rem;
+      gap: 0.55rem;
     }
 
-    #chartContainer {
-      background: rgba(15, 23, 42, 0.95);
+    #chartContainer,
+    #ringContainer {
+      background-color: #ffffff;
+      border: 2px solid #000000;
       border-radius: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      padding: 0.6rem 0.6rem 0.4rem;
-      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.8);
+      padding: 0.45rem 0.5rem 0.5rem;
     }
 
     #chartContainer canvas {
       width: 100% !important;
-      height: 260px !important;
-    }
-
-    #ringContainer {
-      background: rgba(15, 23, 42, 0.95);
-      border-radius: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      padding: 0.6rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.8);
+      height: 240px !important;
     }
 
     #ringToggleRow {
-      align-self: flex-end;
+      display: flex;
+      justify-content: flex-end;
       margin-bottom: 0.25rem;
-      font-size: 0.78rem;
+      gap: 0.25rem;
+      font-size: 0.75rem;
     }
 
     #ringToggleRow button {
-      box-shadow: none;
+      border-radius: 999px;
+      border: 2px solid #000000;
+      background-color: #ffffff;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.74rem;
+    }
+
+    .toggle-active {
+      background-color: #111111;
+      color: #ffffff;
     }
 
     #zoneRing {
       width: 220px;
       height: 220px;
+      display: block;
+      margin: 0 auto;
     }
 
     #zoneRingLegend {
       margin-top: 0.4rem;
-      font-size: 0.8rem;
-      width: 100%;
+      font-size: 0.78rem;
+      color: #444444;
     }
 
     .legend-row {
@@ -345,77 +683,54 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .flags {
-      margin-top: 0.5rem;
-      padding-top: 0.5rem;
-      border-top: 1px solid rgba(148, 163, 184, 0.35);
-      font-size: 0.86rem;
-      color: var(--text-muted);
+    /* Footer */
+
+    footer {
+      border-top: 2px solid #000000;
+      background-color: #ffffff;
+      padding: 0.9rem 1.25rem 1.1rem;
+      font-size: 0.8rem;
     }
 
-    .flags ul {
-      margin: 0.25rem 0 0 1.1rem;
-      padding: 0;
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.75rem 1.5rem;
     }
 
-    .pill {
-      display: inline-block;
-      padding: 0.12rem 0.6rem;
-      border-radius: 999px;
-      font-size: 0.76rem;
-      background: var(--accent-soft);
-      color: #c7d2fe;
-      font-weight: 500;
-      margin-left: 0.25rem;
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.1rem;
     }
 
-    .muted {
-      color: var(--text-muted);
-    }
-
-    .radio-input {
-      accent-color: var(--accent);
-      cursor: pointer;
-    }
-
-    .comparison-table {
-      margin-top: 0.6rem;
-      font-size: 0.84rem;
-    }
-
-    .comparison-table table {
-      width: 100%;
-      border-collapse: collapse;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .comparison-table th,
-    .comparison-table td {
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      padding: 0.25rem 0.4rem;
-      text-align: left;
-    }
-
-    .comparison-table th {
-      background: rgba(15, 23, 42, 0.9);
+    .footer-link-group-title {
       font-weight: 600;
-      color: var(--text-muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.15rem;
     }
 
-    @media (max-width: 768px) {
-      body {
-        padding: 16px;
+    .footer-link-group a {
+      display: block;
+      font-size: 0.78rem;
+    }
+
+    .footer-link-group a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 720px) {
+      footer {
+        padding-inline: 0.75rem;
       }
-      .card {
-        padding: 1.25rem 1.1rem 1.5rem;
-      }
-      #chartContainer canvas {
-        height: 220px !important;
-      }
-      #zoneRing {
-        width: 200px;
-        height: 200px;
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
@@ -425,595 +740,751 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-  <div class="shell">
+<div class="page">
 
-    <div class="card" id="mainCard">
-      <h1>Bored to Panic Assessment</h1>
-      <p class="subtitle">
-        This tool is designed to help you and your manager understand how work <strong>feels</strong>
-        right now. It is based on the Yerkes–Dodson law, often called the
-        <strong>arousal–performance curve</strong>, which shows that performance tends to improve
-        with challenge up to a point, and then collapses when pressure becomes too high.
-      </p>
-
-      <p class="subtitle">
-        The Bored → Comfort → Stretch → Stress → Panic scale turns that science into
-        a simple conversational tool. It captures how your last few days or weeks have felt,
-        so you can talk about workload, challenge, clarity and support in a consistent way.
-        It is <strong>not</strong> a replacement for good management or judgement. It is simply a
-        structured way to collect how you feel, track patterns over time, and help guide the
-        highest quality conversations about staying in the best growth state for you and for the
-        business.
-      </p>
-
-      <h2>About the five zones</h2>
-      <div class="scale-description">
-        <p><strong>Bored:</strong> Under loaded and under stimulated. Tasks feel repetitive or too easy.
-           Risk of disengagement or drifting away from development.</p>
-        <p><strong>Comfort:</strong> Stable and predictable. Workload feels manageable. Good for consistency
-           but can become stagnant without some stretch.</p>
-        <p><strong>Stretch:</strong> The ideal growth zone. Challenging but energising. Skills are expanding,
-           learning is visible and performance stays strong.</p>
-        <p><strong>Stress:</strong> High pressure and cognitive load. Performance is still happening, but
-           fatigue and error risk rise. Sustainable only in short bursts.</p>
-        <p><strong>Panic:</strong> Load exceeds capacity. Thinking collapses and decisions become reactive.
-           A system problem, not a personal failing. Needs immediate intervention.</p>
+  <!-- Global nav (same structure as index) -->
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-left">
+        <a href="index.html">Home</a>
+        <a href="index.html#tools">Tools</a>
+        <a href="#about">About</a>
       </div>
+      <div class="nav-right">IMTHEBUS tools</div>
+    </div>
+  </nav>
 
-      <div class="field">
-        <label for="personName">Name (optional)</label>
-        <input id="personName" type="text" placeholder="e.g. Alex, Operator" />
-      </div>
+  <main class="page-main">
+    <div class="page-inner">
 
-      <div class="field">
-        <label for="roleLevel">Role level (optional)</label>
-        <select id="roleLevel">
-          <option value="">Select role level</option>
-          <option value="L1">Operator</option>
-          <option value="L2">Senior Operator</option>
-          <option value="L3">Supervisor</option>
-          <option value="L4">Manager</option>
-          <option value="L5">Director</option>
-        </select>
-      </div>
+      <!-- Sidebar clipboard -->
+      <aside class="sidebar">
+        <div class="sidebar-inner">
+          <h1 class="sidebar-title">Bored to Panic scale</h1>
+          <p class="sidebar-tagline">
+            A shared language for how work feels, from bored through comfort and stretch, into stress and panic.
+          </p>
 
-      <div class="field">
-        <label for="context">Context (optional)</label>
-        <select id="context">
-          <option value="">Select context</option>
-          <option value="Normal week">Normal week</option>
-          <option value="Peak period">Peak period</option>
-          <option value="Project workload">Project workload</option>
-          <option value="Returning from leave">Returning from leave</option>
-          <option value="Team changes">Team changes</option>
-          <option value="User-defined">Other (specify below)</option>
-        </select>
-        <input id="contextCustom" type="text" placeholder="Specify your context (optional)"
-               style="margin-top:0.5rem; display:none;">
-      </div>
-
-      <h2>Questionnaire</h2>
-      <p class="muted" style="font-size: 0.9rem;">
-        For each statement, select how often it reflects your experience at work.
-      </p>
-
-      <table>
-        <thead>
-          <tr>
-            <th style="width: 40px;">#</th>
-            <th>Question</th>
-            <th class="radio-group">Never</th>
-            <th class="radio-group">Rarely</th>
-            <th class="radio-group">Sometimes</th>
-            <th class="radio-group">Often</th>
-            <th class="radio-group">Always</th>
-          </tr>
-        </thead>
-        <tbody id="questionsBody">
-          <!-- questions injected by JS -->
-        </tbody>
-      </table>
-
-      <div class="button-row" style="margin-top: 0.9rem;">
-        <button id="calculateFromQuestions" type="button">
-          Calculate from answers
-        </button>
-      </div>
-
-      <div class="field" style="margin-top: 1.2rem;">
-        <label>Calculated zone and scores</label>
-        <div class="results-layout">
-          <div id="calculationResults" class="results-box">
-            Answer the questions and click <strong>Calculate from answers</strong> to see your results.
+          <div class="sidebar-actions">
+            <button class="btn btn-primary" type="button" id="calculateFromQuestions">
+              Calculate from answers
+            </button>
+            <button class="btn btn-secondary" type="button"
+                    onclick="document.getElementById('questionsBody').scrollIntoView({behavior:'smooth'});">
+              Jump to questions
+            </button>
           </div>
-          <div id="chartPanel">
-            <div id="chartContainer">
-              <canvas id="zoneChart"></canvas>
+
+          <div class="sidebar-section" id="about">
+            <div class="sidebar-section-header">
+              <div>How this tool works</div>
+              <span>hover to expand</span>
             </div>
-            <div id="ringContainer">
-              <div id="ringToggleRow">
-                <button type="button" class="secondary small toggle-active" id="ringModeCurrent">Current</button>
-                <button type="button" class="secondary small" id="ringModeIdeal">Ideal</button>
-              </div>
-              <canvas id="zoneRing" width="220" height="220"></canvas>
-              <div id="zoneRingLegend" class="muted">
-                The outer circle represents 100% of your current experience. Bands show how much sits in each zone.
-              </div>
+            <div class="sidebar-section-body">
+              <p>
+                The Bored → Comfort → Stretch → Stress → Panic scale is based on the
+                Yerkes Dodson law and turns it into a simple conversational tool.
+              </p>
+              <p>
+                You answer a short set of questions about how the last few days or weeks
+                have felt at work. The tool then estimates how much of your time sits
+                in each zone and highlights prompts for a better conversation.
+              </p>
+              <p>
+                It is <strong>not</strong> a diagnostic or performance rating. It is
+                a way to structure a discussion about workload, challenge, clarity and support.
+              </p>
+            </div>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-section-header">
+              <div>Data and privacy</div>
+              <span>hover to expand</span>
+            </div>
+            <div class="sidebar-section-body">
+              <p>
+                Your responses are stored <strong>only</strong> in this browser using local storage.
+                Nothing is uploaded or shared anywhere.
+              </p>
+              <p>
+                Clearing browser storage, switching device or pressing
+                “Clear all saved entries” deletes the data permanently.
+              </p>
+              <p>
+                The questions and scoring model were developed experimentally for internal use.
+                They will evolve over time and may contain errors.
+              </p>
+              <button id="sendFeedback" type="button" class="btn btn-secondary btn-small">
+                Send feedback or suggest a feature
+              </button>
+            </div>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-section-header">
+              <div>Keyboard and mouse tips</div>
+              <span>shared across tools</span>
+            </div>
+            <div class="sidebar-section-body">
+              <p>
+                This tool reuses the same whiteboard frame as other IMTHEBUS tools.
+              </p>
+              <p>
+                Common patterns:
+              </p>
+              <ul>
+                <li>Tab through fields, enter to activate main buttons.</li>
+                <li>Use the “Fullscreen board” button to focus only on this tool.</li>
+                <li>Export to CSV for deeper analysis or save a one page PDF snapshot.</li>
+              </ul>
             </div>
           </div>
         </div>
-      </div>
+      </aside>
 
-      <h2>Overall scale result</h2>
-      <div class="field">
-        <div id="overallResult" class="scale-description">
-          Run a calculation to see the overall score, description, key deviations from the ideal profile for this role, and a suggested focus to progress toward the next level.
+      <!-- Whiteboard -->
+      <section class="board-wrapper" aria-label="Bored to Panic whiteboard">
+        <div class="board-header">
+          <h2 class="board-title-display">Bored to Panic assessment</h2>
+          <div class="board-toolbar">
+            <button type="button" data-fullscreen-btn>Fullscreen board</button>
+          </div>
+        </div>
+        <div class="board-meta">
+          <span>Use the fields on the left to set context and work through each expandable section of questions.</span>
+          <span>Then review the summaries, charts and prompts on the right.</span>
+        </div>
+
+        <div id="mainCard">
+          <!-- Left column: intro + questions -->
+          <div class="b2p-left">
+            <h1>Bored to Panic Assessment</h1>
+            <p class="b2p-subtitle">
+              This tool helps you and your manager understand how work <strong>feels</strong> at the moment.
+              It maps your answers to five zones: Bored, Comfort, Stretch, Stress and Panic.
+            </p>
+            <p class="b2p-subtitle">
+              Work through the sections below. All questions start at <strong>Sometimes</strong>.
+              For each statement, move the dot towards <strong>Never</strong> or <strong>Always</strong>
+              so it matches your recent experience.
+            </p>
+
+            <div class="b2p-scale-note">
+              Scale for each dot:
+              <span>0</span> Never ·
+              <span>1</span> Rarely ·
+              <span>2</span> Sometimes ·
+              <span>3</span> Often ·
+              <span>4</span> Always
+            </div>
+
+            <div class="field-row">
+              <label for="personName">Name (optional)</label>
+              <input id="personName" type="text" placeholder="e.g. Alex, Operator" />
+            </div>
+
+            <div class="field-row">
+              <label for="roleLevel">Role level (optional)</label>
+              <select id="roleLevel">
+                <option value="">Select role level</option>
+                <option value="L1">Operator</option>
+                <option value="L2">Senior Operator</option>
+                <option value="L3">Supervisor</option>
+                <option value="L4">Manager</option>
+                <option value="L5">Director</option>
+              </select>
+            </div>
+
+            <div class="field-row">
+              <label for="context">Context (optional)</label>
+              <select id="context">
+                <option value="">Select context</option>
+                <option value="Normal week">Normal week</option>
+                <option value="Peak period">Peak period</option>
+                <option value="Project workload">Project workload</option>
+                <option value="Returning from leave">Returning from leave</option>
+                <option value="Team changes">Team changes</option>
+                <option value="User-defined">Other (specify below)</option>
+              </select>
+              <input id="contextCustom" type="text"
+                     placeholder="Specify your context"
+                     style="margin-top:0.4rem; display:none;">
+              <small>Use the context to make it easier to compare entries later.</small>
+            </div>
+
+            <!-- Question groups container -->
+            <div id="questionsBody" class="question-groups"></div>
+            <div class="scale-legend">
+              If a section feels irrelevant, keep the dots on <span>Sometimes</span> and
+              focus on sections that match your role.
+            </div>
+          </div>
+
+          <!-- Right column: results, charts, history -->
+          <div class="b2p-right">
+            <div class="results-panel">
+              <div class="results-field">
+                <div class="results-field-label">Calculated zone and scores</div>
+                <div class="results-layout">
+                  <div id="calculationResults">
+                    Answer the questions and press <strong>Calculate from answers</strong> in the sidebar
+                    to see your pattern across the five zones.
+                  </div>
+                  <div id="chartPanel">
+                    <div id="chartContainer">
+                      <canvas id="zoneChart"></canvas>
+                    </div>
+                    <div id="ringContainer">
+                      <div id="ringToggleRow">
+                        <button type="button" id="ringModeCurrent" class="toggle-active">Current</button>
+                        <button type="button" id="ringModeIdeal">Ideal</button>
+                      </div>
+                      <canvas id="zoneRing" width="220" height="220"></canvas>
+                      <div id="zoneRingLegend">
+                        The outer circle represents 100% of your current experience.
+                        Bands show how much sits in each zone.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:0.8rem;">
+                <div class="results-field-label">Overall scale result</div>
+                <div id="overallResult">
+                  Run a calculation to see the overall score, description, key deviations from
+                  the ideal profile for this role, and prompts for conversation.
+                </div>
+              </div>
+
+              <div class="results-buttons">
+                <button id="saveEntry" type="button" class="btn btn-primary btn-small">
+                  Save entry
+                </button>
+                <button id="exportCsv" type="button" class="btn btn-secondary btn-small">
+                  Export CSV
+                </button>
+                <button id="exportPdf" type="button" class="btn btn-secondary btn-small">
+                  Save as PDF
+                </button>
+                <button id="clearEntries" type="button" class="btn btn-danger btn-small">
+                  Clear all saved entries
+                </button>
+              </div>
+
+              <div class="field-row" style="margin-top:0.9rem;">
+                <label for="loadEntry">Load a previous result</label>
+                <select id="loadEntry">
+                  <option value="">Select saved entry</option>
+                </select>
+                <small>
+                  Loading replaces the current answers and results with the selected entry.
+                </small>
+              </div>
+
+              <div style="margin-top:0.9rem;">
+                <div class="results-field-label">Recorded entries (browser only)</div>
+                <p style="font-size:0.78rem; color:#555555; margin-bottom:0.4rem;">
+                  Entries are stored only in this browser using local storage. Export to CSV to
+                  analyse elsewhere.
+                </p>
+                <div style="border-radius:12px; border:2px solid #000000; background:#ffffff; overflow:hidden;">
+                  <table id="entriesTable" style="width:100%; border-collapse:collapse; font-size:0.78rem;">
+                    <thead>
+                    <tr>
+                      <th style="border-bottom:2px solid #000;padding:0.25rem 0.3rem;text-align:left;">Date/time</th>
+                      <th style="border-bottom:2px solid #000;padding:0.25rem 0.3rem;text-align:left;">Name</th>
+                      <th style="border-bottom:2px solid #000;padding:0.25rem 0.3rem;text-align:left;">Role level</th>
+                      <th style="border-bottom:2px solid #000;padding:0.25rem 0.3rem;text-align:left;">Context</th>
+                      <th style="border-bottom:2px solid #000;padding:0.25rem 0.3rem;text-align:left;">Score</th>
+                      <th style="border-bottom:2px solid #000;padding:0.25rem 0.3rem;text-align:left;">Zone</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- rows injected by JS -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <p style="font-size:0.75rem; color:#555555; margin-top:1.2rem;">
+                Tool design, questions, scoring model and interpretation framework created by Dean Rougvie.
+                All calculations are experimental and may contain errors.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        © <span id="year"></span> IMTHEBUS. All rights reserved.
+        Built as a small, evolving collection of tools to support real work.
+      </div>
+      <div class="footer-links">
+        <div class="footer-link-group">
+          <div class="footer-link-group-title">Contact</div>
+          <a href="mailto:contact@imthebus.co.uk?subject=General%20enquiry">
+            contact@imthebus.co.uk
+          </a>
+          <a href="mailto:contact@imthebus.co.uk?subject=Bug%20report">
+            Report a bug
+          </a>
+          <a href="mailto:contact@imthebus.co.uk?subject=Tool%20idea">
+            Suggest a tool
+          </a>
+        </div>
+        <div class="footer-link-group">
+          <div class="footer-link-group-title">Legal</div>
+          <a href="#">Privacy notice (placeholder)</a>
+          <a href="#">Terms of use (placeholder)</a>
         </div>
       </div>
-
-      <div class="button-row">
-        <button id="saveEntry">Save entry</button>
-        <button id="exportCsv" type="button" class="secondary">Export CSV</button>
-        <button id="exportPdf" type="button" class="secondary">Save as PDF</button>
-        <button id="clearEntries" type="button" class="danger">Clear all saved entries</button>
-      </div>
-
-      <div class="field" style="margin-top: 1.4rem;">
-        <label for="loadEntry">Load a previous result</label>
-        <select id="loadEntry">
-          <option value="">Select saved entry</option>
-        </select>
-        <p class="muted" style="font-size: 0.8rem;">
-          Loading will replace the current answers and results with the selected entry.
-        </p>
-      </div>
-
-      <div class="summary">
-        <h2>Recorded entries (browser only)</h2>
-        <p class="muted" style="font-size: 0.9rem;">
-          Entries are stored in this browser only using local storage. Export to CSV to analyse elsewhere.
-        </p>
-        <table id="entriesTable">
-          <thead>
-            <tr>
-              <th>Date/time</th>
-              <th>Name</th>
-              <th>Role level</th>
-              <th>Context</th>
-              <th>Score</th>
-              <th>Zone</th>
-            </tr>
-          </thead>
-          <tbody>
-          <!-- rows injected by JS -->
-          </tbody>
-        </table>
-      </div>
-
-      <p class="muted" style="font-size:0.8rem; margin-top:2rem;">
-        Tool design, questions, scoring model and interpretation framework created by Dean Rougvie.
-        All calculations are experimental and may contain errors.
-      </p>
     </div>
+  </footer>
+</div>
 
-    <div class="card" id="privacyCard">
-      <h2>Your data and privacy</h2>
-      <p class="muted">
-        Your responses are stored <strong>only in this browser</strong> using local storage.
-        Nothing is uploaded, shared or sent anywhere.  
-        If you clear your browser storage or press “Clear all saved entries”, your data will be
-        <strong>permanently deleted and cannot be recovered</strong>.
-      </p>
+<!-- Charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-      <p style="margin-top:1rem; color: var(--text-muted);">
-        The questions, scoring model and interpretations were created for internal use and may contain
-        errors or be incomplete. They are intended as a practical tool to support conversation, not as a
-        diagnostic, assessment or formal evaluation system.
-      </p>
+<script>
+  // Footer year
+  document.getElementById("year").textContent = new Date().getFullYear();
 
-      <button id="sendFeedback" type="button" class="secondary">Send feedback or suggest a feature</button>
-    </div>
-  </div>
+  // -----------------------------
+  // Core data and scoring model
+  // -----------------------------
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  const questions = [
+    { id: 1,  text: "I regularly handle tasks that feel new or unfamiliar." },
+    { id: 2,  text: "I complete many tasks automatically, without conscious effort." },
+    { id: 3,  text: "I must make decisions without having all the information I would like." },
+    { id: 4,  text: "I feel calm and in control during most of my working time." },
+    { id: 5,  text: "I feel overwhelmed or unable to keep up with my work." },
+    { id: 6,  text: "My work feels repetitive or predictable." },
+    { id: 7,  text: "I put deliberate effort into practising new skills or behaviours." },
+    { id: 8,  text: "I feel mentally stretched in a way that requires focus." },
+    { id: 9,  text: "I adapt how I work to achieve good results." },   // reverse scored
+    { id: 10, text: "I feel positively challenged and encouraged to grow." },
+    { id: 11, text: "My days are stable and contain few unexpected demands." },
+    { id: 12, text: "My workload builds up faster than I can process it." },
+    { id: 13, text: "I need to switch rapidly between competing tasks." },
+    { id: 14, text: "I take on responsibilities that require learning and adaptation." },
+    { id: 15, text: "I feel energised or stimulated by new challenges." },
+    { id: 16, text: "I find myself firefighting without space to recover." },
+    { id: 17, text: "I complete routine tasks smoothly and confidently." },
+    { id: 18, text: "I manage situations involving tight deadlines or time pressure." },
+    { id: 19, text: "I feel under used or under challenged in parts of my role." },
+    { id: 20, text: "I can predict how most of my day or week will unfold." },
+    { id: 21, text: "I feel a mild sense of pressure that helps me stay focused." },
+    { id: 22, text: "I take on tasks that sit outside my comfort zone." },
+    { id: 23, text: "I experience periods where I cannot think clearly due to pressure." },
+    { id: 24, text: "I feel confident in handling unexpected problems when they arise." },
+    { id: 25, text: "I avoid tasks that feel too overwhelming." }
+  ];
 
-  <script>
-    // Questions
-    const questions = [
-      { id: 1,  text: "I regularly handle tasks that feel new or unfamiliar." },
-      { id: 2,  text: "I complete many tasks automatically, without conscious effort." },
-      { id: 3,  text: "I must make decisions without having all the information I would like." },
-      { id: 4,  text: "I feel calm and in control during most of my working time." },
-      { id: 5,  text: "I feel overwhelmed or unable to keep up with my work." },
-      { id: 6,  text: "My work feels repetitive or predictable." },
-      { id: 7,  text: "I put deliberate effort into practising new skills or behaviours." },
-      { id: 8,  text: "I feel mentally stretched in a way that requires focus." },
-      { id: 9,  text: "I adapt how I work to achieve good results." },   // reverse scored
-      { id: 10, text: "I feel positively challenged and encouraged to grow." },
-      { id: 11, text: "My days are stable and contain few unexpected demands." },
-      { id: 12, text: "My workload builds up faster than I can process it." },
-      { id: 13, text: "I need to switch rapidly between competing tasks." },
-      { id: 14, text: "I take on responsibilities that require learning and adaptation." },
-      { id: 15, text: "I feel energised or stimulated by new challenges." },
-      { id: 16, text: "I find myself firefighting without space to recover." },
-      { id: 17, text: "I complete routine tasks smoothly and confidently." },
-      { id: 18, text: "I manage situations involving tight deadlines or time pressure." },
-      { id: 19, text: "I feel under used or under challenged in parts of my role." },
-      { id: 20, text: "I can predict how most of my day or week will unfold." },
-      { id: 21, text: "I feel a mild sense of pressure that helps me stay focused." },
-      { id: 22, text: "I take on tasks that sit outside my comfort zone." },
-      { id: 23, text: "I experience periods where I cannot think clearly due to pressure." },
-      { id: 24, text: "I feel confident in handling unexpected problems when they arise." },
-      { id: 25, text: "I avoid tasks that feel too overwhelming." }
-    ];
+  // Group questions into expandable sections (each question appears once)
+  const questionSections = [
+    {
+      id: "workload",
+      title: "Workload and pace",
+      summary: "How fast work comes at you and how heavy it feels.",
+      questions: [3, 5, 12, 13, 16, 18]
+    },
+    {
+      id: "challenge",
+      title: "Challenge and growth",
+      summary: "Stretch, learning and positive pressure.",
+      questions: [1, 7, 8, 10, 14, 15, 22]
+    },
+    {
+      id: "stability",
+      title: "Stability and routine",
+      summary: "Predictability, habits and smooth running.",
+      questions: [2, 6, 11, 17, 20]
+    },
+    {
+      id: "capacity",
+      title: "Capacity and under / over use",
+      summary: "Whether your role feels too small or too big.",
+      questions: [19, 21, 25]
+    },
+    {
+      id: "control",
+      title: "Control and problem solving",
+      summary: "Clarity, confidence and reacting under pressure.",
+      questions: [4, 9, 23, 24]
+    }
+  ];
 
-    const reverseScored = new Set([9]);
+  const reverseScored = new Set([9]);
 
-    const responseOptions = [
-      { value: 0, label: "Never" },
-      { value: 1, label: "Rarely" },
-      { value: 2, label: "Sometimes" },
-      { value: 3, label: "Often" },
-      { value: 4, label: "Always" }
-    ];
+  const responseOptions = [
+    { value: 0, label: "0", title: "Never" },
+    { value: 1, label: "1", title: "Rarely" },
+    { value: 2, label: "2", title: "Sometimes" },
+    { value: 3, label: "3", title: "Often" },
+    { value: 4, label: "4", title: "Always" }
+  ];
 
-    const contextSelect = document.getElementById("context");
-    const contextCustom = document.getElementById("contextCustom");
+  const contextSelect = document.getElementById("context");
+  const contextCustom = document.getElementById("contextCustom");
 
-    contextSelect.addEventListener("change", () => {
-      contextCustom.style.display = contextSelect.value === "User-defined" ? "block" : "none";
-    });
+  contextSelect.addEventListener("change", () => {
+    contextCustom.style.display = contextSelect.value === "User-defined" ? "block" : "none";
+  });
 
-    // Zone mapping
-    const zoneQuestions = {
-      bored:   [2, 6, 9, 19, 20],
-      comfort: [4, 11, 17, 20, 24],
-      stretch: [1, 7, 8, 10, 14, 15, 18, 21, 22],
-      stress:  [3, 12, 13],
-      panic:   [5, 16, 23, 25]
-    };
+  // Zone mapping
+  const zoneQuestions = {
+    bored:   [2, 6, 9, 19, 20],
+    comfort: [4, 11, 17, 20, 24],
+    stretch: [1, 7, 8, 10, 14, 15, 18, 21, 22],
+    stress:  [3, 12, 13],
+    panic:   [5, 16, 23, 25]
+  };
 
-    // Colours (stronger; bored is black)
-    const zoneColors = {
-      bored:   { fill: "rgba(0, 0, 0, 0.35)",   stroke: "#111827" },
-      comfort: { fill: "rgba(59, 130, 246, 0.45)", stroke: "#60a5fa" },
-      stretch: { fill: "rgba(34, 197, 94, 0.45)",  stroke: "#4ade80" },
-      stress:  { fill: "rgba(245, 158, 11, 0.45)", stroke: "#facc15" },
-      panic:   { fill: "rgba(239, 68, 68, 0.45)",  stroke: "#f97373" }
-    };
+  const zoneColors = {
+    bored:   { fill: "rgba(0, 0, 0, 0.35)",   stroke: "#111827" },
+    comfort: { fill: "rgba(59, 130, 246, 0.45)", stroke: "#60a5fa" },
+    stretch: { fill: "rgba(34, 197, 94, 0.45)",  stroke: "#4ade80" },
+    stress:  { fill: "rgba(245, 158, 11, 0.45)", stroke: "#facc15" },
+    panic:   { fill: "rgba(239, 68, 68, 0.45)",  stroke: "#f97373" }
+  };
 
-    // Role targets (panic ideal = 0; boredom low but non-zero)
-    const roleTargets = {
-      L1: { bored: 20, comfort: 45, stretch: 30, stress: 5,  panic: 0 }, // Operator
-      L2: { bored: 15, comfort: 40, stretch: 35, stress: 10, panic: 0 }, // Senior Operator
-      L3: { bored: 10, comfort: 30, stretch: 40, stress: 20, panic: 0 }, // Supervisor
-      L4: { bored: 8,  comfort: 25, stretch: 45, stress: 22, panic: 0 }, // Manager
-      L5: { bored: 5,  comfort: 20, stretch: 55, stress: 20, panic: 0 }  // Director
-    };
+  const roleTargets = {
+    L1: { bored: 20, comfort: 45, stretch: 30, stress: 5,  panic: 0 },
+    L2: { bored: 15, comfort: 40, stretch: 35, stress: 10, panic: 0 },
+    L3: { bored: 10, comfort: 30, stretch: 40, stress: 20, panic: 0 },
+    L4: { bored: 8,  comfort: 25, stretch: 45, stress: 22, panic: 0 },
+    L5: { bored: 5,  comfort: 20, stretch: 55, stress: 20, panic: 0 }
+  };
 
-    const roleLabels = {
-      L1: "Operator",
-      L2: "Senior Operator",
-      L3: "Supervisor",
-      L4: "Manager",
-      L5: "Director"
-    };
+  const roleLabels = {
+    L1: "Operator",
+    L2: "Senior Operator",
+    L3: "Supervisor",
+    L4: "Manager",
+    L5: "Director"
+  };
 
-    // Scale descriptions (1–5)
-    const descriptions = {
-      1: {
-        label: "Bored",
-        text: "Underloaded. Too little challenge or variety. Skills underused. Output may be steady but flat with little visible development. Risk of disengagement and drift.",
-        manager: "Increase challenge, variety or responsibility. Clarify expectations for growth. Check if the role is too small for the person or if work has been removed without replacement."
-      },
-      2: {
-        label: "Comfort",
-        text: "Workload feels manageable with low pressure. Performance is reliable and predictable. Good for stability but may not stretch capability on its own.",
-        manager: "Keep core workload stable but add stretch tasks or projects. Agree a development focus so the person spends some time in Stretch, not just Comfort."
-      },
-      3: {
-        label: "Stretch",
-        text: "Healthy stretch zone. Work is challenging in a good way. Learning is visible and energy is positive. This is the optimal zone for growth and long term capability.",
-        manager: "Protect this state. Remove unnecessary friction. Make sure stretch is focused on the right priorities and is recognised and supported."
-      },
-      4: {
-        label: "Stress",
-        text: "High cognitive load and pressure. Work is being done but error risk, fatigue and stress indicators are increasing. Acceptable in short bursts only.",
-        manager: "Trim or re-prioritise workload. Clarify what can wait. Add temporary support. Agree a clear end point for this level of stress."
-      },
-      5: {
-        label: "Panic",
-        text: "Demand exceeds capacity. Performance becomes unstable or collapses. Decisions are reactive and rushed. This is not sustainable.",
-        manager: "Immediate intervention. Remove or reassign work. Clarify boundaries. Offer support and reset expectations. Treat this as a signal that the system, not just the person, needs review."
-      }
-    };
+  const descriptions = {
+    1: {
+      label: "Bored",
+      text: "Underloaded. Too little challenge or variety. Skills underused. Output may be steady but flat with little visible development. Risk of disengagement and drift.",
+      manager: "Increase challenge, variety or responsibility. Clarify expectations for growth. Check if the role is too small for the person or if work has been removed without replacement."
+    },
+    2: {
+      label: "Comfort",
+      text: "Workload feels manageable with low pressure. Performance is reliable and predictable. Good for stability but may not stretch capability on its own.",
+      manager: "Keep core workload stable but add stretch tasks or projects. Agree a development focus so the person spends some time in Stretch, not just Comfort."
+    },
+    3: {
+      label: "Stretch",
+      text: "Healthy stretch zone. Work is challenging in a good way. Learning is visible and energy is positive. This is the optimal zone for growth and long term capability.",
+      manager: "Protect this state. Remove unnecessary friction. Make sure stretch is focused on the right priorities and is recognised and supported."
+    },
+    4: {
+      label: "Stress",
+      text: "High cognitive load and pressure. Work is being done but error risk, fatigue and stress indicators are increasing. Acceptable in short bursts only.",
+      manager: "Trim or re-prioritise workload. Clarify what can wait. Add temporary support. Agree a clear end point for this level of stress."
+    },
+    5: {
+      label: "Panic",
+      text: "Demand exceeds capacity. Performance becomes unstable or collapses. Decisions are reactive and rushed. This is not sustainable.",
+      manager: "Immediate intervention. Remove or reassign work. Clarify boundaries. Offer support and reset expectations. Treat this as a signal that the system, not just the person, needs review."
+    }
+  };
 
-    const roleLevelSelect = document.getElementById("roleLevel");
-    const saveButton = document.getElementById("saveEntry");
-    const exportButton = document.getElementById("exportCsv");
-    const exportPdfButton = document.getElementById("exportPdf");
-    const clearButton = document.getElementById("clearEntries");
-    const questionsBody = document.getElementById("questionsBody");
-    const calculationResults = document.getElementById("calculationResults");
-    const calculateButton = document.getElementById("calculateFromQuestions");
-    const tableBody = document.querySelector("#entriesTable tbody");
-    const loadSelect = document.getElementById("loadEntry");
-    const overallResult = document.getElementById("overallResult");
-    const ringModeCurrentBtn = document.getElementById("ringModeCurrent");
-    const ringModeIdealBtn = document.getElementById("ringModeIdeal");
-    const sendFeedbackButton = document.getElementById("sendFeedback");
+  const roleLevelSelect = document.getElementById("roleLevel");
+  const saveButton = document.getElementById("saveEntry");
+  const exportButton = document.getElementById("exportCsv");
+  const exportPdfButton = document.getElementById("exportPdf");
+  const clearButton = document.getElementById("clearEntries");
+  const questionsBody = document.getElementById("questionsBody");
+  const calculationResults = document.getElementById("calculationResults");
+  const calculateButton = document.getElementById("calculateFromQuestions");
+  const tableBody = document.querySelector("#entriesTable tbody");
+  const loadSelect = document.getElementById("loadEntry");
+  const overallResult = document.getElementById("overallResult");
+  const ringModeCurrentBtn = document.getElementById("ringModeCurrent");
+  const ringModeIdealBtn = document.getElementById("ringModeIdeal");
+  const sendFeedbackButton = document.getElementById("sendFeedback");
 
-    // State
-    let latestZonePercents = null;
-    let latestZoneRaw = null;
-    let latestTopZone = null;
-    let latestTopScore = null;
-    let latestResponses = null;
-    let latestScaleScore = null;
-    let ringMode = "current";
+  // State
+  let latestZonePercents = null;
+  let latestZoneRaw = null;
+  let latestTopZone = null;
+  let latestTopScore = null;
+  let latestResponses = null;
+  let latestScaleScore = null;
+  let ringMode = "current";
 
-    // Radar chart
-    const chartCtx = document.getElementById("zoneChart").getContext("2d");
-    let radarChart = new Chart(chartCtx, {
-      type: "radar",
-      data: {
-        labels: ["Bored", "Comfort", "Stretch", "Stress", "Panic"],
-        datasets: [
-          {
-            label: "Actual",
-            data: [0, 0, 0, 0, 0],
-            fill: true,
-            borderWidth: 2,
-            pointRadius: 3,
-            backgroundColor: "rgba(79, 70, 229, 0.25)",
-            borderColor: "rgba(129, 140, 248, 1)"
-          },
-          {
-            label: "Ideal",
-            data: [0, 0, 0, 0, 0],
-            fill: false,
-            borderWidth: 1.5,
-            pointRadius: 0,
-            borderDash: [4, 3],
-            borderColor: "rgba(148, 163, 184, 0.9)",
-            hidden: true
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          r: {
-            beginAtZero: true,
-            min: 0,
-            max: 50,
-            ticks: {
-              showLabelBackdrop: false,
-              stepSize: 10,
-              color: "#9ca3af",
-              callback: value => value + "%"
-            },
-            angleLines: { color: "rgba(148, 163, 184, 0.3)" },
-            grid: { color: "rgba(55, 65, 81, 0.8)" },
-            pointLabels: {
-              font: { size: 11 },
-              color: "#e5e7eb"
-            }
-          }
+  // -----------------------------
+  // Charts
+  // -----------------------------
+
+  const chartCtx = document.getElementById("zoneChart").getContext("2d");
+  let radarChart = new Chart(chartCtx, {
+    type: "radar",
+    data: {
+      labels: ["Bored", "Comfort", "Stretch", "Stress", "Panic"],
+      datasets: [
+        {
+          label: "Actual",
+          data: [0, 0, 0, 0, 0],
+          fill: true,
+          borderWidth: 2,
+          pointRadius: 3,
+          backgroundColor: "rgba(79, 70, 229, 0.25)",
+          borderColor: "rgba(129, 140, 248, 1)"
         },
-        plugins: {
-          legend: { display: false },
-          title: { display: false }
+        {
+          label: "Ideal",
+          data: [0, 0, 0, 0, 0],
+          fill: false,
+          borderWidth: 1.5,
+          pointRadius: 0,
+          borderDash: [4, 3],
+          borderColor: "rgba(148, 163, 184, 0.9)",
+          hidden: true
         }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          beginAtZero: true,
+          min: 0,
+          max: 50,
+          ticks: {
+            showLabelBackdrop: false,
+            stepSize: 10,
+            color: "#4b5563",
+            callback: v => v + "%"
+          },
+          angleLines: { color: "rgba(148, 163, 184, 0.3)" },
+          grid: { color: "rgba(148, 163, 184, 0.4)" },
+          pointLabels: {
+            font: { size: 11 },
+            color: "#111111"
+          }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        title: { display: false }
       }
-    });
+    }
+  });
 
-    // Concentric ring chart
-    const ringCanvas = document.getElementById("zoneRing");
-    const ringCtx = ringCanvas.getContext("2d");
+  const ringCanvas = document.getElementById("zoneRing");
+  const ringCtx = ringCanvas.getContext("2d");
 
-    function drawRingChart(data) {
-      const w = ringCanvas.width;
-      const h = ringCanvas.height;
-      ringCtx.clearRect(0, 0, w, h);
+  function drawRingChart(data) {
+    const w = ringCanvas.width;
+    const h = ringCanvas.height;
+    ringCtx.clearRect(0, 0, w, h);
 
-      const cx = w / 2;
-      const cy = h / 2;
-      const maxRadius = Math.min(w, h) / 2 - 8;
+    const cx = w / 2;
+    const cy = h / 2;
+    const maxRadius = Math.min(w, h) / 2 - 8;
 
-      if (!data) {
-        ringCtx.beginPath();
-        ringCtx.arc(cx, cy, maxRadius, 0, 2 * Math.PI);
-        ringCtx.strokeStyle = "#4b5563";
-        ringCtx.lineWidth = 2;
-        ringCtx.stroke();
-        return;
-      }
-
-      const order = ["bored", "comfort", "stretch", "stress", "panic"];
-      let innerR = 0;
-      order.forEach(zone => {
-        const pct = data[zone] || 0;
-        const outerR = innerR + maxRadius * (pct / 100);
-        if (outerR <= innerR) return;
-
-        ringCtx.beginPath();
-        ringCtx.arc(cx, cy, outerR, 0, 2 * Math.PI);
-        ringCtx.arc(cx, cy, innerR, 2 * Math.PI, 0, true);
-        ringCtx.closePath();
-        ringCtx.fillStyle = zoneColors[zone].fill;
-        ringCtx.fill();
-
-        innerR = outerR;
-      });
-
+    if (!data) {
       ringCtx.beginPath();
       ringCtx.arc(cx, cy, maxRadius, 0, 2 * Math.PI);
-      ringCtx.strokeStyle = "#6b7280";
-      ringCtx.lineWidth = 1.5;
+      ringCtx.strokeStyle = "#4b5563";
+      ringCtx.lineWidth = 2;
       ringCtx.stroke();
+      return;
     }
 
-    function updateRingLegend(data, labelText) {
-      const legend = document.getElementById("zoneRingLegend");
-      if (!data) {
-        legend.classList.add("muted");
-        legend.innerHTML = "The outer circle represents 100% of your current experience. Bands show how much sits in each zone.";
-        return;
-      }
-      const order = ["bored", "comfort", "stretch", "stress", "panic"];
-      const labels = {
-        bored: "Bored",
-        comfort: "Comfort",
-        stretch: "Stretch",
-        stress: "Stress",
-        panic: "Panic"
-      };
-      const rows = order.map(z => {
-        const pct = data[z] ?? 0;
-        const color = zoneColors[z].stroke;
-        return `
-          <div class="legend-row">
-            <span class="legend-swatch" style="background:${color};"></span>
-            <span class="legend-label">${labels[z]}</span>
-            <span class="legend-value">${pct}%</span>
-          </div>`;
-      }).join("");
-      legend.classList.remove("muted");
-      legend.innerHTML = `<div style="margin-bottom:0.15rem;font-weight:500;font-size:0.78rem;">${labelText}</div>${rows}`;
-    }
+    const order = ["bored", "comfort", "stretch", "stress", "panic"];
+    let innerR = 0;
+    order.forEach(zone => {
+      const pct = data[zone] || 0;
+      const outerR = innerR + maxRadius * (pct / 100);
+      if (outerR <= innerR) return;
 
-    function currentTarget(role) {
-      return role ? roleTargets[role] : null;
-    }
+      ringCtx.beginPath();
+      ringCtx.arc(cx, cy, outerR, 0, 2 * Math.PI);
+      ringCtx.arc(cx, cy, innerR, 2 * Math.PI, 0, true);
+      ringCtx.closePath();
+      ringCtx.fillStyle = zoneColors[zone].fill;
+      ringCtx.fill();
 
-    function updateCharts(percents, target, role) {
-      radarChart.data.datasets[0].data = [
-        percents.bored,
-        percents.comfort,
-        percents.stretch,
-        percents.stress,
-        percents.panic
+      innerR = outerR;
+    });
+
+    ringCtx.beginPath();
+    ringCtx.arc(cx, cy, maxRadius, 0, 2 * Math.PI);
+    ringCtx.strokeStyle = "#6b7280";
+    ringCtx.lineWidth = 1.5;
+    ringCtx.stroke();
+  }
+
+  function updateRingLegend(data, labelText) {
+    const legend = document.getElementById("zoneRingLegend");
+    if (!data) {
+      legend.innerHTML = "The outer circle represents 100% of your current experience. Bands show how much sits in each zone.";
+      return;
+    }
+    const order = ["bored", "comfort", "stretch", "stress", "panic"];
+    const labels = {
+      bored: "Bored",
+      comfort: "Comfort",
+      stretch: "Stretch",
+      stress: "Stress",
+      panic: "Panic"
+    };
+    const rows = order.map(z => {
+      const pct = data[z] ?? 0;
+      const color = zoneColors[z].stroke;
+      return `
+        <div class="legend-row">
+          <span class="legend-swatch" style="background:${color};"></span>
+          <span class="legend-label">${labels[z]}</span>
+          <span class="legend-value">${pct}%</span>
+        </div>`;
+    }).join("");
+    legend.innerHTML = `<div style="margin-bottom:0.15rem;font-weight:500;font-size:0.78rem;">${labelText}</div>${rows}`;
+  }
+
+  function currentTarget(role) {
+    return role ? roleTargets[role] : null;
+  }
+
+  function updateCharts(percents, target, role) {
+    radarChart.data.datasets[0].data = [
+      percents.bored,
+      percents.comfort,
+      percents.stretch,
+      percents.stress,
+      percents.panic
+    ];
+    if (target) {
+      radarChart.data.datasets[1].data = [
+        target.bored,
+        target.comfort,
+        target.stretch,
+        target.stress,
+        target.panic
       ];
-      if (target) {
-        radarChart.data.datasets[1].data = [
-          target.bored,
-          target.comfort,
-          target.stretch,
-          target.stress,
-          target.panic
-        ];
-        radarChart.data.datasets[1].hidden = false;
-      } else {
-        radarChart.data.datasets[1].hidden = true;
-      }
-
-      const allValues = [
-        percents.bored,
-        percents.comfort,
-        percents.stretch,
-        percents.stress,
-        percents.panic
-      ];
-      if (target) {
-        allValues.push(
-          target.bored,
-          target.comfort,
-          target.stretch,
-          target.stress,
-          target.panic
-        );
-      }
-      const maxVal = Math.max(...allValues, 10);
-      const maxScale = Math.max(30, Math.ceil((maxVal + 5) / 10) * 10);
-      radarChart.options.scales.r.max = maxScale;
-      radarChart.update();
-
-      let ringData = percents;
-      let labelText = "Current pattern";
-      if (ringMode === "ideal" && target) {
-        ringData = target;
-        const label = roleLabels[role] || "role";
-        labelText = `Ideal profile for ${label}`;
-      } else if (ringMode === "ideal" && !target) {
-        ringData = percents;
-        labelText = "Current pattern (no role selected for ideal profile)";
-      }
-      drawRingChart(ringData);
-      updateRingLegend(ringData, labelText);
+      radarChart.data.datasets[1].hidden = false;
+    } else {
+      radarChart.data.datasets[1].hidden = true;
     }
 
-    function levelLabel(actual, ideal) {
-      const diff = actual - ideal;
-      if (Math.abs(diff) <= 5) return "about right";
-      if (diff > 5) return "high";
-      return "low";
+    const allValues = [
+      percents.bored,
+      percents.comfort,
+      percents.stretch,
+      percents.stress,
+      percents.panic
+    ];
+    if (target) {
+      allValues.push(
+        target.bored,
+        target.comfort,
+        target.stretch,
+        target.stress,
+        target.panic
+      );
     }
+    const maxVal = Math.max(...allValues, 10);
+    const maxScale = Math.max(30, Math.ceil((maxVal + 5) / 10) * 10);
+    radarChart.options.scales.r.max = maxScale;
+    radarChart.update();
 
-    function zoneNarrative(zone, actual, ideal) {
-      const level = levelLabel(actual, ideal);
-      switch (zone) {
-        case "bored":
-          if (level === "high") return "Boredom is high; add variety or stretch projects.";
-          if (level === "low") return "Boredom is low; no concern here, focus more on Stretch and Stress patterns.";
-          return "Boredom is about right; capability is broadly in use.";
-        case "comfort":
-          if (level === "high") return "Comfort is high; add small stretch goals or new tasks.";
-          if (level === "low") return "Comfort is low; stabilise core workload and routines.";
-          return "Comfort is close to ideal; keep the basics predictable.";
-        case "stretch":
-          if (level === "high") return "Stretch is high; make sure support and clarity are strong so it stays positive.";
-          if (level === "low") return "Stretch is low; look for development projects or new responsibilities.";
-          return "Stretch is about right; this is a healthy growth pattern.";
-        case "stress":
-          if (level === "high") return "Stress is high; re-prioritise, remove lower value work or add resource.";
-          if (level === "low") return "Stress is low; there may be more capacity if needed.";
-          return "Stress is around the expected level; keep an eye on recovery time.";
-        case "panic":
-          if (level === "high") return "Panic is higher than ideal; treat as a system issue and intervene quickly.";
-          if (level === "low") return "Panic is low; maintain good buffers and early warning conversations.";
-          return "Panic is close to the expected range; still worth exploring triggers.";
-        default:
-          return "";
-      }
+    let ringData = percents;
+    let labelText = "Current pattern";
+    if (ringMode === "ideal" && target) {
+      ringData = target;
+      const label = roleLabels[role] || "role";
+      labelText = `Ideal profile for ${label}`;
+    } else if (ringMode === "ideal" && !target) {
+      ringData = percents;
+      labelText = "Current pattern (no role selected for ideal profile)";
     }
+    drawRingChart(ringData);
+    updateRingLegend(ringData, labelText);
+  }
 
-    function renderOverallScale(topZone, percents, role) {
-      const scoreMap = {
-        bored: 1,
-        comfort: 2,
-        stretch: 3,
-        stress: 4,
-        panic: 5
-      };
-      const score = scoreMap[topZone] || 3;
-      latestScaleScore = score;
+  function levelLabel(actual, ideal) {
+    const diff = actual - ideal;
+    if (Math.abs(diff) <= 5) return "about right";
+    if (diff > 5) return "high";
+    return "low";
+  }
 
-      const desc = descriptions[score];
-      const roleTarget = role ? roleTargets[role] : null;
+  function zoneNarrative(zone, actual, ideal) {
+    const level = levelLabel(actual, ideal);
+    switch (zone) {
+      case "bored":
+        if (level === "high") return "Boredom is high; add variety or stretch projects.";
+        if (level === "low") return "Boredom is low; no concern here, focus more on Stretch and Stress patterns.";
+        return "Boredom is about right; capability is broadly in use.";
+      case "comfort":
+        if (level === "high") return "Comfort is high; add small stretch goals or new tasks.";
+        if (level === "low") return "Comfort is low; stabilise core workload and routines.";
+        return "Comfort is close to ideal; keep the basics predictable.";
+      case "stretch":
+        if (level === "high") return "Stretch is high; make sure support and clarity are strong so it stays positive.";
+        if (level === "low") return "Stretch is low; look for development projects or new responsibilities.";
+        return "Stretch is about right; this is a healthy growth pattern.";
+      case "stress":
+        if (level === "high") return "Stress is high; re-prioritise, remove lower value work or add resource.";
+        if (level === "low") return "Stress is low; there may be more capacity if needed.";
+        return "Stress is around the expected level; keep an eye on recovery time.";
+      case "panic":
+        if (level === "high") return "Panic is higher than ideal; treat as a system issue and intervene quickly.";
+        if (level === "low") return "Panic is low; maintain good buffers and early warning conversations.";
+        return "Panic is close to the expected range; still worth exploring triggers.";
+      default:
+        return "";
+    }
+  }
 
-      const targetSummary = roleTarget
-        ? `<p><strong>Role target pattern (${roleLabels[role]}):</strong>
+  function renderOverallScale(topZone, percents, role) {
+    const scoreMap = {
+      bored: 1,
+      comfort: 2,
+      stretch: 3,
+      stress: 4,
+      panic: 5
+    };
+    const score = scoreMap[topZone] || 3;
+    latestScaleScore = score;
+
+    const desc = descriptions[score];
+    const roleTarget = role ? roleTargets[role] : null;
+
+    const targetSummary = roleTarget
+      ? `<p><strong>Role target pattern (${roleLabels[role]}):</strong>
              Bored ${roleTarget.bored}% · Comfort ${roleTarget.comfort}% · Stretch ${roleTarget.stretch}% · Stress ${roleTarget.stress}% · Panic ${roleTarget.panic}%</p>`
-        : `<p class="muted">Select a role level to compare against an ideal pattern for that role.</p>`;
+      : `<p style="color:#555555;">Select a role level to compare against an ideal pattern for that role.</p>`;
 
-      const deviations = roleTarget
-        ? ["bored", "comfort", "stretch", "stress", "panic"]
-            .map(z => {
-              const actual = percents[z] ?? 0;
-              const ideal = roleTarget[z] ?? 0;
-              return `<tr>
+    const deviations = roleTarget
+      ? ["bored", "comfort", "stretch", "stress", "panic"]
+          .map(z => {
+            const actual = percents[z] ?? 0;
+            const ideal = roleTarget[z] ?? 0;
+            return `<tr>
                 <td>${z.charAt(0).toUpperCase() + z.slice(1)}</td>
                 <td>${actual}%</td>
                 <td>${ideal}%</td>
                 <td>${zoneNarrative(z, actual, ideal)}</td>
               </tr>`;
-            })
-            .join("")
-        : "";
+          })
+          .join("")
+      : "";
 
-      const comparisonTable = roleTarget
-        ? `<div class="comparison-table">
+    const comparisonTable = roleTarget
+      ? `<div class="comparison-table">
              <table>
                <thead>
                  <tr>
@@ -1026,71 +1497,71 @@
                <tbody>${deviations}</tbody>
              </table>
            </div>`
-        : "";
+      : "";
 
-      overallResult.innerHTML = `
+    overallResult.innerHTML = `
         <p><strong>Overall position:</strong> ${desc.label} (score ${score}/5)</p>
         <p>${desc.text}</p>
         <p><strong>Manager focus:</strong> ${desc.manager}</p>
         ${targetSummary}
         ${comparisonTable}
       `;
+  }
+
+  function buildFlags(percents) {
+    const flags = [];
+
+    if (percents.panic >= 15) {
+      flags.push("Panic at or above 15%: dig into specific situations that feel overwhelming, and review workload, boundaries and support urgently.");
+    } else if (percents.panic >= 10) {
+      flags.push("Panic between 10% and 15%: agree regular check ins and watch for patterns that push things over the edge.");
     }
 
-    function buildFlags(percents) {
-      const flags = [];
-
-      if (percents.panic >= 15) {
-        flags.push("Panic at or above 15%: dig into specific situations that feel overwhelming, and review workload, boundaries and support urgently.");
-      } else if (percents.panic >= 10) {
-        flags.push("Panic between 10% and 15%: agree regular check ins and watch for patterns that push things over the edge.");
-      }
-
-      if (percents.stress + percents.panic >= 35) {
-        flags.push("Combined Stress and Panic above 35%: this is a sustained high pressure pattern; consider rescoping work or adding resource.");
-      }
-
-      if (percents.bored >= 25) {
-        flags.push("Bored at or above 25%: under use of capability; explore additional responsibility, variety or development projects.");
-      }
-
-      if (percents.stretch < 30) {
-        flags.push("Stretch below 30%: growth opportunities may be limited; look for ways to introduce constructive challenge.");
-      }
-
-      if (
-        percents.stretch >= 35 &&
-        percents.stretch <= 60 &&
-        percents.panic < 15 &&
-        percents.bored < 20 &&
-        percents.stress >= 10 &&
-        percents.stress <= 25
-      ) {
-        flags.push("Overall pattern looks healthy: mostly in Stretch with manageable Stress and low Panic. Focus on keeping priorities clear and removing friction.");
-      }
-
-      return flags;
+    if (percents.stress + percents.panic >= 35) {
+      flags.push("Combined Stress and Panic above 35%: this is a sustained high pressure pattern; consider rescoping work or adding resource.");
     }
 
-    function renderResults(percents, role, topZone, topScore) {
-      const labels = {
-        bored: "Bored",
-        comfort: "Comfort",
-        stretch: "Stretch",
-        stress: "Stress",
-        panic: "Panic"
-      };
+    if (percents.bored >= 25) {
+      flags.push("Bored at or above 25%: under use of capability; explore additional responsibility, variety or development projects.");
+    }
 
-      const target = role ? currentTarget(role) : null;
+    if (percents.stretch < 30) {
+      flags.push("Stretch below 30%: growth opportunities may be limited; look for ways to introduce constructive challenge.");
+    }
 
-      const lines = [
-        `<p><strong>Highest zone:</strong> ${labels[topZone]} (${topScore}%)</p>`,
-        `<p><strong>Current pattern:</strong> Bored ${percents.bored}% · Comfort ${percents.comfort}% · Stretch ${percents.stretch}% · Stress ${percents.stress}% · Panic ${percents.panic}%</p>`
-      ];
+    if (
+      percents.stretch >= 35 &&
+      percents.stretch <= 60 &&
+      percents.panic < 15 &&
+      percents.bored < 20 &&
+      percents.stress >= 10 &&
+      percents.stress <= 25
+    ) {
+      flags.push("Overall pattern looks healthy: mostly in Stretch with manageable Stress and low Panic. Focus on keeping priorities clear and removing friction.");
+    }
 
-      const flags = buildFlags(percents);
-      const comparisonTable = target
-        ? `<div class="comparison-table">
+    return flags;
+  }
+
+  function renderResults(percents, role, topZone, topScore) {
+    const labels = {
+      bored: "Bored",
+      comfort: "Comfort",
+      stretch: "Stretch",
+      stress: "Stress",
+      panic: "Panic"
+    };
+
+    const target = role ? currentTarget(role) : null;
+
+    const lines = [
+      `<p><strong>Highest zone:</strong> ${labels[topZone]} (${topScore}%)</p>`,
+      `<p><strong>Current pattern:</strong> Bored ${percents.bored}% · Comfort ${percents.comfort}% · Stretch ${percents.stretch}% · Stress ${percents.stress}% · Panic ${percents.panic}%</p>`
+    ];
+
+    const flags = buildFlags(percents);
+    const comparisonTable = target
+      ? `<div class="comparison-table">
              <table>
                <thead>
                  <tr>
@@ -1108,9 +1579,9 @@
                </tbody>
              </table>
            </div>`
-        : "";
+      : "";
 
-      calculationResults.innerHTML = `
+    calculationResults.innerHTML = `
         ${lines.join("")}
         ${comparisonTable}
         <div class="flags">
@@ -1123,121 +1594,121 @@
         </div>
       `;
 
-      renderOverallScale(topZone, percents, role);
-      updateCharts(percents, target, role);
+    renderOverallScale(topZone, percents, role);
+    updateCharts(percents, target, role);
+  }
+
+  function getResponses() {
+    const responses = {};
+    for (const q of questions) {
+      const checked = document.querySelector(`input[name="q${q.id}"]:checked`);
+      if (!checked) {
+        return null;
+      }
+      responses[q.id] = parseInt(checked.value, 10);
+    }
+    return responses;
+  }
+
+  function calculateZoneScores(responses) {
+    const raw = {};
+    let totalRaw = 0;
+
+    for (const [zone, ids] of Object.entries(zoneQuestions)) {
+      let sum = 0;
+      ids.forEach(id => {
+        const base = responses[id] ?? 0;
+        const score = reverseScored.has(id) ? (4 - base) : base;
+        sum += score;
+      });
+      raw[zone] = sum;
+      totalRaw += sum;
     }
 
-    function getResponses() {
-      const responses = {};
-      for (const q of questions) {
-        const checked = document.querySelector(`input[name="q${q.id}"]:checked`);
-        if (!checked) {
-          return null;
+    const percents = {};
+    const zones = Object.keys(raw);
+
+    if (totalRaw === 0) {
+      zones.forEach(z => { percents[z] = 0; });
+    } else {
+      let runningTotal = 0;
+      zones.forEach((zone, idx) => {
+        if (idx === zones.length - 1) {
+          percents[zone] = 100 - runningTotal;
+        } else {
+          const p = Math.round((raw[zone] / totalRaw) * 100);
+          percents[zone] = p;
+          runningTotal += p;
         }
-        responses[q.id] = parseInt(checked.value, 10);
+      });
+    }
+
+    return { raw, percents };
+  }
+
+  function handleCalculate() {
+    const responses = getResponses();
+    if (!responses) {
+      alert("Please work through each section so every question has a dot selected.");
+      return;
+    }
+
+    const { raw, percents } = calculateZoneScores(responses);
+
+    const entriesArr = Object.entries(percents);
+    entriesArr.sort((a, b) => b[1] - a[1]);
+    const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
+
+    latestZonePercents = percents;
+    latestZoneRaw = raw;
+    latestTopZone = topZone;
+    latestTopScore = topScore;
+    latestResponses = responses;
+
+    const role = roleLevelSelect.value || null;
+    renderResults(percents, role, topZone, topScore);
+  }
+
+  function handleRoleChange() {
+    const role = roleLevelSelect.value || null;
+
+    if (latestZonePercents) {
+      let topZone = latestTopZone;
+      let topScore = latestTopScore;
+      if (!topZone) {
+        const entries = Object.entries(latestZonePercents);
+        entries.sort((a, b) => b[1] - a[1]);
+        const top = entries[0] || ["stretch", 0];
+        topZone = top[0];
+        topScore = top[1];
+        latestTopZone = topZone;
+        latestTopScore = topScore;
       }
-      return responses;
+      renderResults(latestZonePercents, role, topZone, topScore);
+    } else {
+      drawRingChart(null);
+      updateRingLegend(null);
     }
+  }
 
-    function calculateZoneScores(responses) {
-      const raw = {};
-      let totalRaw = 0;
+  function loadEntries() {
+    const raw = localStorage.getItem("boredToPanicEntries") || "[]";
+    return JSON.parse(raw);
+  }
 
-      for (const [zone, ids] of Object.entries(zoneQuestions)) {
-        let sum = 0;
-        ids.forEach(id => {
-          const base = responses[id] ?? 0;
-          const score = reverseScored.has(id) ? (4 - base) : base;
-          sum += score;
-        });
-        raw[zone] = sum;
-        totalRaw += sum;
-      }
+  function saveEntries(entries) {
+    localStorage.setItem("boredToPanicEntries", JSON.stringify(entries));
+  }
 
-      const percents = {};
-      const zones = Object.keys(raw);
+  function renderEntriesTableAndDropdown() {
+    const entries = loadEntries();
+    tableBody.innerHTML = "";
+    loadSelect.innerHTML = '<option value="">Select saved entry</option>';
 
-      if (totalRaw === 0) {
-        zones.forEach(z => { percents[z] = 0; });
-      } else {
-        let runningTotal = 0;
-        zones.forEach((zone, idx) => {
-          if (idx === zones.length - 1) {
-            percents[zone] = 100 - runningTotal;
-          } else {
-            const p = Math.round((raw[zone] / totalRaw) * 100);
-            percents[zone] = p;
-            runningTotal += p;
-          }
-        });
-      }
-
-      return { raw, percents };
-    }
-
-    function handleCalculate() {
-      const responses = getResponses();
-      if (!responses) {
-        alert("Please answer all questions before calculating.");
-        return;
-      }
-
-      const { raw, percents } = calculateZoneScores(responses);
-
-      const entriesArr = Object.entries(percents);
-      entriesArr.sort((a, b) => b[1] - a[1]);
-      const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
-
-      latestZonePercents = percents;
-      latestZoneRaw = raw;
-      latestTopZone = topZone;
-      latestTopScore = topScore;
-      latestResponses = responses;
-
-      const role = roleLevelSelect.value || null;
-      renderResults(percents, role, topZone, topScore);
-    }
-
-    function handleRoleChange() {
-      const role = roleLevelSelect.value || null;
-
-      if (latestZonePercents) {
-        let topZone = latestTopZone;
-        let topScore = latestTopScore;
-        if (!topZone) {
-          const entries = Object.entries(latestZonePercents);
-          entries.sort((a, b) => b[1] - a[1]);
-          const top = entries[0] || ["stretch", 0];
-          topZone = top[0];
-          topScore = top[1];
-          latestTopZone = topZone;
-          latestTopScore = topScore;
-        }
-        renderResults(latestZonePercents, role, topZone, topScore);
-      } else {
-        drawRingChart(null);
-        updateRingLegend(null);
-      }
-    }
-
-    function loadEntries() {
-      const raw = localStorage.getItem("boredToPanicEntries") || "[]";
-      return JSON.parse(raw);
-    }
-
-    function saveEntries(entries) {
-      localStorage.setItem("boredToPanicEntries", JSON.stringify(entries));
-    }
-
-    function renderEntriesTableAndDropdown() {
-      const entries = loadEntries();
-      tableBody.innerHTML = "";
-      loadSelect.innerHTML = '<option value="">Select saved entry</option>';
-
-      entries.forEach((entry, index) => {
-        const tr = document.createElement("tr");
-        const roleLabel = roleLabels[entry.roleLevel] || entry.roleLevel || "";
-        tr.innerHTML = `
+    entries.forEach((entry, index) => {
+      const tr = document.createElement("tr");
+      const roleLabel = roleLabels[entry.roleLevel] || entry.roleLevel || "";
+      tr.innerHTML = `
           <td>${entry.timestamp}</td>
           <td>${entry.name || ""}</td>
           <td>${roleLabel}</td>
@@ -1245,317 +1716,415 @@
           <td>${entry.score}</td>
           <td>${descriptions[entry.score]?.label || ""}</td>
         `;
-        tableBody.appendChild(tr);
+      tableBody.appendChild(tr);
 
-        const optLabel = `${entry.timestamp} – ${entry.name || "No name"} (${descriptions[entry.score]?.label || "Score " + entry.score})`;
-        const opt = document.createElement("option");
-        opt.value = index.toString();
-        opt.textContent = optLabel;
-        loadSelect.appendChild(opt);
-      });
+      const optLabel = `${entry.timestamp} – ${entry.name || "No name"} (${descriptions[entry.score]?.label || "Score " + entry.score})`;
+      const opt = document.createElement("option");
+      opt.value = index.toString();
+      opt.textContent = optLabel;
+      loadSelect.appendChild(opt);
+    });
+  }
+
+  function handleSave() {
+    if (!latestZonePercents || !latestTopZone) {
+      alert("Please calculate your results before saving.");
+      return;
     }
 
-    function handleSave() {
-      if (!latestZonePercents || !latestTopZone) {
-        alert("Please calculate your results before saving.");
-        return;
-      }
-
-      const name = document.getElementById("personName").value.trim();
-      const roleLevel = roleLevelSelect.value || "";
-      let contextValue = "";
-      if (contextSelect.value === "User-defined") {
-        contextValue = contextCustom.value.trim();
-      } else {
-        contextValue = contextSelect.value;
-      }
-
-      const scoreMap = {
-        bored: 1,
-        comfort: 2,
-        stretch: 3,
-        stress: 4,
-        panic: 5
-      };
-      const score = scoreMap[latestTopZone] || latestScaleScore || 3;
-
-      const entries = loadEntries();
-      const timestamp = new Date().toLocaleString();
-      entries.push({
-        timestamp,
-        name,
-        roleLevel,
-        context: contextValue,
-        score,
-        zonePercents: latestZonePercents,
-        zoneRaw: latestZoneRaw,
-        responses: latestResponses
-      });
-      saveEntries(entries);
-      renderEntriesTableAndDropdown();
-      alert("Entry saved in this browser.");
+    const name = document.getElementById("personName").value.trim();
+    const roleLevel = roleLevelSelect.value || "";
+    let contextValue = "";
+    if (contextSelect.value === "User-defined") {
+      contextValue = contextCustom.value.trim();
+    } else {
+      contextValue = contextSelect.value;
     }
 
-    function toCsvRow(cells) {
-      return cells
-        .map(cell => {
-          const val = cell == null ? "" : String(cell);
-          if (val.includes(",") || val.includes("\"") || val.includes("\n")) {
-            return "\"" + val.replace(/"/g, "\"\"") + "\"";
-          }
-          return val;
-        })
-        .join(",");
+    const scoreMap = {
+      bored: 1,
+      comfort: 2,
+      stretch: 3,
+      stress: 4,
+      panic: 5
+    };
+    const score = scoreMap[latestTopZone] || latestScaleScore || 3;
+
+    const entries = loadEntries();
+    const timestamp = new Date().toLocaleString();
+    entries.push({
+      timestamp,
+      name,
+      roleLevel,
+      context: contextValue,
+      score,
+      zonePercents: latestZonePercents,
+      zoneRaw: latestZoneRaw,
+      responses: latestResponses
+    });
+    saveEntries(entries);
+    renderEntriesTableAndDropdown();
+    alert("Entry saved in this browser.");
+  }
+
+  function toCsvRow(cells) {
+    return cells
+      .map(cell => {
+        const val = cell == null ? "" : String(cell);
+        if (val.includes(",") || val.includes("\"") || val.includes("\n")) {
+          return "\"" + val.replace(/"/g, "\"\"") + "\"";
+        }
+        return val;
+      })
+      .join(",");
+  }
+
+  function handleExportCsv() {
+    const entries = loadEntries();
+    if (!entries.length) {
+      alert("No entries to export.");
+      return;
     }
 
-    function handleExportCsv() {
-      const entries = loadEntries();
-      if (!entries.length) {
-        alert("No entries to export.");
-        return;
-      }
+    const headers = [
+      "Timestamp",
+      "Name",
+      "RoleLevel",
+      "Context",
+      "Score",
+      "ZoneLabel",
+      "Bored%",
+      "Comfort%",
+      "Stretch%",
+      "Stress%",
+      "Panic%"
+    ];
 
-      const headers = [
-        "Timestamp",
-        "Name",
-        "RoleLevel",
-        "Context",
-        "Score",
-        "ZoneLabel",
-        "Bored%",
-        "Comfort%",
-        "Stretch%",
-        "Stress%",
-        "Panic%"
+    questions.forEach(q => {
+      headers.push(`Q${q.id}`);
+    });
+
+    const rows = [toCsvRow(headers)];
+
+    entries.forEach(entry => {
+      const zp = entry.zonePercents || {};
+      const responses = entry.responses || {};
+      const row = [
+        entry.timestamp,
+        entry.name || "",
+        entry.roleLevel || "",
+        entry.context || "",
+        entry.score,
+        descriptions[entry.score]?.label || "",
+        zp.bored ?? "",
+        zp.comfort ?? "",
+        zp.stretch ?? "",
+        zp.stress ?? "",
+        zp.panic ?? ""
       ];
 
       questions.forEach(q => {
-        headers.push(`Q${q.id}`);
+        row.push(responses ? (responses[q.id] ?? "") : "");
       });
 
-      const rows = [toCsvRow(headers)];
+      rows.push(toCsvRow(row));
+    });
 
-      entries.forEach(entry => {
-        const zp = entry.zonePercents || {};
-        const responses = entry.responses || {};
-        const row = [
-          entry.timestamp,
-          entry.name || "",
-          entry.roleLevel || "",
-          entry.context || "",
-          entry.score,
-          descriptions[entry.score]?.label || "",
-          zp.bored ?? "",
-          zp.comfort ?? "",
-          zp.stretch ?? "",
-          zp.stress ?? "",
-          zp.panic ?? ""
-        ];
+    const csvContent = rows.join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "bored_to_panic_entries.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
 
-        questions.forEach(q => {
-          row.push(responses ? (responses[q.id] ?? "") : "");
-        });
+  function handleClearEntries() {
+    if (!confirm("Clear all saved entries in this browser?")) return;
+    localStorage.removeItem("boredToPanicEntries");
+    renderEntriesTableAndDropdown();
+  }
 
-        rows.push(toCsvRow(row));
-      });
+  function handleLoadEntry() {
+    const idx = loadSelect.value;
+    if (idx === "") return;
+    const entries = loadEntries();
+    const entry = entries[parseInt(idx, 10)];
+    if (!entry) return;
 
-      const csvContent = rows.join("\r\n");
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "bored_to_panic_entries.csv";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }
+    document.getElementById("personName").value = entry.name || "";
+    roleLevelSelect.value = entry.roleLevel || "";
 
-    function handleClearEntries() {
-      if (!confirm("Clear all saved entries in this browser?")) return;
-      localStorage.removeItem("boredToPanicEntries");
-      renderEntriesTableAndDropdown();
-    }
-
-    function handleLoadEntry() {
-      const idx = loadSelect.value;
-      if (idx === "") return;
-      const entries = loadEntries();
-      const entry = entries[parseInt(idx, 10)];
-      if (!entry) return;
-
-      document.getElementById("personName").value = entry.name || "";
-      roleLevelSelect.value = entry.roleLevel || "";
-
-      // Restore context
-      if (entry.context) {
-        const matchOption = Array.from(contextSelect.options).find(
-          opt => opt.value === entry.context
-        );
-        if (matchOption) {
-          contextSelect.value = entry.context;
-          contextCustom.value = "";
-          contextCustom.style.display = "none";
-        } else {
-          contextSelect.value = "User-defined";
-          contextCustom.value = entry.context;
-          contextCustom.style.display = "block";
-        }
-      } else {
-        contextSelect.value = "";
+    if (entry.context) {
+      const matchOption = Array.from(contextSelect.options).find(
+        opt => opt.value === entry.context
+      );
+      if (matchOption) {
+        contextSelect.value = entry.context;
         contextCustom.value = "";
         contextCustom.style.display = "none";
+      } else {
+        contextSelect.value = "User-defined";
+        contextCustom.value = entry.context;
+        contextCustom.style.display = "block";
       }
+    } else {
+      contextSelect.value = "";
+      contextCustom.value = "";
+      contextCustom.style.display = "none";
+    }
 
-      questions.forEach(q => {
-        const radios = document.getElementsByName(`q${q.id}`);
-        Array.from(radios).forEach(r => { r.checked = false; });
+    questions.forEach(q => {
+      const radios = document.getElementsByName(`q${q.id}`);
+      Array.from(radios).forEach(r => { r.checked = false; });
+    });
+
+    if (entry.responses) {
+      Object.entries(entry.responses).forEach(([qid, val]) => {
+        const radio = document.querySelector(`input[name="q${qid}"][value="${val}"]`);
+        if (radio) radio.checked = true;
       });
-
-      if (entry.responses) {
-        Object.entries(entry.responses).forEach(([qid, val]) => {
-          const radio = document.querySelector(`input[name="q${qid}"][value="${val}"]`);
-          if (radio) radio.checked = true;
-        });
-      }
-
-      latestResponses = entry.responses || null;
-
-      let percents = entry.zonePercents;
-      let raw = entry.zoneRaw;
-
-      if (!percents && entry.responses) {
-        const calc = calculateZoneScores(entry.responses);
-        percents = calc.percents;
-        raw = calc.raw;
-      }
-
-      if (!percents) {
-        alert("This saved entry does not have enough data to reconstruct the scores.");
-        return;
-      }
-
-      latestZonePercents = percents;
-      latestZoneRaw = raw;
-
-      const entriesArr = Object.entries(percents);
-      entriesArr.sort((a, b) => b[1] - a[1]);
-      const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
-      latestTopZone = topZone;
-      latestTopScore = topScore;
-
-      const role = roleLevelSelect.value || null;
-      renderResults(percents, role, topZone, topScore);
     }
 
-    function setRingMode(mode) {
-      const role = roleLevelSelect.value || null;
-      const target = currentTarget(role);
+    latestResponses = entry.responses || null;
 
-      if (mode === "ideal" && !target) {
-        alert("Select a role level to view the ideal profile.");
-        return;
-      }
-      ringMode = mode;
+    let percents = entry.zonePercents;
+    let raw = entry.zoneRaw;
 
-      ringModeCurrentBtn.classList.remove("toggle-active");
-      ringModeIdealBtn.classList.remove("toggle-active");
-      if (mode === "current") {
-        ringModeCurrentBtn.classList.add("toggle-active");
-      } else {
-        ringModeIdealBtn.classList.add("toggle-active");
-      }
-
-      if (latestZonePercents) {
-        updateCharts(latestZonePercents, target, role);
-      } else {
-        drawRingChart(null);
-        updateRingLegend(null);
-      }
+    if (!percents && entry.responses) {
+      const calc = calculateZoneScores(entry.responses);
+      percents = calc.percents;
+      raw = calc.raw;
     }
 
-    async function handleExportPdf() {
-      const { jsPDF } = window.jspdf;
-      const card = document.getElementById("mainCard");
-
-      const canvas = await html2canvas(card, { scale: 2 });
-      const img = canvas.toDataURL("image/jpeg", 0.9);
-
-      const pdf = new jsPDF("p", "mm", "a4");
-      const width = pdf.internal.pageSize.getWidth();
-      const height = (canvas.height * width) / canvas.width;
-
-      pdf.addImage(img, "JPEG", 0, 0, width, height);
-      pdf.save("Bored_to_Panic_Assessment.pdf");
+    if (!percents) {
+      alert("This saved entry does not have enough data to reconstruct the scores.");
+      return;
     }
 
-    function handleSendFeedback() {
-      const subject = encodeURIComponent("Bored to Panic tool feedback");
-      const body = encodeURIComponent(
-        "Please add any feedback, bugs you have spotted, or feature ideas below:\n\n"
-      );
-      window.location.href = `mailto:dean@bookspeed.com?subject=${subject}&body=${body}`;
+    latestZonePercents = percents;
+    latestZoneRaw = raw;
+
+    const entriesArr = Object.entries(percents);
+    entriesArr.sort((a, b) => b[1] - a[1]);
+    const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
+    latestTopZone = topZone;
+    latestTopScore = topScore;
+
+    const role = roleLevelSelect.value || null;
+    renderResults(percents, role, topZone, topScore);
+  }
+
+  function setRingMode(mode) {
+    const role = roleLevelSelect.value || null;
+    const target = currentTarget(role);
+
+    if (mode === "ideal" && !target) {
+      alert("Select a role level to view the ideal profile.");
+      return;
+    }
+    ringMode = mode;
+
+    ringModeCurrentBtn.classList.remove("toggle-active");
+    ringModeIdealBtn.classList.remove("toggle-active");
+    if (mode === "current") {
+      ringModeCurrentBtn.classList.add("toggle-active");
+    } else {
+      ringModeIdealBtn.classList.add("toggle-active");
     }
 
-    function buildQuestions() {
-      questions.forEach(q => {
-        const tr = document.createElement("tr");
+    if (latestZonePercents) {
+      updateCharts(latestZonePercents, target, role);
+    } else {
+      drawRingChart(null);
+      updateRingLegend(null);
+    }
+  }
 
-        const tdNum = document.createElement("td");
-        tdNum.textContent = q.id;
-        tr.appendChild(tdNum);
+  async function handleExportPdf() {
+    const { jsPDF } = window.jspdf;
+    const card = document.querySelector(".board-wrapper");
 
-        const tdText = document.createElement("td");
-        tdText.className = "question-text";
-        tdText.textContent = q.text;
-        tr.appendChild(tdText);
+    const canvas = await html2canvas(card, { scale: 2 });
+    const img = canvas.toDataURL("image/jpeg", 0.9);
+
+    const pdf = new jsPDF("p", "mm", "a4");
+    const width = pdf.internal.pageSize.getWidth();
+    const height = (canvas.height * width) / canvas.width;
+
+    pdf.addImage(img, "JPEG", 0, 0, width, height);
+    pdf.save("Bored_to_Panic_Assessment.pdf");
+  }
+
+  function handleSendFeedback() {
+    const subject = encodeURIComponent("Bored to Panic tool feedback");
+    const body = encodeURIComponent(
+      "Please add any feedback, bugs you have spotted, or feature ideas below:\n\n"
+    );
+    window.location.href = `mailto:dean@bookspeed.com?subject=${subject}&body=${body}`;
+  }
+
+  // Build question groups with expandable sections
+  function buildQuestions() {
+    const questionMap = new Map(questions.map(q => [q.id, q]));
+    questionsBody.innerHTML = "";
+
+    questionSections.forEach((section, index) => {
+      const group = document.createElement("section");
+      group.className = "question-group";
+      group.setAttribute("data-section-id", section.id);
+
+      const header = document.createElement("button");
+      header.type = "button";
+      header.className = "question-group-header";
+      header.innerHTML = `
+        <div>
+          <span class="question-group-title">${section.title}</span>
+          <span class="question-group-summary">${section.summary}</span>
+        </div>
+        <div class="question-group-header-icon" aria-hidden="true">+</div>
+      `;
+
+      const body = document.createElement("div");
+      body.className = "question-group-body";
+
+      section.questions.forEach(qid => {
+        const q = questionMap.get(qid);
+        if (!q) return;
+
+        const row = document.createElement("div");
+        row.className = "question-row";
+
+        const num = document.createElement("div");
+        num.className = "question-number";
+        num.textContent = q.id;
+
+        const text = document.createElement("div");
+        text.className = "question-text";
+        text.textContent = q.text;
+
+        const scale = document.createElement("div");
+        scale.className = "question-scale";
 
         responseOptions.forEach(opt => {
-          const td = document.createElement("td");
-          td.className = "radio-group";
-          const id = `q${q.id}_${opt.value}`;
+          const pill = document.createElement("label");
+          pill.className = "scale-pill";
+          pill.title = opt.title;
+
           const input = document.createElement("input");
           input.type = "radio";
           input.name = `q${q.id}`;
-          input.id = id;
           input.value = opt.value;
-          input.className = "radio-input";
 
-          // Default all radios to the middle option (value 2 = "Sometimes")
           if (opt.value === 2) {
             input.checked = true;
+            pill.classList.add("selected");
           }
 
-          const label = document.createElement("label");
-          label.setAttribute("for", id);
-          label.style.display = "inline-block";
-          label.style.margin = "0";
-          label.textContent = "";
-          td.appendChild(input);
-          td.appendChild(label);
-          tr.appendChild(td);
+          input.addEventListener("change", () => {
+            document
+              .querySelectorAll(`.scale-pill input[name="q${q.id}"]`)
+              .forEach(el => el.parentElement.classList.remove("selected"));
+            pill.classList.add("selected");
+          });
+
+          const span = document.createElement("span");
+          span.textContent = opt.label;
+
+          pill.appendChild(input);
+          pill.appendChild(span);
+          scale.appendChild(pill);
         });
 
-        questionsBody.appendChild(tr);
+        row.appendChild(num);
+        row.appendChild(text);
+        row.appendChild(scale);
+        body.appendChild(row);
       });
+
+      header.addEventListener("click", () => {
+        const isOpen = group.classList.contains("open");
+        document.querySelectorAll(".question-group").forEach(g => {
+          g.classList.remove("open");
+          const icon = g.querySelector(".question-group-header-icon");
+          if (icon) icon.textContent = "+";
+        });
+        if (!isOpen) {
+          group.classList.add("open");
+          const icon = group.querySelector(".question-group-header-icon");
+          if (icon) icon.textContent = "–";
+        }
+      });
+
+      group.appendChild(header);
+      group.appendChild(body);
+      questionsBody.appendChild(group);
+
+      if (index === 0) {
+        group.classList.add("open");
+        const icon = group.querySelector(".question-group-header-icon");
+        if (icon) icon.textContent = "–";
+      }
+    });
+  }
+
+  // Initial setup
+  buildQuestions();
+  renderEntriesTableAndDropdown();
+  drawRingChart(null);
+  updateRingLegend(null);
+
+  calculateButton.addEventListener("click", handleCalculate);
+  roleLevelSelect.addEventListener("change", handleRoleChange);
+  saveButton.addEventListener("click", handleSave);
+  exportButton.addEventListener("click", handleExportCsv);
+  exportPdfButton.addEventListener("click", handleExportPdf);
+  clearButton.addEventListener("click", handleClearEntries);
+  loadSelect.addEventListener("change", handleLoadEntry);
+  ringModeCurrentBtn.addEventListener("click", () => setRingMode("current"));
+  ringModeIdealBtn.addEventListener("click", () => setRingMode("ideal"));
+  sendFeedbackButton.addEventListener("click", handleSendFeedback);
+
+  // -----------------------------
+  // Whiteboard helpers
+  // -----------------------------
+
+  const boardWrapper = document.querySelector(".board-wrapper");
+  const fsButtons = document.querySelectorAll("[data-fullscreen-btn]");
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      if (boardWrapper && boardWrapper.requestFullscreen) {
+        boardWrapper.requestFullscreen();
+      }
+    } else if (document.exitFullscreen) {
+      document.exitFullscreen();
     }
+  }
 
-    // Initial setup
-    buildQuestions();
-    renderEntriesTableAndDropdown();
-    drawRingChart(null);
-    updateRingLegend(null);
+  fsButtons.forEach(btn => btn.addEventListener("click", toggleFullscreen));
 
-    calculateButton.addEventListener("click", handleCalculate);
-    roleLevelSelect.addEventListener("change", handleRoleChange);
-    saveButton.addEventListener("click", handleSave);
-    exportButton.addEventListener("click", handleExportCsv);
-    exportPdfButton.addEventListener("click", handleExportPdf);
-    clearButton.addEventListener("click", handleClearEntries);
-    loadSelect.addEventListener("change", handleLoadEntry);
-    ringModeCurrentBtn.addEventListener("click", () => setRingMode("current"));
-    ringModeIdealBtn.addEventListener("click", () => setRingMode("ideal"));
-    sendFeedbackButton.addEventListener("click", handleSendFeedback);
-  </script>
+  function attachFallTransition(selector) {
+    document.querySelectorAll(selector).forEach(link => {
+      link.addEventListener("click", evt => {
+        const href = link.getAttribute("href");
+        if (!href || href.startsWith("#")) {
+          return;
+        }
+        evt.preventDefault();
+        const notes = document.querySelectorAll(".note");
+        notes.forEach(n => n.classList.add("note-fall"));
+        setTimeout(() => {
+          window.location.href = href;
+        }, 380);
+      });
+    });
+  }
+
+  attachFallTransition("nav a");
+</script>
 </body>
 </html>
