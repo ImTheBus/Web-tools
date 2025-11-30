@@ -7,22 +7,21 @@
 
   /* shared textures – paths are relative to /assets/ */
   --bg-texture: url("whiteboard.jpg");
-  --bg-noise: url("whiteboard-texture.jpg");
 
-  /* shared quadrant colours for notes */
+  /* quadrant colours for notes */
   --q-do: #c7f9cc;
   --q-schedule: #bde0fe;
   --q-delegate: #ffeaa7;
   --q-delete: #ffb3c1;
 
-  --accent-strong: #111111;
   --accent-soft: #4b5563;
-  --accent-primary: #111111;
   --accent-primary-soft: #f97316;
 
   --radius-card: 10px;
   --radius-pill: 999px;
 }
+
+/* RESET */
 
 *,
 *::before,
@@ -44,8 +43,21 @@ body {
   line-height: 1.4;
   color: var(--ink);
   background:
-    var(--bg-noise) repeat,
     var(--bg-texture) center / cover fixed;
+}
+
+/* ACCESSIBILITY HELPERS */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* LINKS */
@@ -59,7 +71,7 @@ a:hover {
   text-decoration: underline;
 }
 
-/* BASIC LAYOUT */
+/* LAYOUT */
 
 .page {
   max-width: 1200px;
@@ -72,7 +84,7 @@ a:hover {
   position: relative;
 }
 
-/* NAVIGATION – dark overlay on same texture */
+/* HEADER / NAV */
 
 nav.site-nav {
   position: sticky;
@@ -118,16 +130,16 @@ nav.site-nav a:hover {
   font-size: 0.9rem;
 }
 
-/* FOOTER – darker overlay on texture */
+/* FOOTER – compact */
 
 .site-footer {
   border-top: 2px solid var(--border-strong);
-  margin-top: 30px;
-  padding: 14px 20px 18px;
+  margin-top: 24px;
+  padding: 10px 16px 12px;
   display: flex;
   justify-content: space-between;
-  gap: 24px;
-  font-size: 0.8rem;
+  gap: 16px;
+  font-size: 0.78rem;
   background:
     linear-gradient(rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.82)),
     var(--bg-texture) repeat;
@@ -135,18 +147,41 @@ nav.site-nav a:hover {
   color: #e5e7eb;
 }
 
+.site-footer-left {
+  max-width: 55%;
+}
+
+.site-footer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
 .site-footer a {
   color: #f9fafb;
 }
 
-/* CARDS AND WHITEBOARD FRAMING */
+.footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.footer-note {
+  font-size: 0.7rem;
+  opacity: 0.9;
+}
+
+/* CARDS / WHITEBOARD FRAMING */
 
 .sidebar-card {
   position: relative;
   z-index: 5;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   border-radius: var(--radius-card);
   border: 2px solid var(--border-strong);
   padding: 14px 14px 16px;
@@ -165,7 +200,7 @@ nav.site-nav a:hover {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
   overflow: hidden;
   background:
-    linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)),
+    linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
     var(--bg-texture) repeat;
   background-size: 1200px;
 }
@@ -174,12 +209,32 @@ nav.site-nav a:hover {
   padding: 10px 16px 12px;
 }
 
-/* BUTTONS AND INPUTS */
+/* TEXT UTILS */
+
+.page-title {
+  font-family: "Archivo Black", system-ui, sans-serif;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 4px;
+}
+
+.page-subtitle {
+  font-size: 0.82rem;
+  margin: 0 0 4px;
+  color: var(--accent-soft);
+}
+
+.text-muted {
+  color: var(--accent-soft);
+}
+
+/* BUTTONS / INPUTS */
 
 .btn {
   border-radius: 6px;
   border: 2px solid var(--border-strong);
-  padding: 4px 10px;
+  padding: 3px 9px;
   font-size: 0.8rem;
   background: #ffffff;
   cursor: pointer;
@@ -193,7 +248,6 @@ nav.site-nav a:hover {
 
 .btn-primary {
   background: var(--accent-primary-soft);
-  border-color: var(--border-strong);
 }
 
 .btn-primary:hover {
@@ -202,33 +256,38 @@ nav.site-nav a:hover {
 
 .btn-pill-small {
   border-radius: var(--radius-pill);
-  padding: 2px 10px;
+  padding: 2px 9px;
   font-size: 0.75rem;
   background: #ffffff;
+}
+
+/* icon-only circular buttons (used for revisit / remove) */
+.icon-btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.icon-btn-remove {
+  border-color: #b91c1c;
+  color: #b91c1c;
 }
 
 .input-text {
   border-radius: 6px;
   border: 2px solid var(--border-strong);
-  padding: 6px 8px;
+  padding: 5px 8px;
   font-family: inherit;
   font-size: 0.85rem;
   background: rgba(255, 255, 255, 0.96);
 }
 
-/* GENERIC TEXT UTILS */
-
-.text-muted {
-  color: var(--accent-soft);
-}
-
-h1,
-h2,
-h3 {
-  margin: 0;
-}
-
-/* STICKY NOTES – shared across tools */
+/* NOTES (sticky) */
 
 .note {
   position: absolute;
@@ -275,6 +334,8 @@ h3 {
     0 1px 0 rgba(255, 255, 255, 0.9) inset;
 }
 
+/* QUADRANT COLOUR HELPERS (for placed notes) */
+
 .note-q1 {
   background-color: var(--q-do);
 }
@@ -291,7 +352,7 @@ h3 {
   background-color: var(--q-delete);
 }
 
-/* QUADRANT BOARD – shared 2x2 grid */
+/* QUADRANT BOARD / 2×2 */
 
 .quadrant-board {
   position: relative;
@@ -300,7 +361,10 @@ h3 {
   padding: 18px 16px 40px;
   height: 420px;
   overflow: hidden;
-  background: #ffffff;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+    var(--bg-texture) repeat;
+  background-size: 1200px;
 }
 
 .quadrant-grid {
@@ -375,7 +439,7 @@ h3 {
   pointer-events: none;
 }
 
-/* SIMPLE COLLAPSIBLE (for pages that opt in) */
+/* SIMPLE COLLAPSIBLE BODY (for pages that choose to use it) */
 
 [data-collapsible-body] {
   max-height: 0;
@@ -401,6 +465,14 @@ h3 {
 
   .site-footer {
     flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .site-footer-left {
+    max-width: none;
+  }
+
+  .site-footer-right {
     align-items: flex-start;
   }
 }
