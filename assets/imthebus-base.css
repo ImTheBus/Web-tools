@@ -5,17 +5,24 @@
   --ink: #111111;
   --border-strong: #000000;
 
-  /* single shared texture – relative to /assets/imthebus-base.css */
+  /* shared textures – paths are relative to /assets/ */
   --bg-texture: url("whiteboard.jpg");
+  --bg-noise: url("whiteboard-texture.jpg");
 
-  /* quadrant colours for notes */
+  /* shared quadrant colours for notes */
   --q-do: #c7f9cc;
   --q-schedule: #bde0fe;
   --q-delegate: #ffeaa7;
   --q-delete: #ffb3c1;
-}
 
-/* GLOBAL RESET LIGHT */
+  --accent-strong: #111111;
+  --accent-soft: #4b5563;
+  --accent-primary: #111111;
+  --accent-primary-soft: #f97316;
+
+  --radius-card: 10px;
+  --radius-pill: 999px;
+}
 
 *,
 *::before,
@@ -23,12 +30,22 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: var(--bg-texture) repeat;
-  background-size: 1200px;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
   color: var(--ink);
+  background:
+    var(--bg-noise) repeat,
+    var(--bg-texture) center / cover fixed;
 }
 
 /* LINKS */
@@ -42,14 +59,17 @@ a:hover {
   text-decoration: underline;
 }
 
-/* BRAND TEXT */
+/* BASIC LAYOUT */
 
-.site-brand {
-  font-family: "Archivo Black", system-ui, sans-serif;
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-size: 0.9rem;
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: flex-start;
+  position: relative;
 }
 
 /* NAVIGATION – dark overlay on same texture */
@@ -63,57 +83,63 @@ nav.site-nav {
   justify-content: space-between;
   gap: 24px;
   padding: 10px 20px;
+  border-bottom: 2px solid var(--border-strong);
   background:
-    linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
+    linear-gradient(rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.72)),
     var(--bg-texture) repeat;
   background-size: 1200px;
-  border-bottom: 3px solid var(--border-strong);
-  font-family: "Archivo Black", system-ui, sans-serif;
-  font-size: 0.8rem;
-  text-transform: uppercase;
   color: #f9fafb;
 }
 
-.site-nav-left {
-  display: flex;
-  gap: 18px;
-  align-items: center;
-}
-
-.site-nav-left a {
-  padding: 2px 4px;
-}
-
-.site-nav-left a:hover {
-  background: #f9fafb;
-  color: #000000;
-  text-decoration: none;
-}
-
+.site-nav-left,
 .site-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+nav.site-nav a {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 0;
+}
+
+nav.site-nav a:hover {
+  text-decoration: none;
+  border-bottom: 1px solid #f9fafb;
+}
+
+.site-brand {
+  font-family: "Archivo Black", system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   font-size: 0.9rem;
 }
 
-/* PAGE LAYOUT */
+/* FOOTER – darker overlay on texture */
 
-.page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px 16px 40px;
-  display: grid;
-  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-  gap: 20px;
-  align-items: flex-start;
-  position: relative;
+.site-footer {
+  border-top: 2px solid var(--border-strong);
+  margin-top: 30px;
+  padding: 14px 20px 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  font-size: 0.8rem;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.82)),
+    var(--bg-texture) repeat;
+  background-size: 1200px;
+  color: #e5e7eb;
 }
 
-@media (max-width: 900px) {
-  .page {
-    grid-template-columns: minmax(0, 1fr);
-  }
+.site-footer a {
+  color: #f9fafb;
 }
 
-/* SIDEBAR CARD */
+/* CARDS AND WHITEBOARD FRAMING */
 
 .sidebar-card {
   position: relative;
@@ -121,8 +147,8 @@ nav.site-nav {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  border-radius: 10px;
-  border: 2px solid #000000;
+  border-radius: var(--radius-card);
+  border: 2px solid var(--border-strong);
   padding: 14px 14px 16px;
   box-shadow: 0 8px 14px rgba(0, 0, 0, 0.22);
   background:
@@ -131,108 +157,11 @@ nav.site-nav {
   background-size: 1200px;
 }
 
-/* TITLES */
-
-.page-title {
-  font-family: "Archivo Black", system-ui, sans-serif;
-  font-size: 1.4rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  margin: 0 0 4px;
-}
-
-.page-subtitle {
-  font-size: 0.85rem;
-  margin: 0 0 8px;
-}
-
-/* INPUTS */
-
-.input-text,
-.input-date,
-.textarea-small {
-  width: 100%;
-  border-radius: 6px;
-  border: 1px solid #000000;
-  padding: 6px 8px;
-  font-size: 0.9rem;
-}
-
-.textarea-small {
-  min-height: 48px;
-  resize: vertical;
-}
-
-/* BUTTONS */
-
-.btn {
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid #000000;
-  background: #ffffff;
-  font-size: 0.8rem;
-  cursor: pointer;
-  font-family: "Inter", system-ui, sans-serif;
-}
-
-.btn:hover {
-  background: #000000;
-  color: #ffffff;
-}
-
-.btn-pill-small {
-  padding: 3px 6px;
-  border-radius: 999px;
-  border: 1px solid #000000;
-  background: #ffffff;
-  font-size: 0.75rem;
-  cursor: pointer;
-  font-family: "Inter", system-ui, sans-serif;
-}
-
-.btn-primary {
-  background: #000000;
-  color: #ffffff;
-}
-
-/* COLLAPSIBLES */
-
-.collapsible {
-  border-top: 1px dashed rgba(0, 0, 0, 0.2);
-  padding-top: 6px;
-  margin-top: 6px;
-  font-size: 0.8rem;
-}
-
-.collapsible-toggle {
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: "Archivo Black", system-ui, sans-serif;
-  text-transform: uppercase;
-}
-
-.collapsible-body {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.18s ease;
-  padding-top: 2px;
-}
-
-.collapsible-body.open {
-  max-height: 260px;
-}
-
-/* BOARD WRAPPER – same texture, light overlay inside frame */
-
 .board-wrapper {
   position: relative;
   align-self: flex-start;
   border-radius: 12px;
-  border: 2px solid #000000;
+  border: 2px solid var(--border-strong);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
   overflow: hidden;
   background:
@@ -245,26 +174,233 @@ nav.site-nav {
   padding: 10px 16px 12px;
 }
 
-/* FOOTER – dark overlay on same texture */
+/* BUTTONS AND INPUTS */
 
-.site-footer {
-  border-top: 2px solid #000000;
-  padding: 10px 20px 16px;
-  margin-top: 30px;
+.btn {
+  border-radius: 6px;
+  border: 2px solid var(--border-strong);
+  padding: 4px 10px;
   font-size: 0.8rem;
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  background:
-    linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
-    var(--bg-texture) repeat;
-  background-size: 1200px;
-  color: #f9fafb;
+  background: #ffffff;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1.1;
 }
 
-.site-footer a {
-  color: #f9fafb;
+.btn:hover {
+  background: #f3f4f6;
 }
 
-/* NOTE STYLING (unchanged from previous answer, shortened here if your file already has it) */
-/* keep your .note, .note-remove, .note-removing, etc definitions as they are now */
+.btn-primary {
+  background: var(--accent-primary-soft);
+  border-color: var(--border-strong);
+}
+
+.btn-primary:hover {
+  background: #fb923c;
+}
+
+.btn-pill-small {
+  border-radius: var(--radius-pill);
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  background: #ffffff;
+}
+
+.input-text {
+  border-radius: 6px;
+  border: 2px solid var(--border-strong);
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+/* GENERIC TEXT UTILS */
+
+.text-muted {
+  color: var(--accent-soft);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+/* STICKY NOTES – shared across tools */
+
+.note {
+  position: absolute;
+  min-width: 120px;
+  max-width: 230px;
+  min-height: 40px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #000000;
+  box-shadow:
+    0 10px 12px rgba(0, 0, 0, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  font-family: "Permanent Marker", system-ui, sans-serif;
+  font-size: 0.9rem;
+  user-select: none;
+  cursor: grab;
+  transform-origin: center top;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.6),
+    transparent 30%
+  );
+  pointer-events: auto;
+  transition: box-shadow 0.08s ease-out, transform 0.08s ease-out;
+}
+
+.note-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note.dragging {
+  cursor: grabbing;
+  box-shadow:
+    0 16px 20px rgba(0, 0, 0, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+.note:hover:not(.dragging) {
+  transform: translateY(-1px) scale(1.01) rotate(var(--note-rot, 0deg));
+  box-shadow:
+    0 12px 16px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+.note-q1 {
+  background-color: var(--q-do);
+}
+
+.note-q2 {
+  background-color: var(--q-schedule);
+}
+
+.note-q3 {
+  background-color: var(--q-delegate);
+}
+
+.note-q4 {
+  background-color: var(--q-delete);
+}
+
+/* QUADRANT BOARD – shared 2x2 grid */
+
+.quadrant-board {
+  position: relative;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  padding: 18px 16px 40px;
+  height: 420px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.quadrant-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.quadrant-lines::before,
+.quadrant-lines::after {
+  content: "";
+  position: absolute;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.quadrant-lines::before {
+  width: 1px;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-0.5px);
+}
+
+.quadrant-lines::after {
+  height: 1px;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-0.5px);
+}
+
+.axis-label-x {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  font-family: "Permanent Marker", system-ui, sans-serif;
+}
+
+.axis-label-x span {
+  margin: 0 60px;
+}
+
+.axis-label-y {
+  position: absolute;
+  left: -14px;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  font-size: 0.8rem;
+  font-family: "Permanent Marker", system-ui, sans-serif;
+}
+
+.quadrant-headings {
+  position: absolute;
+  inset: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  font-family: "Permanent Marker", system-ui, sans-serif;
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.quadrant-headings > div {
+  padding: 4px 6px;
+}
+
+.board-inner {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* SIMPLE COLLAPSIBLE (for pages that opt in) */
+
+[data-collapsible-body] {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease;
+}
+
+[data-collapsible-body].open {
+  max-height: 260px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 800px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  nav.site-nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .site-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
