@@ -361,9 +361,11 @@ nav.site-nav a:hover {
   padding: 18px 16px 40px;
   height: 420px;
   overflow: hidden;
+
+  /* make the whiteboard really visible */
   background:
-    linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
-    var(--bg-texture) repeat;
+    var(--bg-texture) repeat,
+    #ffffff;
   background-size: 1200px;
 }
 
