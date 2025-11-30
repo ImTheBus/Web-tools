@@ -1,407 +1,237 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <title>Bored to Panic – IMTHEBUS Tools</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Fonts -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;500;600&display=swap">
+  <!-- Shared base styles and core helpers -->
+  <link rel="stylesheet" href="assets/imthebus-base.css" />
+  <script src="assets/imthebus-core.js" defer></script>
 
-  <!-- Charts / export libs -->
+  <!-- Charts / export libs (same behaviour as original page) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+  <!-- Page-specific styling (no overrides of shared layout / background) -->
   <style>
-    :root {
-      --bg-board: #fdfdfd;
-      --ink: #111111;
-      --border-strong: #000000;
-
-      --strength-bg: #c7f9cc;
-      --weakness-bg: #ffb3c1;
-      --opportunity-bg: #bde0fe;
-      --threat-bg: #ffeaa7;
-
-      --strength-tag: #15803d;
-      --weakness-tag: #b91c1c;
-      --opportunity-tag: #1d4ed8;
-      --threat-tag: #b45309;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background-color: #f3f3f3;
-      background-image: url("assets/whiteboard.jpg");
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      color: var(--ink);
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    /* Layout shell */
-
-    .page {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: rgba(253, 253, 253, 0.96);
-      border-bottom: 2px solid var(--border-strong);
-      padding: 0.4rem 1.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .nav-left {
-      display: flex;
-      gap: 1.25rem;
-      font-size: 0.95rem;
-    }
-
-    .nav-left a {
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      position: relative;
-      padding-bottom: 0.1rem;
-    }
-
-    .nav-left a::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: -0.05rem;
-      width: 0;
-      height: 2px;
-      background: #000;
-      transition: width 0.15s ease-out;
-    }
-
-    .nav-left a:hover::after {
-      width: 100%;
-    }
-
-    .nav-right {
-      font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 1.2rem;
-      letter-spacing: 0.04em;
-    }
-
-    main {
-      flex: 1;
-      padding: 1.5rem 1.25rem 2rem;
-    }
-
-    .page-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .page-grid {
-      display: grid;
-      grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
-      gap: 1.25rem;
-      align-items: flex-start;
-    }
-
-    @media (max-width: 860px) {
-      .page-grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    /* Sidebar clipboard */
-
-    .sidebar {
-      background: #ffffff;
-      border: 3px solid #000;
-      border-radius: 18px;
-      box-shadow: 0 10px 0 rgba(0, 0, 0, 0.12);
-      padding: 1.1rem 1.1rem 1.2rem;
-      position: relative;
-    }
-
-    .sidebar::before {
-      content: "";
-      position: absolute;
-      top: 0.45rem;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70%;
-      height: 9px;
-      border-radius: 999px;
-      border: 2px solid #000;
-      background: #fff;
-    }
+    /* SIDEBAR CONTENT */
 
     .sidebar-title {
-      margin-top: 1.6rem;
+      margin: 0 0 4px;
       font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 1.6rem;
+      font-size: 1.5rem;
     }
 
     .sidebar-subtitle {
-      margin-top: 0.25rem;
-      font-size: 0.9rem;
+      margin: 0 0 8px;
+      font-size: 0.86rem;
       line-height: 1.5;
     }
 
     .sidebar-field {
-      margin-top: 0.75rem;
-      font-size: 0.85rem;
+      margin-top: 8px;
+      font-size: 0.82rem;
     }
 
     .sidebar-field label {
       display: block;
       font-weight: 600;
-      margin-bottom: 0.15rem;
+      margin-bottom: 3px;
     }
 
-    .sidebar-field input,
-    .sidebar-field select {
+    .sidebar-field .input-text,
+    .sidebar-field select.input-text {
       width: 100%;
-      font: inherit;
-      padding: 0.4rem 0.6rem;
-      border-radius: 999px;
-      border: 2px solid #000;
-      background: #fff;
     }
 
     .sidebar-note {
-      margin-top: 0.5rem;
-      font-size: 0.78rem;
-      color: #555;
+      margin-top: 6px;
+      font-size: 0.76rem;
+      color: var(--accent-soft);
     }
 
     .sidebar-section {
-      margin-top: 0.9rem;
-      border-top: 1px solid #ddd;
-      padding-top: 0.5rem;
+      margin-top: 10px;
+      border-top: 1px solid rgba(0, 0, 0, 0.12);
+      padding-top: 6px;
+      font-size: 0.8rem;
     }
 
     .sidebar-section-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      font-size: 0.9rem;
       cursor: pointer;
+      gap: 6px;
     }
 
-    .sidebar-section-header span.label {
+    .sidebar-section-header .label {
       font-weight: 600;
+      font-size: 0.82rem;
     }
 
-    .sidebar-section-header span.hint {
-      font-size: 0.78rem;
-      color: #777;
+    .sidebar-section-header .hint {
+      font-size: 0.72rem;
+      color: var(--accent-soft);
     }
 
-    .sidebar-section-body {
+    .sidebar-section-body,
+    .sidebar-export-body {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.25s ease-out;
-      font-size: 0.82rem;
-      color: #444;
+      transition: max-height 0.2s ease;
+      font-size: 0.78rem;
+      color: var(--accent-soft);
     }
 
-    .sidebar-section.open .sidebar-section-body {
+    .sidebar-section.open .sidebar-section-body,
+    .sidebar-section.sidebar-export.open .sidebar-export-body {
       max-height: 260px;
     }
 
     .sidebar-section-body p {
-      margin: 0.45rem 0;
+      margin: 4px 0;
     }
 
     .sidebar-section-body ul {
-      margin: 0.3rem 0 0.3rem 1.1rem;
+      margin: 4px 0 4px 1.1rem;
       padding: 0;
     }
 
     .sidebar-section-body li {
-      margin-bottom: 0.2rem;
-    }
-
-    .sidebar-export-body {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.25s ease-out;
-    }
-
-    .sidebar-section.sidebar-export.open .sidebar-export-body {
-      max-height: 260px;
+      margin-bottom: 2px;
     }
 
     .sidebar-buttons {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-top: 0.4rem;
+      gap: 6px;
+      margin-top: 6px;
     }
 
-    .sidebar-buttons button,
-    .sidebar-buttons select {
-      font: inherit;
+    .sidebar-buttons .btn {
       font-size: 0.78rem;
     }
 
-    .sidebar-buttons button {
-      border-radius: 999px;
-      border: 2px solid #000;
-      background: #fff;
-      padding: 0.3rem 0.7rem;
-      cursor: pointer;
-    }
-
-    .sidebar-buttons button.primary {
-      background: #000;
-      color: #fff;
-    }
-
-    .sidebar-buttons button.danger {
-      background: #e11d48;
-      color: #fff;
-    }
-
-    .sidebar-buttons button:hover {
-      transform: translateY(-1px);
-    }
-
-    .sidebar-buttons select {
-      border-radius: 999px;
-      border: 2px solid #000;
-      padding: 0.28rem 0.55rem;
+    .sidebar-buttons select.input-text {
+      font-size: 0.78rem;
       max-width: 100%;
+      padding-top: 2px;
+      padding-bottom: 2px;
     }
 
-    /* Board */
-
-    .board-wrapper {
-      background: var(--bg-board);
-      border-radius: 22px;
-      border: 3px solid var(--border-strong);
-      box-shadow: 0 14px 0 rgba(0, 0, 0, 0.14);
-      padding: 1rem 1.15rem 1.35rem;
-      position: relative;
-      overflow: hidden;
-      transition: box-shadow 0.2s ease-out;
+    .sidebar-buttons .btn-danger {
+      border-color: #b91c1c;
+      background: #b91c1c;
+      color: #ffffff;
     }
 
-    .board-wrapper:fullscreen {
-      overflow-y: auto;
+    .sidebar-meta-small {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: var(--accent-soft);
     }
 
-    .board-wrapper.calculated {
-      box-shadow: 0 0 0 3px #111 inset, 0 14px 0 rgba(0, 0, 0, 0.14);
+    .sidebar-meta-small strong {
+      font-weight: 600;
     }
 
-    .board-inner {
+    /* BOARD LAYOUT INSIDE SHARED .board-wrapper */
+
+    .tool-board-inner {
       display: flex;
       flex-direction: column;
-      gap: 0.8rem;
+      gap: 8px;
     }
 
     .board-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 0.75rem;
+      gap: 10px;
+      margin-bottom: 4px;
     }
 
     .board-title-display {
       font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 1.7rem;
+      font-size: 1.4rem;
     }
 
     .board-toolbar {
       display: flex;
-      gap: 0.4rem;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
-    .board-toolbar button {
-      font: inherit;
-      font-size: 0.8rem;
-      border-radius: 999px;
-      border: 2px solid #000;
-      background: #fff;
-      padding: 0.25rem 0.7rem;
-      cursor: pointer;
+    .board-toolbar .btn {
+      font-size: 0.78rem;
     }
 
-    .board-body {
-      display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(260px, 1fr);
-      gap: 1rem;
-      align-items: flex-start;
+    .board-wrapper.calculated {
+      box-shadow:
+        0 0 0 3px var(--border-strong) inset,
+        0 10px 20px rgba(0, 0, 0, 0.28);
     }
-
-    @media (max-width: 980px) {
-      .board-body {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    /* Export stacking */
-    .board-inner.export-mode .board-body {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .board-column {
-      min-width: 0;
-    }
-
-    /* Highlight / about card inside board */
 
     .board-highlight {
-      border-radius: 18px;
-      border: 2px solid #000;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
       background: #fffbe6;
-      padding: 0.65rem 0.8rem;
-      font-size: 0.85rem;
-      line-height: 1.5;
+      padding: 6px 8px;
+      font-size: 0.82rem;
+      line-height: 1.4;
     }
 
     .board-highlight strong {
       font-weight: 600;
     }
 
-    /* Question sections */
+    .board-body-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr);
+      gap: 12px;
+      align-items: flex-start;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 900px) {
+      .board-body-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .board-column {
+      min-width: 0;
+    }
+
+    .board-inner.export-mode .board-body-grid {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* QUESTION SECTIONS & RADIO BUTTONS (kept from original behaviour) */
 
     .question-sections-note {
       font-size: 0.78rem;
-      color: #555;
-      margin-bottom: 0.45rem;
+      color: var(--accent-soft);
+      margin: 0 0 6px;
     }
 
     .question-section {
-      border-radius: 16px;
-      border: 2px solid #000;
-      background: #fff;
-      margin-bottom: 0.5rem;
+      border-radius: 10px;
+      border: 1px solid var(--border-strong);
+      background: #ffffff;
+      margin-bottom: 4px;
       overflow: hidden;
     }
 
     .question-section-header {
       width: 100%;
       border: none;
-      background: #fff;
-      padding: 0.55rem 0.7rem;
+      background: #ffffff;
+      padding: 6px 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -411,17 +241,17 @@
 
     .question-section-title {
       font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 1.05rem;
+      font-size: 1rem;
     }
 
     .question-section-subtitle {
-      font-size: 0.8rem;
-      color: #555;
-      margin-left: 0.35rem;
+      font-size: 0.78rem;
+      color: var(--accent-soft);
+      margin-left: 4px;
     }
 
     .question-section-toggle {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 600;
       transform-origin: center;
       transition: transform 0.18s ease-out;
@@ -431,7 +261,8 @@
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.25s ease-out;
-      border-top: 2px solid #000;
+      border-top: 1px solid var(--border-strong);
+      background: rgba(255, 255, 255, 0.96);
     }
 
     .question-section.open .question-section-body {
@@ -445,24 +276,24 @@
     .question-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
     }
 
     .question-table th,
     .question-table td {
-      padding: 0.45rem 0.5rem;
+      padding: 4px 6px;
       vertical-align: middle;
     }
 
     .question-table th {
-      border-bottom: 1px solid #ddd;
-      font-size: 0.78rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      font-size: 0.76rem;
       text-align: center;
     }
 
     .question-table th:first-child,
     .question-table td:first-child {
-      width: 2.2rem;
+      width: 2rem;
       text-align: center;
     }
 
@@ -472,8 +303,8 @@
     }
 
     .question-number {
-      font-size: 0.8rem;
-      color: #444;
+      font-size: 0.76rem;
+      color: var(--accent-soft);
     }
 
     .question-text {
@@ -484,23 +315,19 @@
       font-weight: 500;
     }
 
-    .scale-label-row th:nth-child(3) {
-      text-align: center;
-    }
-
     .scale-label-row th span {
       display: block;
     }
 
     .scale-label-row th span.label {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
     }
 
     .scale-label-row th span.caption {
       font-size: 0.7rem;
-      color: #666;
+      color: var(--accent-soft);
     }
 
     .response-cell {
@@ -514,9 +341,11 @@
       width: 26px;
       height: 26px;
       border-radius: 999px;
-      border: 2px solid #000;
+      border: 2px solid var(--border-strong);
       cursor: pointer;
       font-size: 0.8rem;
+      background: #ffffff;
+      transition: background 0.08s ease-out, transform 0.08s ease-out;
     }
 
     .response-radio input {
@@ -528,48 +357,46 @@
     }
 
     .response-radio.selected {
-      background: #000;
-      color: #fff;
+      background: var(--border-strong);
+      color: #ffffff;
+      transform: translateY(-1px);
     }
 
     .calculate-row {
-      margin-top: 0.65rem;
+      margin-top: 6px;
       display: flex;
       justify-content: flex-start;
     }
 
-    .calculate-row button {
-      font: inherit;
+    .calculate-row .btn-primary {
       font-size: 0.9rem;
-      border-radius: 999px;
-      border: 2px solid #000;
-      background: #000;
-      color: #fff;
-      padding: 0.45rem 1.1rem;
-      cursor: pointer;
-      transition: background 0.15s ease-out, transform 0.08s ease-out;
+      padding-inline: 14px;
     }
 
-    .calculate-row button.calculating {
+    .calculate-row .btn-primary.calculating {
       background: #1f2937;
       transform: translateY(1px);
     }
 
-    /* Right column: donut and results */
+    /* RIGHT-HAND PANELS AND GRAPHS */
 
-    .donut-panel {
-      border-radius: 16px;
-      border: 2px solid #000;
-      background: #fff;
-      padding: 0.6rem 0.8rem 0.7rem;
-      margin-bottom: 0.6rem;
+    .donut-panel,
+    .results-panel,
+    .overall-panel,
+    .entries-panel {
+      border-radius: 10px;
+      border: 1px solid var(--border-strong);
+      background: #ffffff;
+      padding: 6px 8px;
+      font-size: 0.82rem;
+      margin-bottom: 6px;
     }
 
     .donut-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 0.3rem;
+      margin-bottom: 4px;
     }
 
     .donut-header-title {
@@ -578,8 +405,8 @@
     }
 
     .donut-header-note {
-      font-size: 0.75rem;
-      color: #555;
+      font-size: 0.76rem;
+      color: var(--accent-soft);
     }
 
     #zoneRing {
@@ -591,9 +418,9 @@
     .zone-legend-row {
       display: flex;
       align-items: center;
-      gap: 0.3rem;
+      gap: 4px;
       font-size: 0.78rem;
-      margin-top: 0.15rem;
+      margin-top: 2px;
     }
 
     .zone-legend-swatch {
@@ -612,54 +439,38 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .results-panel,
-    .overall-panel,
-    .entries-panel {
-      border-radius: 16px;
-      border: 2px solid #000;
-      background: #fff;
-      padding: 0.7rem 0.8rem;
-      font-size: 0.85rem;
-      margin-bottom: 0.6rem;
-    }
-
     .results-panel h3,
     .overall-panel h3,
     .entries-panel h3 {
-      margin: 0 0 0.4rem;
-      font-size: 0.95rem;
+      margin: 0 0 4px;
+      font-size: 0.92rem;
       font-weight: 600;
-    }
-
-    .results-panel p,
-    .overall-panel p {
-      margin: 0.25rem 0;
     }
 
     .results-panel table,
     .overall-panel table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 0.35rem;
-      font-size: 0.8rem;
+      margin-top: 4px;
+      font-size: 0.78rem;
     }
 
     .results-panel th,
     .results-panel td,
     .overall-panel th,
     .overall-panel td {
-      border: 1px solid #000;
-      padding: 0.25rem 0.3rem;
+      border: 1px solid var(--border-strong);
+      padding: 3px 4px;
       vertical-align: top;
     }
 
     .conversation-prompts {
-      margin-top: 0.4rem;
-      font-size: 0.8rem;
+      margin-top: 4px;
+      font-size: 0.78rem;
     }
 
     .conversation-prompts ul {
-      margin: 0.25rem 0 0.25rem 1rem;
+      margin: 2px 0 2px 1rem;
       padding: 0;
     }
 
@@ -671,1425 +482,1336 @@
 
     .entries-panel th,
     .entries-panel td {
-      border: 1px solid #000;
-      padding: 0.25rem 0.3rem;
+      border: 1px solid var(--border-strong);
+      padding: 3px 4px;
       text-align: center;
       font-variant-numeric: tabular-nums;
     }
 
     #entriesChart {
-      margin-top: 0.5rem;
+      margin-top: 6px;
     }
 
-    /* Export header/footer inside board for PDF */
+    /* EXPORT HEADER/FOOTER INSIDE BOARD FOR PDF */
 
     .export-header {
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 0.4rem;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+      font-size: 0.86rem;
     }
 
     .export-header-title {
       font-weight: 600;
-      margin-bottom: 0.2rem;
+      margin-bottom: 2px;
     }
 
     .export-header-meta {
-      font-size: 0.8rem;
-    }
-
-    .export-footer {
-      border-top: 1px solid #ccc;
-      margin-top: 0.8rem;
-      padding-top: 0.3rem;
-      font-size: 0.75rem;
-      text-align: right;
-      color: #444;
+      font-size: 0.78rem;
     }
 
     .export-highlight {
-      margin-top: 0.45rem;
+      margin-top: 4px;
       font-size: 0.8rem;
     }
 
     .export-suggestion {
-      margin-top: 0.25rem;
+      margin-top: 3px;
       font-size: 0.8rem;
       font-weight: 600;
     }
 
-    /* Site footer */
-
-    footer.site-footer {
-      border-top: 2px solid #000;
-      background: rgba(253, 253, 253, 0.96);
-      padding: 0.8rem 1.75rem 1rem;
-      font-size: 0.8rem;
-    }
-
-    .footer-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 1rem;
-      align-items: flex-end;
-    }
-
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.4rem;
-    }
-
-    .footer-group-title {
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      font-weight: 600;
-      font-size: 0.72rem;
-      margin-bottom: 0.2rem;
-    }
-
-    .footer-group a {
-      display: block;
-      font-size: 0.8rem;
-      margin-bottom: 0.1rem;
-    }
-
-    .footer-group a:hover {
-      text-decoration: underline;
-    }
-
-    .footer-meta-line {
-      margin-top: 0.15rem;
-    }
-
-    .footer-counter {
-      margin-top: 0.25rem;
-      font-size: 0.78rem;
-      color: #444;
+    .export-footer {
+      border-top: 1px solid rgba(0, 0, 0, 0.2);
+      margin-top: 8px;
+      padding-top: 4px;
+      font-size: 0.75rem;
+      text-align: right;
+      color: var(--accent-soft);
     }
   </style>
 </head>
 
-<body>
-<div class="page">
-  <nav>
-    <div class="nav-left">
-      <a href="index.html">Home</a>
-      <a href="index.html#tools">Tools</a>
-      <a href="about.html">About</a>
-    </div>
-    <div class="nav-right">IMTHEBUS tools</div>
-  </nav>
+<body data-counter-key="bored-to-panic">
+  <!-- Shared header/nav -->
+  <div data-include="header.html"></div>
 
-  <main>
-    <div class="page-inner">
-      <div class="page-grid">
+  <main class="page">
+    <!-- Sidebar using shared card shell -->
+    <aside class="sidebar-card">
+      <h1 class="sidebar-title">Bored to Panic scale</h1>
+      <p class="sidebar-subtitle">
+        A shared language for how work feels. This tool helps you and your manager turn day to day
+        workload into five zones: Bored, Comfort, Stretch, Stress and Panic, so you can talk about how
+        work is landing rather than guessing.
+      </p>
 
-        <!-- Sidebar clipboard -->
-        <aside class="sidebar">
-          <h1 class="sidebar-title">Bored to Panic scale</h1>
-          <p class="sidebar-subtitle">
-            A shared language for how work feels. This tool helps you and your manager turn day to day
-            workload into five zones: Bored, Comfort, Stretch, Stress and Panic, so you can talk about how
-            work is landing rather than guessing.
-          </p>
-
-          <div class="sidebar-field">
-            <label for="personName">Name</label>
-            <input id="personName" type="text" placeholder="e.g. Alex Smith" />
-          </div>
-
-          <div class="sidebar-field">
-            <label for="roleLevel">Role level</label>
-            <select id="roleLevel">
-              <option value="">Select role level</option>
-              <option value="L1">Operator</option>
-              <option value="L2">Senior Operator</option>
-              <option value="L3">Supervisor</option>
-              <option value="L4">Manager</option>
-              <option value="L5">Director</option>
-            </select>
-          </div>
-
-          <div class="sidebar-field">
-            <label for="context">Context (optional)</label>
-            <select id="context">
-              <option value="">Select context</option>
-              <option value="Normal week">Normal week</option>
-              <option value="Peak period">Peak period</option>
-              <option value="Project workload">Project workload</option>
-              <option value="Returning from leave">Returning from leave</option>
-              <option value="Team changes">Team changes</option>
-              <option value="User-defined">Other (specify below)</option>
-            </select>
-          </div>
-
-          <div class="sidebar-field" style="margin-top:0.45rem;">
-            <input id="contextCustom" type="text" placeholder="Specify your context (optional)" style="display:none;">
-          </div>
-
-          <p class="sidebar-note">
-            Use this once per check-in to capture how the last few days or weeks have actually felt.
-          </p>
-
-          <!-- About this tool / Yerkes–Dodson -->
-          <div class="sidebar-section" id="aboutSection">
-            <div class="sidebar-section-header">
-              <span class="label">About this tool</span>
-              <span class="hint">tap or click to expand</span>
-            </div>
-            <div class="sidebar-section-body">
-              <p>
-                The Bored → Comfort → Stretch → Stress → Panic scale is based on the Yerkes–Dodson law,
-                which links performance to arousal or pressure. Too little pressure and we drift into Bored;
-                too much and we drop into Stress and Panic. In the middle, particularly in Stretch, we do
-                our best learning and growth.
-              </p>
-              <p>
-                Over time, spending more time in Stretch makes that work feel easier. Your Comfort zone
-                grows, so you visit Stress less often and Panic becomes rarer and less intense. You also get
-                used to seeing yourself succeed, or learning from failures without treating them as
-                disasters.
-              </p>
-              <p>
-                This tool focuses on where your time and energy sit now. It does not label people as good or
-                bad performers. It asks whether the “exercise” you do each day is helping you grow a bigger
-                Comfort zone, or pushing you toward Boredom or Panic.
-              </p>
-            </div>
-          </div>
-
-          <!-- Data and privacy -->
-          <div class="sidebar-section" id="privacySection">
-            <div class="sidebar-section-header">
-              <span class="label">Data and privacy</span>
-              <span class="hint">tap or click to expand</span>
-            </div>
-            <div class="sidebar-section-body">
-              <p>
-                Your responses are stored only in this browser using local storage.
-                Nothing is uploaded, shared or sent anywhere.
-              </p>
-              <p>
-                Clearing browser storage, switching device or pressing “Clear all saved entries” deletes the
-                data permanently.
-              </p>
-            </div>
-          </div>
-
-          <!-- Saved / export -->
-          <div class="sidebar-section sidebar-export" id="exportSection">
-            <div class="sidebar-section-header">
-              <span class="label">Saved results and export</span>
-              <span class="hint">tap or click to expand</span>
-            </div>
-            <div class="sidebar-export-body">
-              <div class="sidebar-field" style="margin-top:0.4rem;">
-                <label for="loadEntry">Load a previous result</label>
-                <select id="loadEntry">
-                  <option value="">Select saved entry</option>
-                </select>
-              </div>
-
-              <div class="sidebar-buttons">
-                <button id="saveEntry" type="button" class="primary">Save current view</button>
-                <button id="exportCsv" type="button">Export CSV</button>
-                <button id="exportPdf" type="button">Save as PDF</button>
-                <button id="clearEntries" type="button" class="danger">Clear all</button>
-              </div>
-
-              <p class="sidebar-note" style="margin-top:0.35rem;">
-                Entries stay in this browser only. Use CSV or PDF to keep a record elsewhere.
-              </p>
-            </div>
-          </div>
-        </aside>
-
-        <!-- Board -->
-        <section class="board-wrapper" id="boardWrapper">
-          <div class="board-inner" id="boardInner">
-            <div class="board-header">
-              <div class="board-title-display">Bored to Panic assessment board</div>
-              <div class="board-toolbar">
-                <button type="button" id="fullscreenToggle">Fullscreen board</button>
-              </div>
-            </div>
-
-            <div class="board-highlight" id="onScreenHighlight">
-              <strong>Why Bored and Panic matter.</strong> Both Bored and Panic are zones we do not enjoy.
-              They are not places where we feel safely challenged or comfortable, and they rarely support
-              learning. We spend time in <strong>Stretch</strong> to expand our Comfort zone, and we learn
-              how to recover when we have to visit <strong>Stress</strong>. This assessment is about
-              understanding where you currently spend your time and whether the daily “exercise” of work is
-              helping or hindering that growth.
-            </div>
-
-            <div class="board-body" id="boardBody">
-              <!-- Left: questions -->
-              <div class="board-column">
-                <p class="question-sections-note">
-                  For each section, select how often each statement reflects your recent experience.
-                  1 = never, 3 = sometimes, 5 = always.
-                </p>
-                <div id="questionSections"></div>
-                <div class="calculate-row">
-                  <button id="calculateFromQuestions" type="button">Calculate from answers</button>
-                </div>
-              </div>
-
-              <!-- Right: donut and results -->
-              <div class="board-column">
-                <div class="donut-panel">
-                  <div class="donut-header">
-                    <div class="donut-header-title">Zone pattern</div>
-                    <div class="donut-header-note" id="donutLabel">
-                      Equal starting pattern. Updates after calculation.
-                    </div>
-                  </div>
-                  <canvas id="zoneRing" width="260" height="220"></canvas>
-                  <div id="zoneRingLegend"></div>
-                </div>
-
-                <div class="results-panel">
-                  <h3>Calculated zone and scores</h3>
-                  <div id="calculationResults">
-                    Answer the questions and click <strong>Calculate from answers</strong> to see your
-                    distribution across Bored, Comfort, Stretch, Stress and Panic.
-                  </div>
-                </div>
-
-                <div class="overall-panel">
-                  <h3>Overall scale result</h3>
-                  <div id="overallResult">
-                    Select a role level to compare your pattern against a typical target for that role.
-                  </div>
-                </div>
-
-                <div class="entries-panel">
-                  <h3>Recorded entries (this browser)</h3>
-                  <p style="margin:0 0 0.3rem;">
-                    Use this to track how your pattern changes over time.
-                  </p>
-                  <table id="entriesTable">
-                    <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Bored&nbsp;%</th>
-                      <th>Comfort&nbsp;%</th>
-                      <th>Stretch&nbsp;%</th>
-                      <th>Stress&nbsp;%</th>
-                      <th>Panic&nbsp;%</th>
-                    </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
-                  <canvas id="entriesChart" height="140" style="display:none;"></canvas>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div class="sidebar-field">
+        <label for="personName">Name</label>
+        <input id="personName" type="text" class="input-text" placeholder="e.g. Alex Smith" />
       </div>
-    </div>
+
+      <div class="sidebar-field">
+        <label for="roleLevel">Role level</label>
+        <select id="roleLevel" class="input-text">
+          <option value="">Select role level</option>
+          <option value="L1">Operator</option>
+          <option value="L2">Senior Operator</option>
+          <option value="L3">Supervisor</option>
+          <option value="L4">Manager</option>
+          <option value="L5">Director</option>
+        </select>
+      </div>
+
+      <div class="sidebar-field">
+        <label for="context">Context (optional)</label>
+        <select id="context" class="input-text">
+          <option value="">Select context</option>
+          <option value="Normal week">Normal week</option>
+          <option value="Peak period">Peak period</option>
+          <option value="Project workload">Project workload</option>
+          <option value="Returning from leave">Returning from leave</option>
+          <option value="Team changes">Team changes</option>
+          <option value="User-defined">Other (specify below)</option>
+        </select>
+      </div>
+
+      <div class="sidebar-field" style="margin-top:4px;">
+        <input id="contextCustom" type="text" class="input-text" placeholder="Specify your context (optional)" style="display:none;" />
+      </div>
+
+      <p class="sidebar-note">
+        Use this once per check-in to capture how the last few days or weeks have actually felt.
+      </p>
+
+      <!-- About this tool / Yerkes–Dodson -->
+      <div class="sidebar-section" id="aboutSection">
+        <div class="sidebar-section-header">
+          <span class="label">About this tool</span>
+          <span class="hint">tap or click to expand</span>
+        </div>
+        <div class="sidebar-section-body">
+          <p>
+            The Bored → Comfort → Stretch → Stress → Panic scale is based on the Yerkes–Dodson law,
+            which links performance to arousal or pressure. Too little pressure and we drift into Bored;
+            too much and we drop into Stress and Panic. In the middle, particularly in Stretch, we do
+            our best learning and growth.
+          </p>
+          <p>
+            Over time, spending more time in Stretch makes that work feel easier. Your Comfort zone
+            grows, so you visit Stress less often and Panic becomes rarer and less intense. You also get
+            used to seeing yourself succeed, or learning from failures without treating them as
+            disasters.
+          </p>
+          <p>
+            This tool focuses on where your time and energy sit now. It does not label people as good or
+            bad performers. It asks whether the “exercise” you do each day is helping you grow a bigger
+            Comfort zone, or pushing you toward Boredom or Panic.
+          </p>
+        </div>
+      </div>
+
+      <!-- Data and privacy -->
+      <div class="sidebar-section" id="privacySection">
+        <div class="sidebar-section-header">
+          <span class="label">Data and privacy</span>
+          <span class="hint">tap or click to expand</span>
+        </div>
+        <div class="sidebar-section-body">
+          <p>
+            Your responses are stored only in this browser using local storage.
+            Nothing is uploaded, shared or sent anywhere.
+          </p>
+          <p>
+            Clearing browser storage, switching device or pressing “Clear all saved entries” deletes the
+            data permanently.
+          </p>
+        </div>
+      </div>
+
+      <!-- Saved / export -->
+      <div class="sidebar-section sidebar-export" id="exportSection">
+        <div class="sidebar-section-header">
+          <span class="label">Saved results and export</span>
+          <span class="hint">tap or click to expand</span>
+        </div>
+        <div class="sidebar-export-body">
+          <div class="sidebar-field" style="margin-top:4px;">
+            <label for="loadEntry">Load a previous result</label>
+            <select id="loadEntry" class="input-text">
+              <option value="">Select saved entry</option>
+            </select>
+          </div>
+
+          <div class="sidebar-buttons">
+            <button id="saveEntry" type="button" class="btn btn-primary">Save current view</button>
+            <button id="exportCsv" type="button" class="btn btn-pill-small">Export CSV</button>
+            <button id="exportPdf" type="button" class="btn btn-pill-small">Save as PDF</button>
+            <button id="clearEntries" type="button" class="btn btn-danger btn-pill-small">Clear all</button>
+          </div>
+
+          <p class="sidebar-note" style="margin-top:4px;">
+            Entries stay in this browser only. Use CSV or PDF to keep a record elsewhere.
+          </p>
+        </div>
+      </div>
+
+      <p class="sidebar-meta-small">
+        <strong>Assessments completed in this browser:</strong> <span id="assessmentCount">0</span>
+      </p>
+    </aside>
+
+    <!-- Board using shared whiteboard wrapper -->
+    <section class="board-wrapper" id="boardWrapper">
+      <div class="board-inner-shell">
+        <div class="tool-board-inner" id="boardInner">
+          <div class="board-header">
+            <div class="board-title-display">Bored to Panic assessment board</div>
+            <div class="board-toolbar">
+              <button type="button" id="fullscreenToggle" class="btn btn-pill-small">
+                Fullscreen board
+              </button>
+            </div>
+          </div>
+
+          <div class="board-highlight" id="onScreenHighlight">
+            <strong>Why Bored and Panic matter.</strong> Both Bored and Panic are zones we do not enjoy.
+            They are not places where we feel safely challenged or comfortable, and they rarely support
+            learning. We spend time in <strong>Stretch</strong> to expand our Comfort zone, and we learn
+            how to recover when we have to visit <strong>Stress</strong>. This assessment is about
+            understanding where you currently spend your time and whether the daily “exercise” of work is
+            helping or hindering that growth.
+          </div>
+
+          <div class="board-body-grid" id="boardBody">
+            <!-- Left: questions -->
+            <div class="board-column">
+              <p class="question-sections-note">
+                For each section, select how often each statement reflects your recent experience.
+                1 = never, 3 = sometimes, 5 = always.
+              </p>
+              <div id="questionSections"></div>
+              <div class="calculate-row">
+                <button id="calculateFromQuestions" type="button" class="btn btn-primary">
+                  Calculate from answers
+                </button>
+              </div>
+            </div>
+
+            <!-- Right: donut and results -->
+            <div class="board-column">
+              <div class="donut-panel">
+                <div class="donut-header">
+                  <div class="donut-header-title">Zone pattern</div>
+                  <div class="donut-header-note" id="donutLabel">
+                    Equal starting pattern. Updates after calculation.
+                  </div>
+                </div>
+                <canvas id="zoneRing" width="260" height="220"></canvas>
+                <div id="zoneRingLegend"></div>
+              </div>
+
+              <div class="results-panel">
+                <h3>Calculated zone and scores</h3>
+                <div id="calculationResults">
+                  Answer the questions and click <strong>Calculate from answers</strong> to see your
+                  distribution across Bored, Comfort, Stretch, Stress and Panic.
+                </div>
+              </div>
+
+              <div class="overall-panel">
+                <h3>Overall scale result</h3>
+                <div id="overallResult">
+                  Select a role level to compare your pattern against a typical target for that role.
+                </div>
+              </div>
+
+              <div class="entries-panel">
+                <h3>Recorded entries (this browser)</h3>
+                <p style="margin:0 0 4px;">
+                  Use this to track how your pattern changes over time.
+                </p>
+                <table id="entriesTable">
+                  <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Bored&nbsp;%</th>
+                    <th>Comfort&nbsp;%</th>
+                    <th>Stretch&nbsp;%</th>
+                    <th>Stress&nbsp;%</th>
+                    <th>Panic&nbsp;%</th>
+                  </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+                <canvas id="entriesChart" height="140" style="display:none;"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div>
-        <div>© <span id="year"></span> IMTHEBUS. All rights reserved.</div>
-        <div class="footer-meta-line">
-          Tool design, questions, scoring model and interpretation framework created by Dean Rougvie.
-          All calculations are experimental and may contain errors.
-        </div>
-        <div class="footer-counter">
-          Assessments completed in this browser: <span id="assessmentCount">0</span>
-        </div>
-      </div>
-      <div class="footer-links">
-        <div class="footer-group">
-          <div class="footer-group-title">Contact</div>
-          <a href="mailto:contact@imthebus.co.uk?subject=General%20enquiry">contact@imthebus.co.uk</a>
-          <a href="mailto:contact@imthebus.co.uk?subject=Bug%20report">Report a bug</a>
-          <a href="mailto:contact@imthebus.co.uk?subject=Tool%20idea">Suggest a tool</a>
-        </div>
-        <div class="footer-group">
-          <div class="footer-group-title">Legal</div>
-          <a href="stuff.html#privacy">Privacy notice</a>
-          <a href="stuff.html#terms">Terms of use</a>
-        </div>
-      </div>
-    </div>
-  </footer>
-</div>
+  <!-- Shared footer -->
+  <div data-include="footer.html"></div>
 
-<script>
-  // Footer year
-  document.getElementById("year").textContent = new Date().getFullYear();
-
-  // Sidebar collapsible sections
-  document.querySelectorAll(".sidebar-section").forEach(section => {
-    const header = section.querySelector(".sidebar-section-header");
-    if (!header) return;
-    header.addEventListener("click", () => {
-      section.classList.toggle("open");
+  <script>
+    // Sidebar collapsible sections (keep original behaviour)
+    document.querySelectorAll(".sidebar-section").forEach(section => {
+      const header = section.querySelector(".sidebar-section-header");
+      if (!header) return;
+      header.addEventListener("click", () => {
+        section.classList.toggle("open");
+      });
     });
-  });
 
-  const contextSelect = document.getElementById("context");
-  const contextCustom = document.getElementById("contextCustom");
-  contextSelect.addEventListener("change", () => {
-    contextCustom.style.display = contextSelect.value === "User-defined" ? "block" : "none";
-  });
+    const contextSelect = document.getElementById("context");
+    const contextCustom = document.getElementById("contextCustom");
+    contextSelect.addEventListener("change", () => {
+      contextCustom.style.display = contextSelect.value === "User-defined" ? "block" : "none";
+    });
 
-  // Questions definition
-  const questions = [
-    { id: 1,  text: "I regularly handle tasks that feel new or unfamiliar." },
-    { id: 2,  text: "I complete many tasks automatically, without conscious effort." },
-    { id: 3,  text: "I must make decisions without having all the information I would like." },
-    { id: 4,  text: "I feel calm and in control during most of my working time." },
-    { id: 5,  text: "I feel overwhelmed or unable to keep up with my work." },
-    { id: 6,  text: "My work feels repetitive or predictable." },
-    { id: 7,  text: "I put deliberate effort into practising new skills or behaviours." },
-    { id: 8,  text: "I feel mentally stretched in a way that requires focus." },
-    { id: 9,  text: "I adapt how I work to achieve good results." },   // reverse scored
-    { id: 10, text: "I feel positively challenged and encouraged to grow." },
-    { id: 11, text: "My days are stable and contain few unexpected demands." },
-    { id: 12, text: "My workload builds up faster than I can process it." },
-    { id: 13, text: "I need to switch rapidly between competing tasks." },
-    { id: 14, text: "I take on responsibilities that require learning and adaptation." },
-    { id: 15, text: "I feel energised or stimulated by new challenges." },
-    { id: 16, text: "I find myself firefighting without space to recover." },
-    { id: 17, text: "I complete routine tasks smoothly and confidently." },
-    { id: 18, text: "I manage situations involving tight deadlines or time pressure." },
-    { id: 19, text: "I feel under used or under challenged in parts of my role." },
-    { id: 20, text: "I can predict how most of my day or week will unfold." },
-    { id: 21, text: "I feel a mild sense of pressure that helps me stay focused." },
-    { id: 22, text: "I take on tasks that sit outside my comfort zone." },
-    { id: 23, text: "I experience periods where I cannot think clearly due to pressure." },
-    { id: 24, text: "I feel confident in handling unexpected problems when they arise." },
-    { id: 25, text: "I avoid tasks that feel too overwhelming." }
-  ];
+    // Questions definition (unchanged)
+    const questions = [
+      { id: 1,  text: "I regularly handle tasks that feel new or unfamiliar." },
+      { id: 2,  text: "I complete many tasks automatically, without conscious effort." },
+      { id: 3,  text: "I must make decisions without having all the information I would like." },
+      { id: 4,  text: "I feel calm and in control during most of my working time." },
+      { id: 5,  text: "I feel overwhelmed or unable to keep up with my work." },
+      { id: 6,  text: "My work feels repetitive or predictable." },
+      { id: 7,  text: "I put deliberate effort into practising new skills or behaviours." },
+      { id: 8,  text: "I feel mentally stretched in a way that requires focus." },
+      { id: 9,  text: "I adapt how I work to achieve good results." },   // reverse scored
+      { id: 10, text: "I feel positively challenged and encouraged to grow." },
+      { id: 11, text: "My days are stable and contain few unexpected demands." },
+      { id: 12, text: "My workload builds up faster than I can process it." },
+      { id: 13, text: "I need to switch rapidly between competing tasks." },
+      { id: 14, text: "I take on responsibilities that require learning and adaptation." },
+      { id: 15, text: "I feel energised or stimulated by new challenges." },
+      { id: 16, text: "I find myself firefighting without space to recover." },
+      { id: 17, text: "I complete routine tasks smoothly and confidently." },
+      { id: 18, text: "I manage situations involving tight deadlines or time pressure." },
+      { id: 19, text: "I feel under used or under challenged in parts of my role." },
+      { id: 20, text: "I can predict how most of my day or week will unfold." },
+      { id: 21, text: "I feel a mild sense of pressure that helps me stay focused." },
+      { id: 22, text: "I take on tasks that sit outside my comfort zone." },
+      { id: 23, text: "I experience periods where I cannot think clearly due to pressure." },
+      { id: 24, text: "I feel confident in handling unexpected problems when they arise." },
+      { id: 25, text: "I avoid tasks that feel too overwhelming." }
+    ];
 
-  // Sections
-  const sections = [
-    {
-      id: "workload",
-      title: "Workload and pace",
-      subtitle: "How fast work comes at you and how heavy it feels.",
-      questionIds: [3,5,12,13,16,18]
-    },
-    {
-      id: "challenge",
-      title: "Challenge and growth",
-      subtitle: "Stretch, learning and positive pressure.",
-      questionIds: [1,7,8,10,14,15,22,21]
-    },
-    {
-      id: "stability",
-      title: "Stability and routine",
-      subtitle: "Predictability, habits and smooth running.",
-      questionIds: [2,4,11,17,20,24]
-    },
-    {
-      id: "capacity",
-      title: "Capacity and under / over use",
-      subtitle: "Whether your role feels too small or too big.",
-      questionIds: [6,19,25]
-    },
-    {
-      id: "control",
-      title: "Control and problem solving",
-      subtitle: "Clarity, confidence and reacting under pressure.",
-      questionIds: [9,21,23]
+    // Sections (unchanged)
+    const sections = [
+      {
+        id: "workload",
+        title: "Workload and pace",
+        subtitle: "How fast work comes at you and how heavy it feels.",
+        questionIds: [3,5,12,13,16,18]
+      },
+      {
+        id: "challenge",
+        title: "Challenge and growth",
+        subtitle: "Stretch, learning and positive pressure.",
+        questionIds: [1,7,8,10,14,15,22,21]
+      },
+      {
+        id: "stability",
+        title: "Stability and routine",
+        subtitle: "Predictability, habits and smooth running.",
+        questionIds: [2,4,11,17,20,24]
+      },
+      {
+        id: "capacity",
+        title: "Capacity and under / over use",
+        subtitle: "Whether your role feels too small or too big.",
+        questionIds: [6,19,25]
+      },
+      {
+        id: "control",
+        title: "Control and problem solving",
+        subtitle: "Clarity, confidence and reacting under pressure.",
+        questionIds: [9,21,23]
+      }
+    ];
+
+    const reverseScored = new Set([9]);
+
+    // Response options: values 0–4, labels 1–5
+    const responseOptions = [
+      { value: 0, label: "1" },
+      { value: 1, label: "2" },
+      { value: 2, label: "3" },
+      { value: 3, label: "4" },
+      { value: 4, label: "5" }
+    ];
+
+    // Zone mappings
+    const zoneQuestions = {
+      bored:   [2, 6, 9, 19, 20],
+      comfort: [4, 11, 17, 20, 24],
+      stretch: [1, 7, 8, 10, 14, 15, 18, 21, 22],
+      stress:  [3, 12, 13],
+      panic:   [5, 16, 23, 25]
+    };
+
+    const zoneLabels = {
+      bored: "Bored",
+      comfort: "Comfort",
+      stretch: "Stretch",
+      stress: "Stress",
+      panic: "Panic"
+    };
+
+    // Bolder colours for graphs (same hues, stronger fills)
+    const zoneColors = {
+      bored:   { fill: "rgba(17,24,39,0.45)",  stroke: "#111827" },
+      comfort: { fill: "rgba(96,165,250,0.70)", stroke: "#1d4ed8" },
+      stretch: { fill: "rgba(74,222,128,0.70)", stroke: "#15803d" },
+      stress:  { fill: "rgba(251,191,36,0.70)", stroke: "#b45309" },
+      panic:   { fill: "rgba(248,113,113,0.75)", stroke: "#b91c1c" }
+    };
+
+    const roleTargets = {
+      L1: { bored: 20, comfort: 45, stretch: 30, stress: 5,  panic: 0 },
+      L2: { bored: 15, comfort: 40, stretch: 35, stress: 10, panic: 0 },
+      L3: { bored: 10, comfort: 30, stretch: 40, stress: 20, panic: 0 },
+      L4: { bored: 8,  comfort: 25, stretch: 45, stress: 22, panic: 0 },
+      L5: { bored: 5,  comfort: 20, stretch: 55, stress: 20, panic: 0 }
+    };
+
+    const roleLabels = {
+      L1: "Operator",
+      L2: "Senior Operator",
+      L3: "Supervisor",
+      L4: "Manager",
+      L5: "Director"
+    };
+
+    const descriptions = {
+      1: {
+        label: "Bored",
+        text: "Underloaded. Too little challenge or variety. Skills underused and development may stall.",
+        manager: "Increase challenge, variety or responsibility. Clarify expectations for growth."
+      },
+      2: {
+        label: "Comfort",
+        text: "Workload feels manageable with low pressure. Reliable performance but limited stretch.",
+        manager: "Keep the core stable but agree some stretch tasks or projects."
+      },
+      3: {
+        label: "Stretch",
+        text: "Healthy stretch zone. Work is challenging in a good way, with visible learning.",
+        manager: "Protect this state, keep priorities clear and recognise the effort."
+      },
+      4: {
+        label: "Stress",
+        text: "High pressure and cognitive load. Work is being done but fatigue and error risk rise.",
+        manager: "Re-prioritise, remove low value work or add temporary support."
+      },
+      5: {
+        label: "Panic",
+        text: "Demand exceeds capacity. Performance becomes unstable and reactive.",
+        manager: "Intervene quickly. Adjust workload and support and treat it as a system issue."
+      }
+    };
+
+    const roleLevelSelect = document.getElementById("roleLevel");
+    const saveButton = document.getElementById("saveEntry");
+    const exportButton = document.getElementById("exportCsv");
+    const exportPdfButton = document.getElementById("exportPdf");
+    const clearButton = document.getElementById("clearEntries");
+    const loadSelect = document.getElementById("loadEntry");
+    const calculationResults = document.getElementById("calculationResults");
+    const overallResult = document.getElementById("overallResult");
+    const entriesTableBody = document.querySelector("#entriesTable tbody");
+    const calculateButton = document.getElementById("calculateFromQuestions");
+    const donutLabel = document.getElementById("donutLabel");
+    const boardWrapper = document.getElementById("boardWrapper");
+    const boardInner = document.getElementById("boardInner");
+    const assessmentCountSpan = document.getElementById("assessmentCount");
+    const entriesChartCanvas = document.getElementById("entriesChart");
+
+    let latestZonePercents = null;
+    let latestZoneRaw = null;
+    let latestTopZone = null;
+    let latestTopScore = null;
+    let latestResponses = null;
+    let latestScaleScore = null;
+    let latestFollowupText = "";
+    let entriesChart = null;
+
+    /* ---------- Assessment counter ---------- */
+
+    function loadAssessmentCount() {
+      const raw = localStorage.getItem("boredToPanicCount");
+      const n = raw ? parseInt(raw, 10) || 0 : 0;
+      assessmentCountSpan.textContent = n;
+      return n;
     }
-  ];
 
-  const reverseScored = new Set([9]);
-
-  // Response options: values 0–4, labels 1–5
-  const responseOptions = [
-    { value: 0, label: "1" },
-    { value: 1, label: "2" },
-    { value: 2, label: "3" },
-    { value: 3, label: "4" },
-    { value: 4, label: "5" }
-  ];
-
-  // Zone mappings
-  const zoneQuestions = {
-    bored:   [2, 6, 9, 19, 20],
-    comfort: [4, 11, 17, 20, 24],
-    stretch: [1, 7, 8, 10, 14, 15, 18, 21, 22],
-    stress:  [3, 12, 13],
-    panic:   [5, 16, 23, 25]
-  };
-
-  const zoneLabels = {
-    bored: "Bored",
-    comfort: "Comfort",
-    stretch: "Stretch",
-    stress: "Stress",
-    panic: "Panic"
-  };
-
-  const zoneColors = {
-    bored:   { fill: "rgba(17,24,39,0.25)", stroke: "#111827" },
-    comfort: { fill: "rgba(96,165,250,0.45)", stroke: "#1d4ed8" },
-    stretch: { fill: "rgba(74,222,128,0.45)", stroke: "#15803d" },
-    stress:  { fill: "rgba(251,191,36,0.45)", stroke: "#b45309" },
-    panic:   { fill: "rgba(248,113,113,0.45)", stroke: "#b91c1c" }
-  };
-
-  const roleTargets = {
-    L1: { bored: 20, comfort: 45, stretch: 30, stress: 5,  panic: 0 },
-    L2: { bored: 15, comfort: 40, stretch: 35, stress: 10, panic: 0 },
-    L3: { bored: 10, comfort: 30, stretch: 40, stress: 20, panic: 0 },
-    L4: { bored: 8,  comfort: 25, stretch: 45, stress: 22, panic: 0 },
-    L5: { bored: 5,  comfort: 20, stretch: 55, stress: 20, panic: 0 }
-  };
-
-  const roleLabels = {
-    L1: "Operator",
-    L2: "Senior Operator",
-    L3: "Supervisor",
-    L4: "Manager",
-    L5: "Director"
-  };
-
-  const descriptions = {
-    1: {
-      label: "Bored",
-      text: "Underloaded. Too little challenge or variety. Skills underused and development may stall.",
-      manager: "Increase challenge, variety or responsibility. Clarify expectations for growth."
-    },
-    2: {
-      label: "Comfort",
-      text: "Workload feels manageable with low pressure. Reliable performance but limited stretch.",
-      manager: "Keep the core stable but agree some stretch tasks or projects."
-    },
-    3: {
-      label: "Stretch",
-      text: "Healthy stretch zone. Work is challenging in a good way, with visible learning.",
-      manager: "Protect this state, keep priorities clear and recognise the effort."
-    },
-    4: {
-      label: "Stress",
-      text: "High pressure and cognitive load. Work is being done but fatigue and error risk rise.",
-      manager: "Re-prioritise, remove low value work or add temporary support."
-    },
-    5: {
-      label: "Panic",
-      text: "Demand exceeds capacity. Performance becomes unstable and reactive.",
-      manager: "Intervene quickly. Adjust workload and support and treat it as a system issue."
+    function incrementAssessmentCount() {
+      const n = loadAssessmentCount() + 1;
+      localStorage.setItem("boredToPanicCount", String(n));
+      assessmentCountSpan.textContent = n;
     }
-  };
 
-  const roleLevelSelect = document.getElementById("roleLevel");
-  const saveButton = document.getElementById("saveEntry");
-  const exportButton = document.getElementById("exportCsv");
-  const exportPdfButton = document.getElementById("exportPdf");
-  const clearButton = document.getElementById("clearEntries");
-  const loadSelect = document.getElementById("loadEntry");
-  const calculationResults = document.getElementById("calculationResults");
-  const overallResult = document.getElementById("overallResult");
-  const entriesTableBody = document.querySelector("#entriesTable tbody");
-  const calculateButton = document.getElementById("calculateFromQuestions");
-  const donutLabel = document.getElementById("donutLabel");
-  const boardWrapper = document.getElementById("boardWrapper");
-  const boardInner = document.getElementById("boardInner");
-  const assessmentCountSpan = document.getElementById("assessmentCount");
-  const entriesChartCanvas = document.getElementById("entriesChart");
+    loadAssessmentCount();
 
-  let latestZonePercents = null;
-  let latestZoneRaw = null;
-  let latestTopZone = null;
-  let latestTopScore = null;
-  let latestResponses = null;
-  let latestScaleScore = null;
-  let latestFollowupText = "";
-  let entriesChart = null;
+    /* ---------- Build questions UI (keep radio behaviour) ---------- */
 
-  /* ---------- Assessment counter ---------- */
+    const questionSectionsContainer = document.getElementById("questionSections");
+    const questionMap = new Map(questions.map(q => [q.id, q]));
 
-  function loadAssessmentCount() {
-    const raw = localStorage.getItem("boredToPanicCount");
-    const n = raw ? parseInt(raw, 10) || 0 : 0;
-    assessmentCountSpan.textContent = n;
-    return n;
-  }
+    function buildQuestions() {
+      sections.forEach(section => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "question-section";
+        wrapper.dataset.sectionId = section.id;
 
-  function incrementAssessmentCount() {
-    const n = loadAssessmentCount() + 1;
-    localStorage.setItem("boredToPanicCount", String(n));
-    assessmentCountSpan.textContent = n;
-  }
+        const headerBtn = document.createElement("button");
+        headerBtn.type = "button";
+        headerBtn.className = "question-section-header";
+        headerBtn.innerHTML = `
+          <div>
+            <span class="question-section-title">${section.title}</span>
+            <span class="question-section-subtitle">${section.subtitle}</span>
+          </div>
+          <div class="question-section-toggle">+</div>
+        `;
+        wrapper.appendChild(headerBtn);
 
-  loadAssessmentCount();
+        const body = document.createElement("div");
+        body.className = "question-section-body";
 
-  /* ---------- Build questions UI ---------- */
+        const table = document.createElement("table");
+        table.className = "question-table";
 
-  const questionSectionsContainer = document.getElementById("questionSections");
-  const questionMap = new Map(questions.map(q => [q.id, q]));
+        const thead = document.createElement("thead");
+        thead.innerHTML = `
+          <tr class="scale-label-row">
+            <th>#</th>
+            <th>Question</th>
+            <th colspan="5">
+              <span class="label">Never → Always</span>
+              <span class="caption">1 = never, 3 = sometimes, 5 = always</span>
+            </th>
+          </tr>
+        `;
+        table.appendChild(thead);
 
-  function buildQuestions() {
-    sections.forEach(section => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "question-section";
-      wrapper.dataset.sectionId = section.id;
+        const tbody = document.createElement("tbody");
 
-      const headerBtn = document.createElement("button");
-      headerBtn.type = "button";
-      headerBtn.className = "question-section-header";
-      headerBtn.innerHTML = `
-        <div>
-          <span class="question-section-title">${section.title}</span>
-          <span class="question-section-subtitle">${section.subtitle}</span>
-        </div>
-        <div class="question-section-toggle">+</div>
-      `;
-      wrapper.appendChild(headerBtn);
+        section.questionIds.forEach(qid => {
+          const q = questionMap.get(qid);
+          if (!q) return;
+          const tr = document.createElement("tr");
 
-      const body = document.createElement("div");
-      body.className = "question-section-body";
+          const tdNum = document.createElement("td");
+          tdNum.className = "question-number";
+          tdNum.textContent = q.id;
+          tr.appendChild(tdNum);
 
-      const table = document.createElement("table");
-      table.className = "question-table";
+          const tdText = document.createElement("td");
+          tdText.className = "question-text";
+          tdText.textContent = q.text;
+          tr.appendChild(tdText);
 
-      const thead = document.createElement("thead");
-      thead.innerHTML = `
-        <tr class="scale-label-row">
-          <th>#</th>
-          <th>Question</th>
-          <th colspan="5">
-            <span class="label">Never → Always</span>
-            <span class="caption">1 = never, 3 = sometimes, 5 = always</span>
-          </th>
-        </tr>
-      `;
-      table.appendChild(thead);
+          responseOptions.forEach(opt => {
+            const td = document.createElement("td");
+            td.className = "response-cell";
 
-      const tbody = document.createElement("tbody");
+            const label = document.createElement("label");
+            label.className = "response-radio";
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = `q${q.id}`;
+            input.value = opt.value;
 
-      section.questionIds.forEach(qid => {
-        const q = questionMap.get(qid);
-        if (!q) return;
-        const tr = document.createElement("tr");
+            const span = document.createElement("span");
+            span.textContent = opt.label;
 
-        const tdNum = document.createElement("td");
-        tdNum.className = "question-number";
-        tdNum.textContent = q.id;
-        tr.appendChild(tdNum);
+            label.appendChild(input);
+            label.appendChild(span);
+            td.appendChild(label);
+            tr.appendChild(td);
 
-        const tdText = document.createElement("td");
-        tdText.className = "question-text";
-        tdText.textContent = q.text;
-        tr.appendChild(tdText);
-
-        responseOptions.forEach(opt => {
-          const td = document.createElement("td");
-          td.className = "response-cell";
-
-          const label = document.createElement("label");
-          label.className = "response-radio";
-          const input = document.createElement("input");
-          input.type = "radio";
-          input.name = `q${q.id}`;
-          input.value = opt.value;
-
-          const span = document.createElement("span");
-          span.textContent = opt.label;
-
-          label.appendChild(input);
-          label.appendChild(span);
-          td.appendChild(label);
-          tr.appendChild(td);
-
-          label.addEventListener("click", () => {
-            document
-              .querySelectorAll(`label.response-radio input[name="q${q.id}"]`)
-              .forEach(r => r.parentElement.classList.remove("selected"));
-            label.classList.add("selected");
+            label.addEventListener("click", () => {
+              document
+                .querySelectorAll(`label.response-radio input[name="q${q.id}"]`)
+                .forEach(r => r.parentElement.classList.remove("selected"));
+              label.classList.add("selected");
+            });
           });
+
+          tbody.appendChild(tr);
         });
 
-        tbody.appendChild(tr);
+        table.appendChild(tbody);
+        body.appendChild(table);
+        wrapper.appendChild(body);
+        questionSectionsContainer.appendChild(wrapper);
+
+        headerBtn.addEventListener("click", () => {
+          const isOpen = wrapper.classList.contains("open");
+          if (isOpen) {
+            wrapper.classList.remove("open");
+          } else {
+            document.querySelectorAll(".question-section").forEach(sec => sec.classList.remove("open"));
+            wrapper.classList.add("open");
+          }
+        });
       });
 
-      table.appendChild(tbody);
-      body.appendChild(table);
-      wrapper.appendChild(body);
-      questionSectionsContainer.appendChild(wrapper);
+      // Open the first section by default
+      const firstSection = document.querySelector(".question-section");
+      if (firstSection) firstSection.classList.add("open");
+    }
 
-      headerBtn.addEventListener("click", () => {
-        const isOpen = wrapper.classList.contains("open");
-        if (isOpen) {
-          wrapper.classList.remove("open");
-        } else {
-          document.querySelectorAll(".question-section").forEach(sec => sec.classList.remove("open"));
-          wrapper.classList.add("open");
-        }
+    buildQuestions();
+
+    /* ---------- Concentric ring chart (donut) ---------- */
+
+    const ringCanvas = document.getElementById("zoneRing");
+    const ringCtx = ringCanvas.getContext("2d");
+
+    function drawRingChart(data) {
+      const w = ringCanvas.width;
+      const h = ringCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const maxRadius = Math.min(w, h) / 2 - 8;
+
+      ringCtx.clearRect(0, 0, w, h);
+
+      const order = ["bored", "comfort", "stretch", "stress", "panic"];
+      const values = data || { bored: 20, comfort: 20, stretch: 20, stress: 20, panic: 20 };
+
+      let innerR = 0;
+      order.forEach(zone => {
+        const pct = values[zone] ?? 0;
+        const outerR = innerR + maxRadius * (pct / 100);
+        if (outerR <= innerR) return;
+
+        ringCtx.beginPath();
+        ringCtx.arc(cx, cy, outerR, 0, 2 * Math.PI);
+        ringCtx.arc(cx, cy, innerR, 2 * Math.PI, 0, true);
+        ringCtx.closePath();
+        ringCtx.fillStyle = zoneColors[zone].fill;
+        ringCtx.fill();
+
+        innerR = outerR;
       });
-    });
-
-    // Open the first section by default
-    const firstSection = document.querySelector(".question-section");
-    if (firstSection) firstSection.classList.add("open");
-  }
-
-  buildQuestions();
-
-  /* ---------- Concentric ring chart ---------- */
-
-  const ringCanvas = document.getElementById("zoneRing");
-  const ringCtx = ringCanvas.getContext("2d");
-
-  function drawRingChart(data) {
-    const w = ringCanvas.width;
-    const h = ringCanvas.height;
-    const cx = w / 2;
-    const cy = h / 2;
-    const maxRadius = Math.min(w, h) / 2 - 8;
-
-    ringCtx.clearRect(0, 0, w, h);
-
-    const order = ["bored", "comfort", "stretch", "stress", "panic"];
-    const values = data || { bored: 20, comfort: 20, stretch: 20, stress: 20, panic: 20 };
-
-    let innerR = 0;
-    order.forEach(zone => {
-      const pct = values[zone] ?? 0;
-      const outerR = innerR + maxRadius * (pct / 100);
-      if (outerR <= innerR) return;
 
       ringCtx.beginPath();
-      ringCtx.arc(cx, cy, outerR, 0, 2 * Math.PI);
-      ringCtx.arc(cx, cy, innerR, 2 * Math.PI, 0, true);
-      ringCtx.closePath();
-      ringCtx.fillStyle = zoneColors[zone].fill;
-      ringCtx.fill();
-
-      innerR = outerR;
-    });
-
-    ringCtx.beginPath();
-    ringCtx.arc(cx, cy, maxRadius, 0, 2 * Math.PI);
-    ringCtx.strokeStyle = "#000";
-    ringCtx.lineWidth = 2;
-    ringCtx.stroke();
-  }
-
-  function updateRingLegend(data, labelText) {
-    const legend = document.getElementById("zoneRingLegend");
-    const order = ["bored", "comfort", "stretch", "stress", "panic"];
-    const values = data || { bored: 20, comfort: 20, stretch: 20, stress: 20, panic: 20 };
-    const rows = order.map(zone => {
-      const pct = values[zone] ?? 0;
-      return `
-        <div class="zone-legend-row">
-          <span class="zone-legend-swatch" style="background:${zoneColors[zone].stroke};"></span>
-          <span class="zone-legend-label">${zoneLabels[zone]}</span>
-          <span class="zone-legend-value">${pct}%</span>
-        </div>
-      `;
-    }).join("");
-    legend.innerHTML = rows;
-    donutLabel.textContent = labelText;
-  }
-
-  drawRingChart(null);
-  updateRingLegend(null, "Equal starting pattern. Updates after calculation.");
-
-  /* ---------- Scoring logic (averages) ---------- */
-
-  function getResponses() {
-    const responses = {};
-    for (const q of questions) {
-      const checked = document.querySelector(`input[name="q${q.id}"]:checked`);
-      if (!checked) return null;
-      responses[q.id] = parseInt(checked.value, 10);
+      ringCtx.arc(cx, cy, maxRadius, 0, 2 * Math.PI);
+      ringCtx.strokeStyle = "#000";
+      ringCtx.lineWidth = 2;
+      ringCtx.stroke();
     }
-    return responses;
-  }
 
-  function calculateZoneScores(responses) {
-    const raw = {};
-    const avg = {};
-    let totalIntensity = 0;
-    const zones = Object.keys(zoneQuestions);
+    function updateRingLegend(data, labelText) {
+      const legend = document.getElementById("zoneRingLegend");
+      const order = ["bored", "comfort", "stretch", "stress", "panic"];
+      const values = data || { bored: 20, comfort: 20, stretch: 20, stress: 20, panic: 20 };
+      const rows = order.map(zone => {
+        const pct = values[zone] ?? 0;
+        return `
+          <div class="zone-legend-row">
+            <span class="zone-legend-swatch" style="background:${zoneColors[zone].stroke};"></span>
+            <span class="zone-legend-label">${zoneLabels[zone]}</span>
+            <span class="zone-legend-value">${pct}%</span>
+          </div>
+        `;
+      }).join("");
+      legend.innerHTML = rows;
+      donutLabel.textContent = labelText;
+    }
 
-    zones.forEach(zone => {
-      const ids = zoneQuestions[zone];
-      let sum = 0;
-      ids.forEach(id => {
-        const base = responses[id] ?? 0;
-        const score = reverseScored.has(id) ? (4 - base) : base;
-        sum += score;
+    drawRingChart(null);
+    updateRingLegend(null, "Equal starting pattern. Updates after calculation.");
+
+    /* ---------- Scoring logic (averages) ---------- */
+
+    function getResponses() {
+      const responses = {};
+      for (const q of questions) {
+        const checked = document.querySelector(`input[name="q${q.id}"]:checked`);
+        if (!checked) return null;
+        responses[q.id] = parseInt(checked.value, 10);
+      }
+      return responses;
+    }
+
+    function calculateZoneScores(responses) {
+      const raw = {};
+      const avg = {};
+      let totalIntensity = 0;
+      const zones = Object.keys(zoneQuestions);
+
+      zones.forEach(zone => {
+        const ids = zoneQuestions[zone];
+        let sum = 0;
+        ids.forEach(id => {
+          const base = responses[id] ?? 0;
+          const score = reverseScored.has(id) ? (4 - base) : base;
+          sum += score;
+        });
+        const mean = ids.length ? sum / ids.length : 0;
+        raw[zone] = sum;
+        avg[zone] = mean;
+        totalIntensity += mean;
       });
-      const mean = ids.length ? sum / ids.length : 0;
-      raw[zone] = sum;
-      avg[zone] = mean;
-      totalIntensity += mean;
-    });
 
-    const percents = {};
-    if (totalIntensity === 0) {
-      zones.forEach(z => { percents[z] = 0; });
-    } else {
-      let running = 0;
-      zones.forEach((zone, idx) => {
-        if (idx === zones.length - 1) {
-          percents[zone] = Math.max(0, 100 - running);
-        } else {
-          const p = Math.round((avg[zone] / totalIntensity) * 100);
-          percents[zone] = p;
-          running += p;
-        }
+      const percents = {};
+      if (totalIntensity === 0) {
+        zones.forEach(z => { percents[z] = 0; });
+      } else {
+        let running = 0;
+        zones.forEach((zone, idx) => {
+          if (idx === zones.length - 1) {
+            percents[zone] = Math.max(0, 100 - running);
+          } else {
+            const p = Math.round((avg[zone] / totalIntensity) * 100);
+            percents[zone] = p;
+            running += p;
+          }
+        });
+      }
+
+      return { raw, percents };
+    }
+
+    function currentTarget(role) {
+      return role ? roleTargets[role] : null;
+    }
+
+    function levelLabel(actual, ideal) {
+      const diff = actual - ideal;
+      if (Math.abs(diff) <= 5) return "close to target";
+      if (diff > 5) return "higher than target";
+      return "lower than target";
+    }
+
+    function zoneNarrative(zone, actual, ideal) {
+      const level = levelLabel(actual, ideal);
+      switch (zone) {
+        case "bored":
+          if (level === "higher than target") return "Boredom is high; explore extra responsibility or variety.";
+          if (level === "lower than target") return "Boredom is low; capability is broadly in use.";
+          return "Boredom is close to target; look at other zones for focus.";
+        case "comfort":
+          if (level === "higher than target") return "Comfort is high; consider adding some stretch work.";
+          if (level === "lower than target") return "Comfort is low; stabilise core workload and routines.";
+          return "Comfort is about right; keep the basics predictable.";
+        case "stretch":
+          if (level === "higher than target") return "Stretch is high; make sure support and clarity are strong.";
+          if (level === "lower than target") return "Stretch is low; development work may be limited.";
+          return "Stretch is on target; protect time for this.";
+        case "stress":
+          if (level === "higher than target") return "Stress is high; review priorities and capacity.";
+          if (level === "lower than target") return "Stress is low; there may be spare capacity if needed.";
+          return "Stress is close to target; keep an eye on recovery time.";
+        case "panic":
+          if (level === "higher than target") return "Panic is higher than expected; treat as a system issue.";
+          if (level === "lower than target") return "Panic is low; keep boundaries and buffers in place.";
+          return "Panic is around expected; still worth understanding triggers.";
+        default:
+          return "";
+      }
+    }
+
+    function buildPatternCommentary(percents) {
+      const flags = [];
+      const praise = [];
+
+      if (percents.panic >= 15) {
+        flags.push("Panic at or above 15%: dig into specific situations that feel overwhelming and agree changes to workload, boundaries and support.");
+      } else if (percents.panic >= 10) {
+        flags.push("Panic between 10% and 15%: track patterns that tip things over the edge and agree how to spot them earlier.");
+      }
+
+      if (percents.stress + percents.panic >= 35) {
+        flags.push("Combined Stress and Panic above 35%: this is a sustained high-pressure pattern. Consider rescoping work, changing priorities or adding resource.");
+      }
+
+      if (percents.bored >= 25) {
+        flags.push("Bored at or above 25%: capability may be under-used. Look for extra responsibility, variety or projects that draw more from your strengths.");
+      }
+
+      if (percents.stretch < 30) {
+        flags.push("Stretch below 30%: development and learning time may be limited. Agree one or two practical ways to add constructive challenge.");
+      }
+
+      if (percents.bored >= 20 && percents.panic >= 10) {
+        flags.push("High Bored and high Panic: the work may swing between under-use and overload. Look for structural causes such as uneven work distribution, unclear priorities or stop–start projects.");
+      }
+
+      if (percents.comfort >= 35 && percents.stretch >= 30 && percents.panic < 10 && percents.stress >= 10 && percents.stress <= 25) {
+        praise.push("Comfort and Stretch are carrying most of the load with manageable Stress and low Panic. This is a broadly healthy pattern. Focus on keeping priorities clear and recovery time protected.");
+      }
+
+      if (percents.bored < 15 && percents.panic < 5) {
+        praise.push("Boredom and Panic are both low. Day to day, you are mostly working in zones that support performance and learning.");
+      }
+
+      if (!flags.length && !praise.length) {
+        praise.push("No strong risk signals from this pattern. Still useful to ask what is helping it work well and what you would like more of.");
+      }
+
+      return { flags, praise };
+    }
+
+    function buildConversationPromptsHtml(percents) {
+      const { flags, praise } = buildPatternCommentary(percents);
+      let html = "<div class=\"conversation-prompts\">";
+      if (praise.length) {
+        html += "<strong>What seems to be working:</strong><ul>";
+        praise.forEach(p => { html += `<li>${p}</li>`; });
+        html += "</ul>";
+      }
+      if (flags.length) {
+        html += "<strong>Things to watch or adjust:</strong><ul>";
+        flags.forEach(f => { html += `<li>${f}</li>`; });
+        html += "</ul>";
+      }
+      html += "</div>";
+      return html;
+    }
+
+    function getFollowupSuggestion(percents, role) {
+      const target = currentTarget(role);
+      const now = new Date();
+      if (!target) {
+        const weeks = 12;
+        const future = new Date(now.getTime() + weeks * 7 * 24 * 60 * 60 * 1000);
+        return {
+          text: `Suggested time to redo this assessment: around ${weeks === 12 ? "3 months" : weeks + " weeks"}, around ${future.toLocaleDateString()}.`,
+          dateLabel: future.toLocaleDateString()
+        };
+      }
+
+      const zones = ["bored","comfort","stretch","stress","panic"];
+      let sumDiff = 0;
+      zones.forEach(z => {
+        sumDiff += Math.abs((percents[z] ?? 0) - target[z]);
       });
-    }
+      const avgDiff = sumDiff / zones.length;
 
-    return { raw, percents };
-  }
+      let weeks;
+      if (avgDiff >= 18) weeks = 6;
+      else if (avgDiff >= 14) weeks = 8;
+      else if (avgDiff >= 10) weeks = 12;
+      else if (avgDiff >= 6) weeks = 24;
+      else weeks = 52;
 
-  function currentTarget(role) {
-    return role ? roleTargets[role] : null;
-  }
-
-  function levelLabel(actual, ideal) {
-    const diff = actual - ideal;
-    if (Math.abs(diff) <= 5) return "close to target";
-    if (diff > 5) return "higher than target";
-    return "lower than target";
-  }
-
-  function zoneNarrative(zone, actual, ideal) {
-    const level = levelLabel(actual, ideal);
-    switch (zone) {
-      case "bored":
-        if (level === "higher than target") return "Boredom is high; explore extra responsibility or variety.";
-        if (level === "lower than target") return "Boredom is low; capability is broadly in use.";
-        return "Boredom is close to target; look at other zones for focus.";
-      case "comfort":
-        if (level === "higher than target") return "Comfort is high; consider adding some stretch work.";
-        if (level === "lower than target") return "Comfort is low; stabilise core workload and routines.";
-        return "Comfort is about right; keep the basics predictable.";
-      case "stretch":
-        if (level === "higher than target") return "Stretch is high; make sure support and clarity are strong.";
-        if (level === "lower than target") return "Stretch is low; development work may be limited.";
-        return "Stretch is on target; protect time for this.";
-      case "stress":
-        if (level === "higher than target") return "Stress is high; review priorities and capacity.";
-        if (level === "lower than target") return "Stress is low; there may be spare capacity if needed.";
-        return "Stress is close to target; keep an eye on recovery time.";
-      case "panic":
-        if (level === "higher than target") return "Panic is higher than expected; treat as a system issue.";
-        if (level === "lower than target") return "Panic is low; keep boundaries and buffers in place.";
-        return "Panic is around expected; still worth understanding triggers.";
-      default:
-        return "";
-    }
-  }
-
-  function buildPatternCommentary(percents) {
-    const flags = [];
-    const praise = [];
-
-    // Individual flags
-    if (percents.panic >= 15) {
-      flags.push("Panic at or above 15%: dig into specific situations that feel overwhelming and agree changes to workload, boundaries and support.");
-    } else if (percents.panic >= 10) {
-      flags.push("Panic between 10% and 15%: track patterns that tip things over the edge and agree how to spot them earlier.");
-    }
-
-    if (percents.stress + percents.panic >= 35) {
-      flags.push("Combined Stress and Panic above 35%: this is a sustained high-pressure pattern. Consider rescoping work, changing priorities or adding resource.");
-    }
-
-    if (percents.bored >= 25) {
-      flags.push("Bored at or above 25%: capability may be under-used. Look for extra responsibility, variety or projects that draw more from your strengths.");
-    }
-
-    if (percents.stretch < 30) {
-      flags.push("Stretch below 30%: development and learning time may be limited. Agree one or two practical ways to add constructive challenge.");
-    }
-
-    // Combined patterns
-    if (percents.bored >= 20 && percents.panic >= 10) {
-      flags.push("High Bored and high Panic: the work may swing between under-use and overload. Look for structural causes such as uneven work distribution, unclear priorities or stop–start projects.");
-    }
-
-    if (percents.comfort >= 35 && percents.stretch >= 30 && percents.panic < 10 && percents.stress >= 10 && percents.stress <= 25) {
-      praise.push("Comfort and Stretch are carrying most of the load with manageable Stress and low Panic. This is a broadly healthy pattern. Focus on keeping priorities clear and recovery time protected.");
-    }
-
-    if (percents.bored < 15 && percents.panic < 5) {
-      praise.push("Boredom and Panic are both low. Day to day, you are mostly working in zones that support performance and learning.");
-    }
-
-    if (!flags.length && !praise.length) {
-      praise.push("No strong risk signals from this pattern. Still useful to ask what is helping it work well and what you would like more of.");
-    }
-
-    return { flags, praise };
-  }
-
-  function buildConversationPromptsHtml(percents) {
-    const { flags, praise } = buildPatternCommentary(percents);
-    let html = "<div class=\"conversation-prompts\">";
-    if (praise.length) {
-      html += "<strong>What seems to be working:</strong><ul>";
-      praise.forEach(p => { html += `<li>${p}</li>`; });
-      html += "</ul>";
-    }
-    if (flags.length) {
-      html += "<strong>Things to watch or adjust:</strong><ul>";
-      flags.forEach(f => { html += `<li>${f}</li>`; });
-      html += "</ul>";
-    }
-    html += "</div>";
-    return html;
-  }
-
-  function getFollowupSuggestion(percents, role) {
-    const target = currentTarget(role);
-    const now = new Date();
-    if (!target) {
-      const weeks = 12;
       const future = new Date(now.getTime() + weeks * 7 * 24 * 60 * 60 * 1000);
+      const label =
+        weeks === 52 ? "about a year" :
+        weeks === 24 ? "about 6 months" :
+        weeks === 12 ? "about 3 months" :
+        `${weeks} weeks`;
+
       return {
-        text: `Suggested time to redo this assessment: around ${weeks === 12 ? "3 months" : weeks + " weeks"}, around ${future.toLocaleDateString()}.`,
+        text: `Suggested time to redo this assessment: around ${label}, around ${future.toLocaleDateString()}.`,
         dateLabel: future.toLocaleDateString()
       };
     }
 
-    const zones = ["bored","comfort","stretch","stress","panic"];
-    let sumDiff = 0;
-    zones.forEach(z => {
-      sumDiff += Math.abs((percents[z] ?? 0) - target[z]);
-    });
-    const avgDiff = sumDiff / zones.length;
+    function renderResults(percents, role, topZone, topScore) {
+      const target = currentTarget(role);
 
-    let weeks;
-    if (avgDiff >= 18) weeks = 6;
-    else if (avgDiff >= 14) weeks = 8;
-    else if (avgDiff >= 10) weeks = 12;
-    else if (avgDiff >= 6) weeks = 24;
-    else weeks = 52;
-
-    const future = new Date(now.getTime() + weeks * 7 * 24 * 60 * 60 * 1000);
-    const label =
-      weeks === 52 ? "about a year" :
-      weeks === 24 ? "about 6 months" :
-      weeks === 12 ? "about 3 months" :
-      `${weeks} weeks`;
-
-    return {
-      text: `Suggested time to redo this assessment: around ${label}, around ${future.toLocaleDateString()}.`,
-      dateLabel: future.toLocaleDateString()
-    };
-  }
-
-  function renderResults(percents, role, topZone, topScore) {
-    const target = currentTarget(role);
-
-    calculationResults.innerHTML = `
-      <p><strong>Highest zone:</strong> ${zoneLabels[topZone]} (${topScore}%)</p>
-      <p><strong>Pattern:</strong> Bored ${percents.bored}% · Comfort ${percents.comfort}% · Stretch ${percents.stretch}% · Stress ${percents.stress}% · Panic ${percents.panic}%</p>
-      ${
-        target
-          ? `<table>
-               <thead>
-                 <tr><th>Zone</th><th>Current</th><th>Target</th></tr>
-               </thead>
-               <tbody>
-                 <tr><td>Bored</td><td>${percents.bored}%</td><td>${target.bored}%</td></tr>
-                 <tr><td>Comfort</td><td>${percents.comfort}%</td><td>${target.comfort}%</td></tr>
-                 <tr><td>Stretch</td><td>${percents.stretch}%</td><td>${target.stretch}%</td></tr>
-                 <tr><td>Stress</td><td>${percents.stress}%</td><td>${target.stress}%</td></tr>
-                 <tr><td>Panic</td><td>${percents.panic}%</td><td>${target.panic}%</td></tr>
-               </tbody>
-             </table>`
-          : ""
-      }
-      ${buildConversationPromptsHtml(percents)}
-    `;
-
-    renderOverallScale(percents, role, topZone);
-    drawRingChart(percents);
-    updateRingLegend(percents, "Current pattern");
-  }
-
-  function renderOverallScale(percents, role, topZone) {
-    const scoreMap = { bored: 1, comfort: 2, stretch: 3, stress: 4, panic: 5 };
-    const score = scoreMap[topZone] || 3;
-    latestScaleScore = score;
-    const desc = descriptions[score];
-    const target = currentTarget(role);
-
-    let html = `
-      <p><strong>Overall position:</strong> ${desc.label} (score ${score}/5)</p>
-      <p>${desc.text}</p>
-      <p><strong>Manager focus:</strong> ${desc.manager}</p>
-    `;
-
-    if (target) {
-      html += `<p><strong>Role pattern (${roleLabels[role]}):</strong> Bored ${target.bored}%, Comfort ${target.comfort}%, Stretch ${target.stretch}%, Stress ${target.stress}%, Panic ${target.panic}%.</p>`;
-      html += `<table>
-        <thead><tr><th>Zone</th><th>Comment</th></tr></thead>
-        <tbody>
-          ${["bored","comfort","stretch","stress","panic"].map(z => {
-            const actual = percents[z] ?? 0;
-            const ideal = target[z] ?? 0;
-            return `<tr><td>${zoneLabels[z]}</td><td>${zoneNarrative(z, actual, ideal)}</td></tr>`;
-          }).join("")}
-        </tbody>
-      </table>`;
-    }
-
-    const follow = getFollowupSuggestion(percents, role);
-    latestFollowupText = follow.text;
-    html += `<p style="margin-top:0.4rem;"><strong>${follow.text}</strong></p>`;
-
-    overallResult.innerHTML = html;
-  }
-
-  /* ---------- Local storage for entries ---------- */
-
-  function loadEntries() {
-    try {
-      return JSON.parse(localStorage.getItem("boredToPanicEntries") || "[]");
-    } catch {
-      return [];
-    }
-  }
-
-  function saveEntries(entries) {
-    localStorage.setItem("boredToPanicEntries", JSON.stringify(entries));
-  }
-
-  function renderEntriesTableAndDropdown() {
-    const entries = loadEntries();
-    entriesTableBody.innerHTML = "";
-    loadSelect.innerHTML = '<option value="">Select saved entry</option>';
-
-    entries.forEach((entry, index) => {
-      const tr = document.createElement("tr");
-      const zp = entry.zonePercents || {};
-      tr.innerHTML = `
-        <td>${entry.timestamp}</td>
-        <td>${zp.bored ?? ""}%</td>
-        <td>${zp.comfort ?? ""}%</td>
-        <td>${zp.stretch ?? ""}%</td>
-        <td>${zp.stress ?? ""}%</td>
-        <td>${zp.panic ?? ""}%</td>
+      calculationResults.innerHTML = `
+        <p><strong>Highest zone:</strong> ${zoneLabels[topZone]} (${topScore}%)</p>
+        <p><strong>Pattern:</strong> Bored ${percents.bored}% · Comfort ${percents.comfort}% · Stretch ${percents.stretch}% · Stress ${percents.stress}% · Panic ${percents.panic}%</p>
+        ${
+          target
+            ? `<table>
+                 <thead>
+                   <tr><th>Zone</th><th>Current</th><th>Target</th></tr>
+                 </thead>
+                 <tbody>
+                   <tr><td>Bored</td><td>${percents.bored}%</td><td>${target.bored}%</td></tr>
+                   <tr><td>Comfort</td><td>${percents.comfort}%</td><td>${target.comfort}%</td></tr>
+                   <tr><td>Stretch</td><td>${percents.stretch}%</td><td>${target.stretch}%</td></tr>
+                   <tr><td>Stress</td><td>${percents.stress}%</td><td>${target.stress}%</td></tr>
+                   <tr><td>Panic</td><td>${percents.panic}%</td><td>${target.panic}%</td></tr>
+                 </tbody>
+               </table>`
+            : ""
+        }
+        ${buildConversationPromptsHtml(percents)}
       `;
-      entriesTableBody.appendChild(tr);
 
-      const opt = document.createElement("option");
-      opt.value = index.toString();
-      opt.textContent = `${entry.timestamp}`;
-      loadSelect.appendChild(opt);
-    });
-
-    updateEntriesChart(entries);
-  }
-
-  function updateEntriesChart(entries) {
-    entries = entries || loadEntries();
-    if (!entries || entries.length < 2) {
-      if (entriesChart) {
-        entriesChart.destroy();
-        entriesChart = null;
-      }
-      entriesChartCanvas.style.display = "none";
-      return;
+      renderOverallScale(percents, role, topZone);
+      drawRingChart(percents);
+      updateRingLegend(percents, "Current pattern");
     }
 
-    const labels = entries.map(e => e.timestamp);
-    const boredData = entries.map(e => (e.zonePercents?.bored ?? null));
-    const comfortData = entries.map(e => (e.zonePercents?.comfort ?? null));
-    const stretchData = entries.map(e => (e.zonePercents?.stretch ?? null));
-    const stressData = entries.map(e => (e.zonePercents?.stress ?? null));
-    const panicData = entries.map(e => (e.zonePercents?.panic ?? null));
+    function renderOverallScale(percents, role, topZone) {
+      const scoreMap = { bored: 1, comfort: 2, stretch: 3, stress: 4, panic: 5 };
+      const score = scoreMap[topZone] || 3;
+      latestScaleScore = score;
+      const desc = descriptions[score];
+      const target = currentTarget(role);
 
-    const datasets = [
-      { label: "Bored", data: boredData, borderColor: zoneColors.bored.stroke },
-      { label: "Comfort", data: comfortData, borderColor: zoneColors.comfort.stroke },
-      { label: "Stretch", data: stretchData, borderColor: zoneColors.stretch.stroke },
-      { label: "Stress", data: stressData, borderColor: zoneColors.stress.stroke },
-      { label: "Panic", data: panicData, borderColor: zoneColors.panic.stroke }
-    ].map(ds => ({
-      ...ds,
-      fill: false,
-      tension: 0.2,
-      pointRadius: 2,
-      borderWidth: 1.5
-    }));
+      let html = `
+        <p><strong>Overall position:</strong> ${desc.label} (score ${score}/5)</p>
+        <p>${desc.text}</p>
+        <p><strong>Manager focus:</strong> ${desc.manager}</p>
+      `;
 
-    const ctx = entriesChartCanvas.getContext("2d");
-    entriesChartCanvas.style.display = "block";
+      if (target) {
+        html += `<p><strong>Role pattern (${roleLabels[role]}):</strong> Bored ${target.bored}%, Comfort ${target.comfort}%, Stretch ${target.stretch}%, Stress ${target.stress}%, Panic ${target.panic}%.</p>`;
+        html += `<table>
+          <thead><tr><th>Zone</th><th>Comment</th></tr></thead>
+          <tbody>
+            ${["bored","comfort","stretch","stress","panic"].map(z => {
+              const actual = percents[z] ?? 0;
+              const ideal = target[z] ?? 0;
+              return `<tr><td>${zoneLabels[z]}</td><td>${zoneNarrative(z, actual, ideal)}</td></tr>`;
+            }).join("")}
+          </tbody>
+        </table>`;
+      }
 
-    if (entriesChart) {
-      entriesChart.data.labels = labels;
-      entriesChart.data.datasets.forEach((ds, i) => {
-        ds.data = datasets[i].data;
+      const follow = getFollowupSuggestion(percents, role);
+      latestFollowupText = follow.text;
+      html += `<p style="margin-top:4px;"><strong>${follow.text}</strong></p>`;
+
+      overallResult.innerHTML = html;
+    }
+
+    /* ---------- Local storage for entries ---------- */
+
+    function loadEntries() {
+      try {
+        return JSON.parse(localStorage.getItem("boredToPanicEntries") || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function saveEntries(entries) {
+      localStorage.setItem("boredToPanicEntries", JSON.stringify(entries));
+    }
+
+    function renderEntriesTableAndDropdown() {
+      const entries = loadEntries();
+      entriesTableBody.innerHTML = "";
+      loadSelect.innerHTML = '<option value="">Select saved entry</option>';
+
+      entries.forEach((entry, index) => {
+        const tr = document.createElement("tr");
+        const zp = entry.zonePercents || {};
+        tr.innerHTML = `
+          <td>${entry.timestamp}</td>
+          <td>${zp.bored ?? ""}%</td>
+          <td>${zp.comfort ?? ""}%</td>
+          <td>${zp.stretch ?? ""}%</td>
+          <td>${zp.stress ?? ""}%</td>
+          <td>${zp.panic ?? ""}%</td>
+        `;
+        entriesTableBody.appendChild(tr);
+
+        const opt = document.createElement("option");
+        opt.value = index.toString();
+        opt.textContent = `${entry.timestamp}`;
+        loadSelect.appendChild(opt);
       });
-      entriesChart.update();
-    } else {
-      entriesChart = new Chart(ctx, {
-        type: "line",
-        data: { labels, datasets },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: true, position: "bottom" } },
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 100,
-              ticks: { stepSize: 20 }
+
+      updateEntriesChart(entries);
+    }
+
+    function updateEntriesChart(entries) {
+      entries = entries || loadEntries();
+      if (!entries || entries.length < 2) {
+        if (entriesChart) {
+          entriesChart.destroy();
+          entriesChart = null;
+        }
+        entriesChartCanvas.style.display = "none";
+        return;
+      }
+
+      const labels = entries.map(e => e.timestamp);
+      const boredData = entries.map(e => (e.zonePercents?.bored ?? null));
+      const comfortData = entries.map(e => (e.zonePercents?.comfort ?? null));
+      const stretchData = entries.map(e => (e.zonePercents?.stretch ?? null));
+      const stressData = entries.map(e => (e.zonePercents?.stress ?? null));
+      const panicData = entries.map(e => (e.zonePercents?.panic ?? null));
+
+      const datasets = [
+        { label: "Bored", data: boredData, borderColor: zoneColors.bored.stroke },
+        { label: "Comfort", data: comfortData, borderColor: zoneColors.comfort.stroke },
+        { label: "Stretch", data: stretchData, borderColor: zoneColors.stretch.stroke },
+        { label: "Stress", data: stressData, borderColor: zoneColors.stress.stroke },
+        { label: "Panic", data: panicData, borderColor: zoneColors.panic.stroke }
+      ].map(ds => ({
+        ...ds,
+        fill: false,
+        tension: 0.2,
+        pointRadius: 2,
+        borderWidth: 1.5
+      }));
+
+      const ctx = entriesChartCanvas.getContext("2d");
+      entriesChartCanvas.style.display = "block";
+
+      if (entriesChart) {
+        entriesChart.data.labels = labels;
+        entriesChart.data.datasets.forEach((ds, i) => {
+          ds.data = datasets[i].data;
+        });
+        entriesChart.update();
+      } else {
+        entriesChart = new Chart(ctx, {
+          type: "line",
+          data: { labels, datasets },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: true, position: "bottom" } },
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: { stepSize: 20 }
+              }
             }
           }
-        }
-      });
-    }
-  }
-
-  renderEntriesTableAndDropdown();
-
-  function storeEntry(autoSave) {
-    if (!latestZonePercents || !latestTopZone) return;
-
-    const name = document.getElementById("personName").value.trim();
-    const roleLevel = roleLevelSelect.value || "";
-    let contextValue = "";
-    if (contextSelect.value === "User-defined") {
-      contextValue = contextCustom.value.trim();
-    } else {
-      contextValue = contextSelect.value;
-    }
-
-    const scoreMap = { bored: 1, comfort: 2, stretch: 3, stress: 4, panic: 5 };
-    const score = scoreMap[latestTopZone] || latestScaleScore || 3;
-    const entries = loadEntries();
-    const timestamp = new Date().toLocaleString();
-    entries.push({
-      timestamp,
-      name,
-      roleLevel,
-      context: contextValue,
-      score,
-      zonePercents: latestZonePercents,
-      zoneRaw: latestZoneRaw,
-      responses: latestResponses
-    });
-    saveEntries(entries);
-    renderEntriesTableAndDropdown();
-    if (!autoSave) {
-      // No popup, but we could add a subtle visual cue later if needed
-    }
-  }
-
-  /* ---------- CSV export ---------- */
-
-  function toCsvRow(cells) {
-    return cells.map(cell => {
-      const val = cell == null ? "" : String(cell);
-      if (/[",\n]/.test(val)) {
-        return '"' + val.replace(/"/g, '""') + '"';
+        });
       }
-      return val;
-    }).join(",");
-  }
-
-  function handleExportCsv() {
-    const entries = loadEntries();
-    if (!entries.length) {
-      alert("No entries to export.");
-      return;
     }
-    const headers = [
-      "Timestamp","Name","RoleLevel","Context","Score","ZoneLabel",
-      "Bored%","Comfort%","Stretch%","Stress%","Panic%"
-    ];
-    questions.forEach(q => headers.push(`Q${q.id}`));
-    const rows = [toCsvRow(headers)];
 
-    entries.forEach(entry => {
-      const zp = entry.zonePercents || {};
-      const responses = entry.responses || {};
-      const row = [
-        entry.timestamp,
-        entry.name || "",
-        entry.roleLevel || "",
-        entry.context || "",
-        entry.score,
-        descriptions[entry.score]?.label || "",
-        zp.bored ?? "",
-        zp.comfort ?? "",
-        zp.stretch ?? "",
-        zp.stress ?? "",
-        zp.panic ?? ""
-      ];
-      questions.forEach(q => row.push(responses[q.id] ?? ""));
-      rows.push(toCsvRow(row));
-    });
-
-    const blob = new Blob([rows.join("\r\n")], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "bored_to_panic_entries.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }
-
-  function handleClearEntries() {
-    if (!confirm("Clear all saved entries in this browser?")) return;
-    localStorage.removeItem("boredToPanicEntries");
     renderEntriesTableAndDropdown();
-  }
 
-  function handleLoadEntry() {
-    const idx = loadSelect.value;
-    if (idx === "") return;
-    const entries = loadEntries();
-    const entry = entries[parseInt(idx, 10)];
-    if (!entry) return;
+    function storeEntry(autoSave) {
+      if (!latestZonePercents || !latestTopZone) return;
 
-    document.getElementById("personName").value = entry.name || "";
-    roleLevelSelect.value = entry.roleLevel || "";
+      const name = document.getElementById("personName").value.trim();
+      const roleLevel = roleLevelSelect.value || "";
+      let contextValue = "";
+      if (contextSelect.value === "User-defined") {
+        contextValue = contextCustom.value.trim();
+      } else {
+        contextValue = contextSelect.value;
+      }
 
-    if (entry.context) {
-      const match = Array.from(contextSelect.options).find(o => o.value === entry.context);
-      if (match) {
-        contextSelect.value = entry.context;
+      const scoreMap = { bored: 1, comfort: 2, stretch: 3, stress: 4, panic: 5 };
+      const score = scoreMap[latestTopZone] || latestScaleScore || 3;
+      const entries = loadEntries();
+      const timestamp = new Date().toLocaleString();
+      entries.push({
+        timestamp,
+        name,
+        roleLevel,
+        context: contextValue,
+        score,
+        zonePercents: latestZonePercents,
+        zoneRaw: latestZoneRaw,
+        responses: latestResponses
+      });
+      saveEntries(entries);
+      renderEntriesTableAndDropdown();
+    }
+
+    /* ---------- CSV export ---------- */
+
+    function toCsvRow(cells) {
+      return cells.map(cell => {
+        const val = cell == null ? "" : String(cell);
+        if (/[",\n]/.test(val)) {
+          return '"' + val.replace(/"/g, '""') + '"';
+        }
+        return val;
+      }).join(",");
+    }
+
+    function handleExportCsv() {
+      const entries = loadEntries();
+      if (!entries.length) {
+        alert("No entries to export.");
+        return;
+      }
+      const headers = [
+        "Timestamp","Name","RoleLevel","Context","Score","ZoneLabel",
+        "Bored%","Comfort%","Stretch%","Stress%","Panic%"
+      ];
+      questions.forEach(q => headers.push(`Q${q.id}`));
+      const rows = [toCsvRow(headers)];
+
+      entries.forEach(entry => {
+        const zp = entry.zonePercents || {};
+        const responses = entry.responses || {};
+        const row = [
+          entry.timestamp,
+          entry.name || "",
+          entry.roleLevel || "",
+          entry.context || "",
+          entry.score,
+          descriptions[entry.score]?.label || "",
+          zp.bored ?? "",
+          zp.comfort ?? "",
+          zp.stretch ?? "",
+          zp.stress ?? "",
+          zp.panic ?? ""
+        ];
+        questions.forEach(q => row.push(responses[q.id] ?? ""));
+        rows.push(toCsvRow(row));
+      });
+
+      const blob = new Blob([rows.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "bored_to_panic_entries.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function handleClearEntries() {
+      if (!confirm("Clear all saved entries in this browser?")) return;
+      localStorage.removeItem("boredToPanicEntries");
+      renderEntriesTableAndDropdown();
+    }
+
+    function handleLoadEntry() {
+      const idx = loadSelect.value;
+      if (idx === "") return;
+      const entries = loadEntries();
+      const entry = entries[parseInt(idx, 10)];
+      if (!entry) return;
+
+      document.getElementById("personName").value = entry.name || "";
+      roleLevelSelect.value = entry.roleLevel || "";
+
+      if (entry.context) {
+        const match = Array.from(contextSelect.options).find(o => o.value === entry.context);
+        if (match) {
+          contextSelect.value = entry.context;
+          contextCustom.value = "";
+          contextCustom.style.display = "none";
+        } else {
+          contextSelect.value = "User-defined";
+          contextCustom.value = entry.context;
+          contextCustom.style.display = "block";
+        }
+      } else {
+        contextSelect.value = "";
         contextCustom.value = "";
         contextCustom.style.display = "none";
-      } else {
-        contextSelect.value = "User-defined";
-        contextCustom.value = entry.context;
-        contextCustom.style.display = "block";
       }
-    } else {
-      contextSelect.value = "";
-      contextCustom.value = "";
-      contextCustom.style.display = "none";
+
+      questions.forEach(q => {
+        document
+          .querySelectorAll(`label.response-radio input[name="q${q.id}"]`)
+          .forEach(r => {
+            r.checked = false;
+            r.parentElement.classList.remove("selected");
+          });
+      });
+
+      if (entry.responses) {
+        Object.entries(entry.responses).forEach(([qid, val]) => {
+          const radio = document.querySelector(`label.response-radio input[name="q${qid}"][value="${val}"]`);
+          if (radio) {
+            radio.checked = true;
+            radio.parentElement.classList.add("selected");
+          }
+        });
+      }
+
+      latestResponses = entry.responses || null;
+      let percents = entry.zonePercents;
+      let raw = entry.zoneRaw;
+
+      if (!percents && entry.responses) {
+        const calc = calculateZoneScores(entry.responses);
+        percents = calc.percents;
+        raw = calc.raw;
+      }
+      if (!percents) {
+        alert("This saved entry does not contain enough data to reconstruct scores.");
+        return;
+      }
+
+      latestZonePercents = percents;
+      latestZoneRaw = raw;
+      const entriesArr = Object.entries(percents).sort((a, b) => b[1] - a[1]);
+      const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
+      latestTopZone = topZone;
+      latestTopScore = topScore;
+      const role = roleLevelSelect.value || null;
+      renderResults(percents, role, topZone, topScore);
     }
 
-    questions.forEach(q => {
-      document
-        .querySelectorAll(`label.response-radio input[name="q${q.id}"]`)
-        .forEach(r => {
-          r.checked = false;
-          r.parentElement.classList.remove("selected");
-        });
+    saveButton.addEventListener("click", () => storeEntry(false));
+    exportButton.addEventListener("click", handleExportCsv);
+    clearButton.addEventListener("click", handleClearEntries);
+    loadSelect.addEventListener("change", handleLoadEntry);
+
+    /* ---------- Calculation ---------- */
+
+    function handleCalculate() {
+      if (!roleLevelSelect.value) {
+        roleLevelSelect.focus();
+        roleLevelSelect.scrollIntoView({ behavior: "smooth", block: "center" });
+        roleLevelSelect.style.borderColor = "#b91c1c";
+        setTimeout(() => { roleLevelSelect.style.borderColor = ""; }, 1200);
+        return;
+      }
+
+      const responses = getResponses();
+      if (!responses) {
+        alert("Please answer all questions before calculating.");
+        return;
+      }
+
+      calculateButton.classList.add("calculating");
+      boardWrapper.classList.add("calculated");
+
+      const { raw, percents } = calculateZoneScores(responses);
+      const entriesArr = Object.entries(percents).sort((a, b) => b[1] - a[1]);
+      const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
+
+      latestZonePercents = percents;
+      latestZoneRaw = raw;
+      latestTopZone = topZone;
+      latestTopScore = topScore;
+      latestResponses = responses;
+
+      const role = roleLevelSelect.value || null;
+      renderResults(percents, role, topZone, topScore);
+
+      // Auto-save entry
+      storeEntry(true);
+      incrementAssessmentCount();
+
+      setTimeout(() => {
+        calculateButton.classList.remove("calculating");
+        boardWrapper.classList.remove("calculated");
+      }, 1200);
+    }
+
+    calculateButton.addEventListener("click", handleCalculate);
+
+    roleLevelSelect.addEventListener("change", () => {
+      if (!latestZonePercents) return;
+      const role = roleLevelSelect.value || null;
+      const entriesArr = Object.entries(latestZonePercents).sort((a, b) => b[1] - a[1]);
+      const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
+      renderResults(latestZonePercents, role, topZone, topScore);
     });
 
-    if (entry.responses) {
-      Object.entries(entry.responses).forEach(([qid, val]) => {
-        const radio = document.querySelector(`label.response-radio input[name="q${qid}"][value="${val}"]`);
-        if (radio) {
-          radio.checked = true;
-          radio.parentElement.classList.add("selected");
-        }
+    /* ---------- Fullscreen (board only, no notes) ---------- */
+
+    document.getElementById("fullscreenToggle").addEventListener("click", () => {
+      if (!document.fullscreenElement) {
+        boardWrapper.requestFullscreen?.();
+      } else {
+        document.exitFullscreen?.();
+      }
+    });
+
+    /* ---------- PDF export with expanded sections & header/footer ---------- */
+
+    async function handleExportPdf() {
+      const { jsPDF } = window.jspdf;
+
+      const sectionEls = Array.from(document.querySelectorAll(".question-section"));
+      const openState = sectionEls.map(el => el.classContains && el.classList.contains("open"));
+      sectionEls.forEach(el => el.classList.add("open"));
+
+      boardInner.classList.add("export-mode");
+
+      const exportHeader = document.createElement("div");
+      exportHeader.className = "export-header";
+      const name = document.getElementById("personName").value.trim() || "Not specified";
+      const role = roleLabels[roleLevelSelect.value] || (roleLevelSelect.value || "Not specified");
+      let contextValue = "";
+      if (contextSelect.value === "User-defined") {
+        contextValue = contextCustom.value.trim();
+      } else {
+        contextValue = contextSelect.value || "";
+      }
+      const contextLabel = contextValue || "Not specified";
+      const now = new Date();
+      const dateString = now.toLocaleString();
+
+      exportHeader.innerHTML = `
+        <div class="export-header-title">Bored to Panic assessment</div>
+        <div class="export-header-meta">
+          Name: ${name} · Role: ${role} · Context: ${contextLabel} · Date: ${dateString}
+        </div>
+        <div class="export-highlight">
+          Both Bored and Panic are zones that feel negative and rarely support learning. We spend time in
+          Stretch to grow our Comfort zone, and to learn how to recover when we have to visit Stress. This
+          assessment is about understanding where that time is spent and whether the daily “exercise” of work
+          is helping or hindering that growth.
+        </div>
+        <div class="export-suggestion">
+          ${latestFollowupText || ""}
+        </div>
+      `;
+      boardInner.insertBefore(exportHeader, boardInner.firstChild);
+
+      const exportFooter = document.createElement("div");
+      exportFooter.className = "export-footer";
+      const url = "https://imthebus.co.uk/web-tools/bored-to-panic.html";
+      exportFooter.textContent = `Generated from IMTHEBUS Bored to Panic tool (${url}) on ${dateString}`;
+      boardInner.appendChild(exportFooter);
+
+      const boardHeaderEl = document.querySelector(".board-header");
+      const originalBoardHeaderDisplay = boardHeaderEl.style.display;
+      boardHeaderEl.style.display = "none";
+
+      const canvas = await html2canvas(boardWrapper, { scale: 2 });
+      const img = canvas.toDataURL("image/jpeg", 0.9);
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let yPos = 0;
+      let page = 0;
+      while (yPos < canvas.height) {
+        if (page > 0) pdf.addPage();
+        const pageCanvas = document.createElement("canvas");
+        const pageCtx = pageCanvas.getContext("2d");
+        pageCanvas.width = canvas.width;
+        const pagePixelHeight = Math.min(
+          canvas.height - yPos,
+          Math.round((pageHeight * canvas.width) / pageWidth)
+        );
+        pageCanvas.height = pagePixelHeight;
+        pageCtx.drawImage(canvas, 0, yPos, canvas.width, pagePixelHeight, 0, 0, canvas.width, pagePixelHeight);
+        const pageImg = pageCanvas.toDataURL("image/jpeg", 0.9);
+        const pageImgHeight = (pagePixelHeight * imgWidth) / canvas.width;
+        pdf.addImage(pageImg, "JPEG", 0, 0, imgWidth, pageImgHeight);
+        yPos += pagePixelHeight;
+        page += 1;
+      }
+
+      pdf.save("Bored_to_Panic_Assessment.pdf");
+
+      exportHeader.remove();
+      exportFooter.remove();
+      boardInner.classList.remove("export-mode");
+      boardHeaderEl.style.display = originalBoardHeaderDisplay || "";
+
+      sectionEls.forEach((el, idx) => {
+        if (openState[idx]) el.classList.add("open");
+        else el.classList.remove("open");
       });
     }
 
-    latestResponses = entry.responses || null;
-    let percents = entry.zonePercents;
-    let raw = entry.zoneRaw;
-
-    if (!percents && entry.responses) {
-      const calc = calculateZoneScores(entry.responses);
-      percents = calc.percents;
-      raw = calc.raw;
-    }
-    if (!percents) {
-      alert("This saved entry does not contain enough data to reconstruct scores.");
-      return;
-    }
-
-    latestZonePercents = percents;
-    latestZoneRaw = raw;
-    const entriesArr = Object.entries(percents).sort((a, b) => b[1] - a[1]);
-    const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
-    latestTopZone = topZone;
-    latestTopScore = topScore;
-    const role = roleLevelSelect.value || null;
-    renderResults(percents, role, topZone, topScore);
-  }
-
-  saveButton.addEventListener("click", () => storeEntry(false));
-  exportButton.addEventListener("click", handleExportCsv);
-  clearButton.addEventListener("click", handleClearEntries);
-  loadSelect.addEventListener("change", handleLoadEntry);
-
-  /* ---------- Calculation ---------- */
-
-  function handleCalculate() {
-    // Role is required
-    if (!roleLevelSelect.value) {
-      roleLevelSelect.focus();
-      roleLevelSelect.scrollIntoView({ behavior: "smooth", block: "center" });
-      roleLevelSelect.style.borderColor = "#b91c1c";
-      setTimeout(() => { roleLevelSelect.style.borderColor = "#000000"; }, 1200);
-      return;
-    }
-
-    const responses = getResponses();
-    if (!responses) {
-      alert("Please answer all questions before calculating.");
-      return;
-    }
-
-    calculateButton.classList.add("calculating");
-    boardWrapper.classList.add("calculated");
-
-    const { raw, percents } = calculateZoneScores(responses);
-    const entriesArr = Object.entries(percents).sort((a, b) => b[1] - a[1]);
-    const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
-
-    latestZonePercents = percents;
-    latestZoneRaw = raw;
-    latestTopZone = topZone;
-    latestTopScore = topScore;
-    latestResponses = responses;
-
-    const role = roleLevelSelect.value || null;
-    renderResults(percents, role, topZone, topScore);
-
-    // Auto-save entry
-    storeEntry(true);
-    incrementAssessmentCount();
-
-    setTimeout(() => {
-      calculateButton.classList.remove("calculating");
-      boardWrapper.classList.remove("calculated");
-    }, 1200);
-  }
-
-  calculateButton.addEventListener("click", handleCalculate);
-
-  roleLevelSelect.addEventListener("change", () => {
-    if (!latestZonePercents) return;
-    const role = roleLevelSelect.value || null;
-    const entriesArr = Object.entries(latestZonePercents).sort((a, b) => b[1] - a[1]);
-    const [topZone, topScore] = entriesArr[0] || ["stretch", 0];
-    renderResults(latestZonePercents, role, topZone, topScore);
-  });
-
-  /* ---------- Fullscreen ---------- */
-
-  document.getElementById("fullscreenToggle").addEventListener("click", () => {
-    if (!document.fullscreenElement) {
-      boardWrapper.requestFullscreen?.();
-    } else {
-      document.exitFullscreen?.();
-    }
-  });
-
-  /* ---------- PDF export with expanded sections & header/footer ---------- */
-
-  async function handleExportPdf() {
-    const { jsPDF } = window.jspdf;
-
-    const sectionEls = Array.from(document.querySelectorAll(".question-section"));
-    const openState = sectionEls.map(el => el.classList.contains("open"));
-    sectionEls.forEach(el => el.classList.add("open"));
-
-    boardInner.classList.add("export-mode");
-
-    const exportHeader = document.createElement("div");
-    exportHeader.className = "export-header";
-    const name = document.getElementById("personName").value.trim() || "Not specified";
-    const role = roleLabels[roleLevelSelect.value] || (roleLevelSelect.value || "Not specified");
-    let contextValue = "";
-    if (contextSelect.value === "User-defined") {
-      contextValue = contextCustom.value.trim();
-    } else {
-      contextValue = contextSelect.value || "";
-    }
-    const contextLabel = contextValue || "Not specified";
-    const now = new Date();
-    const dateString = now.toLocaleString();
-
-    exportHeader.innerHTML = `
-      <div class="export-header-title">Bored to Panic assessment</div>
-      <div class="export-header-meta">
-        Name: ${name} · Role: ${role} · Context: ${contextLabel} · Date: ${dateString}
-      </div>
-      <div class="export-highlight">
-        Both Bored and Panic are zones that feel negative and rarely support learning. We spend time in
-        Stretch to grow our Comfort zone, and to learn how to recover when we have to visit Stress. This
-        assessment is about understanding where that time is spent and whether the daily “exercise” of work
-        is helping or hindering that growth.
-      </div>
-      <div class="export-suggestion">
-        ${latestFollowupText || ""}
-      </div>
-    `;
-    boardInner.insertBefore(exportHeader, boardInner.firstChild);
-
-    const exportFooter = document.createElement("div");
-    exportFooter.className = "export-footer";
-    const url = "https://imthebus.co.uk/web-tools/bored-to-panic.html";
-    exportFooter.textContent = `Generated from IMTHEBUS Bored to Panic tool (${url}) on ${dateString}`;
-    boardInner.appendChild(exportFooter);
-
-    // Hide board header for export to avoid duplication
-    const originalBoardHeaderDisplay = document.querySelector(".board-header").style.display;
-    document.querySelector(".board-header").style.display = "none";
-
-    const canvas = await html2canvas(boardWrapper, { scale: 2 });
-    const img = canvas.toDataURL("image/jpeg", 0.9);
-
-    const pdf = new jsPDF("p", "mm", "a4");
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-
-    const imgWidth = pageWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    let yPos = 0;
-    let page = 0;
-    while (yPos < canvas.height) {
-      if (page > 0) pdf.addPage();
-      const pageCanvas = document.createElement("canvas");
-      const pageCtx = pageCanvas.getContext("2d");
-      pageCanvas.width = canvas.width;
-      const pagePixelHeight = Math.min(
-        canvas.height - yPos,
-        Math.round((pageHeight * canvas.width) / pageWidth)
-      );
-      pageCanvas.height = pagePixelHeight;
-      pageCtx.drawImage(canvas, 0, yPos, canvas.width, pagePixelHeight, 0, 0, canvas.width, pagePixelHeight);
-      const pageImg = pageCanvas.toDataURL("image/jpeg", 0.9);
-      const pageImgHeight = (pagePixelHeight * imgWidth) / canvas.width;
-      pdf.addImage(pageImg, "JPEG", 0, 0, imgWidth, pageImgHeight);
-      yPos += pagePixelHeight;
-      page += 1;
-    }
-
-    pdf.save("Bored_to_Panic_Assessment.pdf");
-
-    exportHeader.remove();
-    exportFooter.remove();
-    boardInner.classList.remove("export-mode");
-    document.querySelector(".board-header").style.display = originalBoardHeaderDisplay || "";
-
-    sectionEls.forEach((el, idx) => {
-      el.classList.toggle("open", openState[idx]);
-    });
-  }
-
-  exportPdfButton.addEventListener("click", handleExportPdf);
-</script>
+    exportPdfButton.addEventListener("click", handleExportPdf);
+  </script>
 </body>
 </html>
