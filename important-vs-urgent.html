@@ -35,13 +35,6 @@
       margin-bottom: 8px;
     }
 
-    .step-heading {
-      margin-top: 6px;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
     .task-input-row {
       display: flex;
       gap: 8px;
@@ -52,16 +45,10 @@
       flex: 1;
     }
 
-    .tip-text {
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin: 2px 0 6px;
-    }
-
     .task-list {
       list-style: none;
       padding: 0;
-      margin: 4px 0 6px;
+      margin: 8px 0 6px;
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -91,7 +78,7 @@
     }
 
     .task-name {
-      font-weight: 500;
+      font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -122,7 +109,6 @@
     .pill-q2 { background: var(--q2-note); }
     .pill-q3 { background: var(--q3-note); }
     .pill-q4 { background: var(--q4-note); }
-    .pill-unassessed { background: #f5f5f5; }
 
     .empty-state {
       font-size: 0.8rem;
@@ -176,6 +162,22 @@
       }
     }
 
+    /* About section */
+
+    .about-tool {
+      margin-bottom: 8px;
+    }
+
+    .about-body {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .about-body p {
+      margin: 2px 0 4px;
+    }
+
     /* Inline assessment panel */
 
     .assessment-panel {
@@ -191,12 +193,13 @@
       display: flex;
       justify-content: space-between;
       gap: 6px;
-      align-items: center;
+      align-items: baseline;
       margin-bottom: 4px;
     }
 
     .assessment-task-name {
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 0.9rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -388,10 +391,37 @@
     <aside class="sidebar-card">
       <div class="sidebar-title">Important vs Urgent</div>
       <div class="sidebar-subtitle">
-        Capture tasks, answer sliders, then work from the priority list.
+        Use the classic Eisenhower matrix to decide what to do now, later, pass on, or drop.
       </div>
 
-      <div class="step-heading">Step 1 · Tasks</div>
+      <!-- About this tool -->
+      <div class="about-tool">
+        <button
+          class="btn btn-pill-small"
+          data-collapsible-toggle
+          data-collapsible-target="#aboutToolBody"
+          data-label-base="About this tool"
+        >
+          + About this tool
+        </button>
+        <div id="aboutToolBody" data-collapsible-body class="about-body">
+          <p>
+            This layout comes from the <strong>Important vs Urgent</strong> matrix,
+            often called the <strong>Eisenhower matrix</strong>. Dwight D. Eisenhower
+            talked about how important work is rarely urgent, and urgent work is rarely important.
+          </p>
+          <p>
+            The idea was later popularised in productivity books and leadership training.
+            It helps you separate work that moves long-term goals forward from work that only
+            feels urgent in the moment.
+          </p>
+          <p>
+            Add tasks on the left, answer the questions to place each one on the board,
+            then work from the priority list at the bottom. “Do it” items come first,
+            followed by “Schedule it”, then “Delegate it” and finally “Delete it”.
+          </p>
+        </div>
+      </div>
 
       <div class="task-input-row">
         <input
@@ -405,10 +435,6 @@
       </div>
 
       <button class="btn btn-pill-small" id="clearAllButton">Clear</button>
-
-      <div class="tip-text">
-        Tasks are tidied automatically. Questions start from the middle answer.
-      </div>
 
       <ul class="task-list" id="taskList"></ul>
       <div class="empty-state" id="noTasksMessage">
@@ -471,7 +497,7 @@
 
         <div class="priority-panel">
           <div class="priority-panel-header">
-            <div>Step 2 · Priority order</div>
+            <div>Priority order</div>
             <small>Ordered by quadrant (Do → Schedule → Delegate → Delete), then by impact and timing.</small>
           </div>
           <ul class="priority-list" id="priorityList">
@@ -595,7 +621,7 @@
         taskInput.value = "";
         assessmentState = null;
         renderAll();
-        setStatus("Added task: " + cleaned);
+        setStatus("Task added.");
         taskInput.focus();
       }
 
@@ -612,13 +638,12 @@
       }
 
       function deleteTask(id) {
-        const t = tasks.find(function (x) { return x.id === id; });
         tasks = tasks.filter(function (x) { return x.id !== id; });
         if (assessmentState && assessmentState.taskId === id) {
           assessmentState = null;
         }
         renderAll();
-        setStatus("Removed task" + (t ? ": " + t.name : "."));
+        setStatus("Task removed.");
       }
 
       function startAssessment(taskId) {
@@ -629,14 +654,14 @@
           answers: defaultAnswers(task.answers)
         };
         renderAll();
-        setStatus("Now assessing: " + task.name);
+        setStatus("Answer the questions below this task.");
       }
 
       function cancelAssessment() {
         if (!assessmentState) return;
         assessmentState = null;
         renderAll();
-        setStatus("Assessment cancelled.");
+        setStatus("Changes discarded.");
       }
 
       function handleRadioChange(questionId, value) {
@@ -721,7 +746,7 @@
 
         assessmentState = null;
         renderAll();
-        setStatus("Saved assessment for: " + task.name);
+        setStatus("Assessment saved.");
       }
 
       function ensureNoteDefaults(task) {
@@ -760,7 +785,7 @@
           const metaEl = document.createElement("div");
           metaEl.className = "task-meta";
           if (task.importance == null || task.urgency == null) {
-            metaEl.textContent = "Not assessed yet";
+            metaEl.textContent = "";
           } else {
             const qMeta = quadrantMeta(task.quadrant);
             metaEl.textContent = qMeta.label;
@@ -772,14 +797,12 @@
           const actions = document.createElement("div");
           actions.className = "task-actions";
 
-          const pill = document.createElement("div");
-          if (task.importance == null || task.urgency == null) {
-            pill.className = "pill pill-unassessed";
-            pill.textContent = "Needs assessment";
-          } else {
+          if (task.importance != null && task.urgency != null) {
             const qMeta = quadrantMeta(task.quadrant);
+            const pill = document.createElement("div");
             pill.className = "pill " + qMeta.className;
             pill.textContent = qMeta.label;
+            actions.appendChild(pill);
           }
 
           const assessBtn = document.createElement("button");
@@ -808,7 +831,6 @@
             deleteTask(task.id);
           });
 
-          actions.appendChild(pill);
           actions.appendChild(assessBtn);
           actions.appendChild(revisitBtn);
           actions.appendChild(deleteBtn);
@@ -837,11 +859,7 @@
         title.className = "assessment-task-name";
         title.textContent = task.name;
 
-        const headerHint = document.createElement("div");
-        headerHint.textContent = "Six quick sliders. Middle is preselected.";
-
         header.appendChild(title);
-        header.appendChild(headerHint);
         panel.appendChild(header);
 
         const body = document.createElement("div");
@@ -891,7 +909,7 @@
         footer.className = "assessment-footer";
 
         const hint = document.createElement("div");
-        hint.textContent = "Change only answers that feel clearly high or low.";
+        hint.textContent = "Answer each row quickly. You can revisit later.";
 
         const actions = document.createElement("div");
         const cancelBtn = document.createElement("button");
@@ -1064,7 +1082,7 @@
             task.quadrant = quadrantFromScores(task.importance, task.urgency);
             renderTasks();
             renderPriorities();
-            setStatus("Updated position for: " + task.name);
+            setStatus("Position updated.");
           }
         });
         dragInitialised = true;
@@ -1250,7 +1268,7 @@
         const filename =
           "important-vs-urgent-" + formatDateForFilename(now) + ".pdf";
         doc.save(filename);
-        setStatus("PDF exported.");
+        setStatus("PDF created.");
       }
 
       addTaskButton.addEventListener("click", addTaskFromInput);
