@@ -1,5 +1,5 @@
 (function () {
-  // Simple partial include for shared header and footer
+  // Inject header/footer partials
   async function injectPartials() {
     const nodes = document.querySelectorAll("[data-include]");
     for (const el of nodes) {
@@ -23,17 +23,27 @@
       const body = section.querySelector(".collapsible-body");
       if (!toggle || !body) return;
 
+      // if labelBase not set yet, derive from initial text minus +/- prefix
+      if (!toggle.dataset.labelBase) {
+        toggle.dataset.labelBase = toggle.textContent.replace(/^[+−]\s*/, "");
+      }
+
+      function setLabel(open) {
+        toggle.textContent =
+          (open ? "− " : "+ ") + (toggle.dataset.labelBase || "");
+      }
+
+      setLabel(false);
+
       toggle.addEventListener("click", () => {
-        const open = body.classList.toggle("open");
-        // optional symbol swap
-        if (toggle.dataset.labelBase) {
-          toggle.textContent = (open ? "− " : "+ ") + toggle.dataset.labelBase;
-        }
+        const open = !body.classList.contains("open");
+        body.classList.toggle("open", open);
+        setLabel(open);
       });
     });
   }
 
-  // Generic note dragging - individual tools can call this
+  // Draggable notes helper
   function initDraggableNotes(options) {
     const boardEl = options.boardEl;
     const onDrop = options.onDrop; // (noteEl, xNorm, yNorm) -> void
@@ -44,6 +54,7 @@
     function onMouseDown(e) {
       const el = e.target.closest(".note");
       if (!el || e.button !== 0) return;
+      if (el.classList.contains("removing")) return;
       dragging = {
         el,
         startX: e.clientX,
@@ -103,6 +114,38 @@
     boardEl.addEventListener("mousedown", onMouseDown);
   }
 
+  // Counter API – tracks how many times each tool page is loaded
+  function initToolCounter() {
+    const span = document.getElementById("toolUsageCount");
+    if (!span || typeof fetch === "undefined") return;
+
+    const namespace = "imthebus-tools";
+    const body = document.body || document.documentElement;
+    const keyFromBody = body.dataset.counterKey;
+    const pathKey = window.location.pathname.replace(/^\//, "").replace(/\W+/g, "_");
+    const key = keyFromBody || pathKey || "unknown";
+
+    const url =
+      "https://api.counterapi.dev/v1/" +
+      encodeURIComponent(namespace) +
+      "/" +
+      encodeURIComponent(key) +
+      "/up";
+
+    fetch(url)
+      .then(r => r.json())
+      .then(data => {
+        if (typeof data.count === "number") {
+          span.textContent = data.count.toLocaleString();
+        } else {
+          span.textContent = "?";
+        }
+      })
+      .catch(() => {
+        span.textContent = "—";
+      });
+  }
+
   // Expose helpers for tool pages
   window.imthebusCore = {
     initCollapsibles,
@@ -111,8 +154,9 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     injectPartials().then(() => {
-      imthebusCore.initCollapsibles();
-      // page specific JS will run after this
+      initCollapsibles();
+      initToolCounter();
+      // per-page JS runs after this
     });
   });
 })();
