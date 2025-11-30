@@ -1,768 +1,484 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <title>IMTHEBUS tools – Whiteboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Permanent+Marker&display=swap"
-    rel="stylesheet"
-  />
-
+  <!-- Shared base styles and core helpers -->
+  <link rel="stylesheet" href="assets/imthebus-base.css" />
+  <script src="assets/imthebus-core.js" defer></script>
+  
+  <!-- Page-specific styling kept minimal -->
   <style>
-    :root {
-      --bg-board: #fdfdfd;
-      --ink: #111111;
-      --border-strong: #000000;
-
-      --strength-bg: #c7f9cc;
-      --weakness-bg: #ffb3c1;
-      --opportunity-bg: #bde0fe;
-      --threat-bg: #ffeaa7;
-
-      --strength-tag: #15803d;
-      --weakness-tag: #b91c1c;
-      --opportunity-tag: #1d4ed8;
-      --threat-tag: #b45309;
-
-      --sidebar-bg: #ffffff;
-      --sidebar-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-      --note-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
-      --note-shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.22);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--ink);
-      background-color: #f5f5f5;
-      background-image:
-        url("assets/whiteboard.jpg"),
-        url("assets/whiteboard.jpg");
-      background-repeat: repeat, repeat;
-      background-size: 320px 320px, 240px 240px;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    a:focus-visible,
-    button:focus-visible {
-      outline: 2px solid #111111;
-      outline-offset: 3px;
-    }
-
-    /* Page layout */
-
-    .page {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .page-main {
-      flex: 1;
-      padding: 1.25rem;
-    }
-
-    .page-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
-      gap: 1.5rem;
-      align-items: flex-start;
-    }
-
-    @media (max-width: 840px) {
-      .page-main {
-        padding: 0.75rem;
-      }
-      .page-inner {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    /* Navigation */
-
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background-color: #ffffff;
-      border-bottom: 2px solid #000000;
-      padding: 0.5rem 1.25rem;
-    }
-
-    .nav-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-
-    .nav-left {
-      display: flex;
-      gap: 1rem;
+    /* Sidebar tweaks for the home intro */
+    .home-sidebar-tagline {
       font-size: 0.9rem;
+      margin: 0 0 8px;
     }
 
-    .nav-left a {
-      padding: 0.15rem 0;
-      border-bottom: 2px solid transparent;
-    }
-
-    .nav-left a:hover {
-      border-bottom-color: #000000;
-    }
-
-    .nav-right {
-      font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 1.15rem;
-      letter-spacing: 0.04em;
-    }
-
-    @media (max-width: 720px) {
-      .nav-inner {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-
-    /* Sidebar clipboard */
-
-    .sidebar {
-      background-color: var(--sidebar-bg);
-      border: 2px solid #000000;
-      border-radius: 18px;
-      box-shadow: var(--sidebar-shadow);
-      padding: 1.1rem 1rem 1.4rem;
-      position: relative;
-    }
-
-    .sidebar::before {
-      content: "";
-      position: absolute;
-      left: 1.2rem;
-      right: 1.2rem;
-      top: 0.6rem;
-      height: 10px;
-      border-radius: 999px;
-      border: 2px solid #000000;
-      background: #f5f5f5;
-    }
-
-    .sidebar-inner {
-      margin-top: 0.9rem;
-    }
-
-    .sidebar-title {
-      font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 1.4rem;
-      margin: 0 0 0.3rem;
-    }
-
-    .sidebar-tagline {
-      font-size: 0.9rem;
-      color: #444444;
-      margin: 0 0 1rem;
-    }
-
-    .sidebar-actions {
+    .home-sidebar-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
+      gap: 6px;
+      margin-bottom: 10px;
     }
 
-    .btn {
-      padding: 0.5rem 0.9rem;
-      border-radius: 999px;
-      border: 2px solid #000000;
-      background-color: #ffffff;
-      font-size: 0.85rem;
-      cursor: pointer;
+    .home-sidebar-section {
+      border-top: 1px solid rgba(0, 0, 0, 0.12);
+      padding-top: 8px;
+      margin-top: 8px;
+      font-size: 0.84rem;
     }
 
-    .btn-primary {
-      background-color: #111111;
-      color: #ffffff;
-    }
-
-    .btn-secondary {
-      background-color: #f5f5f5;
-    }
-
-    .sidebar-section {
-      border-top: 1px solid #dddddd;
-      padding-top: 0.75rem;
-      margin-top: 0.75rem;
-    }
-
-    .sidebar-section-header {
-      font-size: 0.9rem;
+    .home-sidebar-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
       font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: default;
+      font-size: 0.86rem;
     }
 
-    .sidebar-section-header span {
+    .home-sidebar-section-hint {
       font-size: 0.75rem;
-      color: #777777;
+      color: #6b7280;
     }
 
-    .sidebar-section-body {
-      font-size: 0.85rem;
-      color: #444444;
-      margin-top: 0.4rem;
-      max-height: 260px;
-      overflow: hidden;
-      transition: max-height 160ms ease-out;
+    .home-sidebar-section-body {
+      margin-top: 4px;
+      color: #4b5563;
     }
 
-    .sidebar-section:hover .sidebar-section-body {
-      max-height: 480px;
+    .home-sidebar-section-body ul {
+      padding-left: 1.05rem;
+      margin: 2px 0 0;
     }
 
-    .sidebar-section-body p {
-      margin: 0 0 0.4rem;
+    .home-sidebar-section-body li + li {
+      margin-top: 2px;
     }
 
-    .sidebar-section-body ul {
-      margin: 0.4rem 0 0.2rem;
-      padding-left: 1.1rem;
-    }
-
-    .sidebar-section-body li {
-      margin-bottom: 0.25rem;
-    }
-
-    /* Whiteboard frame */
-
-    .board-wrapper {
-      background-color: var(--bg-board);
-      border-radius: 22px;
-      border: 3px solid var(--border-strong);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
-      padding: 0.75rem 0.85rem 1.1rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .board-header {
+    /* Home whiteboard layout */
+    .home-board-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 1rem;
-      margin-bottom: 0.45rem;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
     }
 
-    .board-title-display {
-      font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 1.4rem;
-      margin: 0;
-    }
-
-    .board-toolbar {
+    .home-board-meta {
+      font-size: 0.78rem;
+      color: #4b5563;
+      margin-bottom: 8px;
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      font-size: 0.75rem;
+      gap: 6px 14px;
     }
 
-    .board-toolbar button {
-      padding: 0.3rem 0.7rem;
-      border-radius: 999px;
-      border: 2px solid #000000;
-      background-color: #ffffff;
-      cursor: pointer;
-      font-size: 0.75rem;
-    }
-
-    .board-meta {
-      font-size: 0.75rem;
-      color: #555555;
-      margin-bottom: 0.5rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-
-    .board {
-      position: relative;
-      min-height: 340px;
-      padding: 0.5rem;
+    .tool-note-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 0.7rem;
-      align-content: flex-start;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
     }
 
-    @media (max-width: 600px) {
-      .board {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    /* Notes */
-
-    .note-link {
+    /* Tool “post-it” cards (not the draggable notes) */
+    .tool-note-link {
       text-decoration: none;
       color: inherit;
     }
 
-    .note {
+    .tool-note {
       position: relative;
-      background-color: var(--opportunity-bg);
-      border-radius: 10px;
-      border: 2px solid #000000;
-      padding: 0.6rem 0.7rem 0.65rem;
-      box-shadow: var(--note-shadow);
-      transform-origin: center;
-      cursor: pointer;
+      border-radius: 9px;
+      border: 2px solid #000;
+      padding: 8px 9px 9px;
+      box-shadow: 0 7px 14px rgba(0, 0, 0, 0.22);
+      background: #fff8a7;
+      transform-origin: center top;
       transition:
-        transform 120ms ease-out,
-        box-shadow 120ms ease-out;
+        transform 0.12s ease-out,
+        box-shadow 0.12s ease-out;
     }
 
-    .note::before {
+    .tool-note::before {
       content: "";
       position: absolute;
       top: 6px;
       left: 50%;
       transform: translateX(-50%);
-      width: 32px;
+      width: 30px;
       height: 8px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.8);
-      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
     }
 
-    .note:hover {
-      transform: translateY(-3px) rotate(var(--note-rot, 0deg));
-      box-shadow: var(--note-shadow-hover);
+    .tool-note-body {
+      font-size: 0.8rem;
+      line-height: 1.35;
+      margin-bottom: 3px;
     }
 
-    .note-title {
-      font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 1rem;
-      margin-bottom: 0.25rem;
-      padding-top: 0.4rem;
-    }
-
-    .note-status {
+    .tool-note-status {
       font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.09em;
-      margin-bottom: 0.25rem;
-      color: #333333;
+      margin-bottom: 2px;
     }
 
-    .note-body {
-      font-size: 0.8rem;
-      line-height: 1.35;
-      margin-bottom: 0.3rem;
+    .tool-note-title {
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 1rem;
+      margin: 2px 0 3px;
     }
 
-    .note-meta {
+    .tool-note-meta {
       font-size: 0.7rem;
-      color: #333333;
-      opacity: 0.8;
+      color: #374151;
+      opacity: 0.9;
     }
 
-    .note-tag-available {
-      background-color: var(--strength-bg);
+    .tool-note-available {
+      background: #c7f9cc;
     }
 
-    .note-tag-prototype {
-      background-color: var(--threat-bg);
+    .tool-note-dev {
+      background: #ffb3c1;
     }
 
-    .note-tag-progress {
-      background-color: var(--weakness-bg);
+    .tool-note-prototype {
+      background: #ffeaa7;
     }
 
-    /* Animations for continuity */
-
-    .note-new {
-      animation: noteDropIn 260ms ease-out forwards;
+    .tool-note-coming {
+      background: #bde0fe;
     }
 
-    .note-fall {
-      animation: noteFall 350ms forwards ease-in;
+    .tool-note:hover {
+      transform: translateY(-2px) rotate(var(--note-rot, 0deg));
+      box-shadow: 0 11px 20px rgba(0, 0, 0, 0.3);
     }
 
-    @keyframes noteDropIn {
-      from {
+    .tool-note-enter {
+      animation: toolNoteEnter 260ms ease-out forwards;
+    }
+
+    .tool-note-drop {
+      animation: toolNoteDrop 360ms ease-in forwards;
+    }
+
+    @keyframes toolNoteEnter {
+      0% {
         opacity: 0;
-        transform: translateY(-18px) rotate(var(--note-rot, 0deg));
+        transform: translateY(-12px) rotate(var(--note-rot, 0deg));
       }
-      to {
+      60% {
+        opacity: 1;
+        transform: translateY(4px) rotate(calc(var(--note-rot, 0deg) * 1.1));
+      }
+      100% {
         opacity: 1;
         transform: translateY(0) rotate(var(--note-rot, 0deg));
       }
     }
 
-    @keyframes noteFall {
+    @keyframes toolNoteDrop {
       0% {
         opacity: 1;
         transform: translateY(0) rotate(var(--note-rot, 0deg));
       }
       100% {
         opacity: 0;
-        transform: translateY(80px) rotate(calc(var(--note-rot, 0deg) + 8deg));
+        transform: translateY(80px) rotate(calc(var(--note-rot, 0deg) + 6deg));
       }
     }
 
-    /* Footer */
-
-    footer {
-      border-top: 2px solid #000000;
-      background-color: #ffffff;
-      padding: 0.9rem 1.25rem 1.1rem;
-      font-size: 0.8rem;
+    /* Board wipe overlay when leaving the page */
+    .board-wipe {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+      transform: translateY(100%);
+      z-index: 2;
+      pointer-events: none;
     }
 
-    .footer-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 0.75rem 1.5rem;
+    .board-wipe-active {
+      animation: boardWipe 420ms ease-in forwards;
     }
 
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.1rem;
-    }
-
-    .footer-link-group-title {
-      font-weight: 600;
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 0.15rem;
-    }
-
-    .footer-link-group a {
-      display: block;
-      font-size: 0.78rem;
-    }
-
-    .footer-link-group a:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 720px) {
-      footer {
-        padding-inline: 0.75rem;
+    @keyframes boardWipe {
+      0% {
+        transform: translateY(100%);
       }
-      .footer-inner {
-        flex-direction: column;
-        align-items: flex-start;
+      60% {
+        transform: translateY(0%);
+      }
+      100% {
+        transform: translateY(-100%);
       }
     }
   </style>
 </head>
-<body>
-<div class="page">
 
-  <!-- Global nav -->
-  <nav>
-    <div class="nav-inner">
-      <div class="nav-left">
-        <a href="index.html">Home</a>
-        <a href="#tools">Tools</a>
-        <a href="#about">About</a>
+<body data-counter-key="home_board">
+  <!-- Shared header -->
+  <header data-include="partials/header.html"></header>
+
+  <main class="page">
+    <!-- Sidebar card (shared style) -->
+    <aside class="sidebar-card">
+      <h1 class="page-title">IMTHEBUS toolbox</h1>
+      <p class="home-sidebar-tagline">
+        A shared whiteboard of simple browser tools to help you think, decide, and manage with other humans.
+      </p>
+
+      <div class="home-sidebar-actions">
+        <button
+          class="btn btn-primary"
+          type="button"
+          onclick="document.getElementById('tools-board').scrollIntoView({ behavior: 'smooth' });"
+        >
+          Browse tools
+        </button>
+        <button
+          class="btn"
+          type="button"
+          onclick="window.location.href='mailto:contact@imthebus.co.uk?subject=Tool%20idea%20or%20bug';"
+        >
+          Suggest a tool or report a bug
+        </button>
       </div>
-      <div class="nav-right">IMTHEBUS tools</div>
-    </div>
-  </nav>
 
-  <main class="page-main">
-    <div class="page-inner">
-
-      <!-- Sidebar clipboard -->
-      <aside class="sidebar">
-        <div class="sidebar-inner">
-          <h1 class="sidebar-title">IMTHEBUS toolbox</h1>
-          <p class="sidebar-tagline">
-            A shared whiteboard of simple browser tools to help you think, decide, and manage with other humans.
+      <section class="home-sidebar-section">
+        <div class="home-sidebar-section-header">
+          <div>About this site</div>
+          <div class="home-sidebar-section-hint">shared across tools</div>
+        </div>
+        <div class="home-sidebar-section-body">
+          <p>
+            IMTHEBUS is a small, evolving collection of tools built for practical day to day work.
+            The aim is to make better conversations and clearer decisions easier, without another platform or login.
           </p>
-
-          <div class="sidebar-actions">
-            <button class="btn btn-primary" type="button"
-                    onclick="document.getElementById('tools').scrollIntoView({behavior: 'smooth'});">
-              Browse tools
-            </button>
-            <button class="btn btn-secondary" type="button"
-                    onclick="window.location.href='mailto:contact@imthebus.co.uk?subject=Tool%20idea%20or%20bug';">
-              Suggest a tool or report a bug
-            </button>
-          </div>
-
-          <div class="sidebar-section" id="about">
-            <div class="sidebar-section-header">
-              <div>About this site</div>
-              <span>hover to expand</span>
-            </div>
-            <div class="sidebar-section-body">
-              <p>
-                IMTHEBUS is a small, evolving collection of tools built for practical use in day to day work.
-                The aim is to make it easier to run better conversations and make clearer decisions without
-                needing a full platform or another login.
-              </p>
-              <p>Each tool is designed to be:</p>
-              <ul>
-                <li><strong>Lightweight</strong> – open it in a browser and you are ready.</li>
-                <li><strong>Focused</strong> – each tool solves one problem instead of trying to do everything.</li>
-                <li><strong>Conversation first</strong> – intended to be used with other people, not just alone.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="sidebar-section" id="keyboard-help">
-            <div class="sidebar-section-header">
-              <div>Whiteboard tips</div>
-              <span>shared across tools</span>
-            </div>
-            <div class="sidebar-section-body">
-              <p>
-                This home page shows your tools as notes on the shared board. Inside each tool you will
-                see the same whiteboard frame, with keyboard and mouse patterns for working with notes.
-              </p>
-              <p>
-                Common patterns include 1 2 3 4 for modes or quadrants, enter to add a note,
-                drag to move notes, and double click to edit.
-              </p>
-            </div>
-          </div>
+          <p>Each tool is designed to be:</p>
+          <ul>
+            <li><strong>Lightweight</strong> open in a browser and it is ready.</li>
+            <li><strong>Focused</strong> built to solve one problem in one conversation.</li>
+            <li><strong>Conversation first</strong> intended to sit in the middle of a group, not quietly solo.</li>
+          </ul>
         </div>
-      </aside>
+      </section>
 
-      <!-- Whiteboard -->
-      <section class="board-wrapper" id="tools" aria-label="IMTHEBUS tools whiteboard">
-        <div class="board-header">
-          <h2 class="board-title-display">Tools pinned to the board</h2>
-          <div class="board-toolbar">
-            <button type="button" data-fullscreen-btn>Fullscreen board</button>
-          </div>
+      <section class="home-sidebar-section">
+        <div class="home-sidebar-section-header">
+          <div>Whiteboard tips</div>
+          <div class="home-sidebar-section-hint">patterns used on other pages</div>
         </div>
-        <div class="board-meta">
+        <div class="home-sidebar-section-body">
+          <p>
+            Most tools use the same whiteboard frame and note patterns.
+            Common shortcuts include using <strong>1-4</strong> for quadrants, <strong>Enter</strong> to add,
+            and dragging notes to fine tune where they sit.
+          </p>
+          <p>
+            The home board just shows which tools are pinned and what each one is for.
+          </p>
+        </div>
+      </section>
+    </aside>
+
+    <!-- Whiteboard with pinned tools -->
+    <section
+      class="board-wrapper"
+      id="tools-board"
+      aria-label="Tools pinned to the IMTHEBUS whiteboard"
+    >
+      <div class="board-inner-shell">
+        <div class="home-board-header">
+          <h2 class="page-title" style="margin-bottom:0;">Tools pinned to the board</h2>
+          <button class="btn-pill-small" type="button" id="homeFullscreenBtn">
+            Fullscreen board
+          </button>
+        </div>
+
+        <div class="home-board-meta">
           <span>Click any note to open that tool.</span>
-          <span>New tools will appear here as they are ready to use.</span>
+          <span>New tools will appear here as they are ready.</span>
         </div>
 
-        <div class="board" aria-label="Tool list as notes">
-
+        <div class="tool-note-grid" aria-label="Tool list as notes">
           <!-- Bored to Panic -->
-          <a class="note-link" href="bored-to-panic.html">
-            <article class="note note-tag-available" data-tool="bored-to-panic">
-              <div class="note-status">Available</div>
-              <div class="note-title">Bored to Panic scale</div>
-              <div class="note-body">
+          <a class="tool-note-link" data-board-nav href="bored-to-panic.html">
+            <article class="tool-note tool-note-available">
+              <div class="tool-note-status">Available</div>
+              <h3 class="tool-note-title">Bored to Panic scale</h3>
+              <p class="tool-note-body">
                 A quick self check on where you sit between boredom and overwhelm so you can stay in a healthy performance zone.
-              </div>
-              <div class="note-meta">
-                Best used in 1 to 1s and coaching sessions
-              </div>
+              </p>
+              <p class="tool-note-meta">
+                Best used in 1 to 1s and coaching sessions.
+              </p>
             </article>
           </a>
 
-          <!-- Feedback Scale -->
-          <a class="note-link" href="feedback-scale.html">
-            <article class="note note-tag-progress" data-tool="feedback-scale">
-              <div class="note-status">In development</div>
-              <div class="note-title">Feedback Scale</div>
-              <div class="note-body">
+          <!-- Feedback scale -->
+          <a class="tool-note-link" data-board-nav href="feedback-scale.html">
+            <article class="tool-note tool-note-dev">
+              <div class="tool-note-status">In development</div>
+              <h3 class="tool-note-title">Feedback Scale</h3>
+              <p class="tool-note-body">
                 A calibration tool to see whether feedback is sparse, resonant, loud, or excessive, so you can tune how you give and receive it.
-              </div>
-              <div class="note-meta">
-                Status: work in progress
-              </div>
+              </p>
+              <p class="tool-note-meta">Status: work in progress.</p>
             </article>
           </a>
 
           <!-- Important vs Urgent -->
-          <a class="note-link" href="important-vs-urgent.html">
-            <article class="note note-tag-prototype" data-tool="important-vs-urgent">
-              <div class="note-status">Prototype</div>
-              <div class="note-title">Important vs Urgent</div>
-              <div class="note-body">
-                A classic 2 by 2 prioritisation board that helps you decide what to do now, schedule, delegate, or drop.
-              </div>
-              <div class="note-meta">
-                Status: internal testing
-              </div>
+          <a class="tool-note-link" data-board-nav href="important-vs-urgent.html">
+            <article class="tool-note tool-note-prototype">
+              <div class="tool-note-status">Prototype</div>
+              <h3 class="tool-note-title">Important vs Urgent</h3>
+              <p class="tool-note-body">
+                A classic 2 by 2 prioritisation board that helps you decide what to do now, schedule, delegate, or delete.
+              </p>
+              <p class="tool-note-meta">Status: internal testing.</p>
             </article>
           </a>
 
-          <!-- Dashboard -->
-          <a class="note-link" href="dashboard.html">
-            <article class="note note-tag-prototype" data-tool="dashboard">
-              <div class="note-status">Prototype</div>
-              <div class="note-title">Silly KPI dashboard</div>
-              <div class="note-body">
+          <!-- Silly KPI dashboard -->
+          <a class="tool-note-link" data-board-nav href="dashboard.html">
+            <article class="tool-note tool-note-prototype">
+              <div class="tool-note-status">Prototype</div>
+              <h3 class="tool-note-title">Silly KPI dashboard</h3>
+              <p class="tool-note-body">
                 A tongue in cheek dashboard that looks serious at first glance and more ridiculous the longer you stare at it.
-              </div>
-              <div class="note-meta">
-                Status: internal testing
-              </div>
+              </p>
+              <p class="tool-note-meta">Status: internal testing.</p>
             </article>
           </a>
 
           <!-- Impact vs Effort -->
-          <a class="note-link" href="impact-vs-effort.html">
-            <article class="note note-tag-available" data-tool="impact-vs-effort">
-              <div class="note-status">Available</div>
-              <div class="note-title">Impact vs Effort</div>
-              <div class="note-body">
+          <a class="tool-note-link" data-board-nav href="impact-vs-effort.html">
+            <article class="tool-note tool-note-available">
+              <div class="tool-note-status">Available</div>
+              <h3 class="tool-note-title">Impact vs Effort</h3>
+              <p class="tool-note-body">
                 A 2 by 2 to sort ideas into quick wins, big bets, fillers, and time sinks so you can spend energy where it counts.
-              </div>
-              <div class="note-meta">
-                Best used in planning and prioritisation sessions
-              </div>
+              </p>
+              <p class="tool-note-meta">
+                Best used in planning and prioritisation sessions.
+              </p>
             </article>
           </a>
 
-                    <!-- Bored to Panic -->
-          <a class="note-link" href="swot.html">
-            <article class="note note-tag-available" data-tool="swot">
-              <div class="note-status">Available</div>
-              <div class="note-title">Swot wall</div>
-              <div class="note-body">
-                You want a SWOT tool? Have a SWOT tool! 
-              </div>
-              <div class="note-meta">
-                Use as a group, or by yourself. SWOTing is better with friends. 
-              </div>
+          <!-- SWOT wall -->
+          <a class="tool-note-link" data-board-nav href="swot.html">
+            <article class="tool-note tool-note-available">
+              <div class="tool-note-status">Available</div>
+              <h3 class="tool-note-title">SWOT wall</h3>
+              <p class="tool-note-body">
+                You want a SWOT tool? Have a SWOT tool. Capture strengths, weaknesses, opportunities, and threats on the same board.
+              </p>
+              <p class="tool-note-meta">
+                Use solo or as a group. SWOTing is better with friends.
+              </p>
             </article>
           </a>
 
-          <!-- Placeholder for future tools -->
-          <article class="note" data-tool="placeholder">
-            <div class="note-status">Coming soon</div>
-            <div class="note-title">Next tool on the board</div>
-            <div class="note-body">
+          <!-- Placeholder -->
+          <article class="tool-note tool-note-coming">
+            <div class="tool-note-status">Coming soon</div>
+            <h3 class="tool-note-title">Next tool on the board</h3>
+            <p class="tool-note-body">
               Future tools will reuse the same whiteboard. When they are ready, a new note will appear here and link to them.
-            </div>
-            <div class="note-meta">
-              You can email ideas to contact@imthebus.co.uk
-            </div>
+            </p>
+            <p class="tool-note-meta">
+              You can email ideas to contact@imthebus.co.uk.
+            </p>
           </article>
-
         </div>
-      </section>
-    </div>
+
+        <!-- Wipe overlay for leaving animation -->
+        <div class="board-wipe" id="boardWipe"></div>
+      </div>
+    </section>
   </main>
 
-  <footer id="contact">
-    <div class="footer-inner">
-      <div>
-        © <span id="year"></span> IMTHEBUS. All rights reserved.
-        Built as a small, evolving collection of tools to support real work.
-      </div>
-      <div class="footer-links">
-        <div class="footer-link-group">
-          <div class="footer-link-group-title">Contact</div>
-          <a href="mailto:contact@imthebus.co.uk?subject=General%20enquiry">
-            contact@imthebus.co.uk
-          </a>
-          <a href="mailto:contact@imthebus.co.uk?subject=Bug%20report">
-            Report a bug
-          </a>
-          <a href="mailto:contact@imthebus.co.uk?subject=Tool%20idea">
-            Suggest a tool
-          </a>
-        </div>
-        <div class="footer-link-group">
-          <div class="footer-link-group-title">Legal</div>
-          <a href="#">Privacy notice (placeholder)</a>
-          <a href="#">Terms of use (placeholder)</a>
-        </div>
-      </div>
-    </div>
-  </footer>
-</div>
+  <!-- Shared footer -->
+  <footer data-include="partials/footer.html"></footer>
 
-<script>
-  // Footer year
-  document.getElementById("year").textContent = new Date().getFullYear();
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const notes = Array.from(document.querySelectorAll(".tool-note"));
+      const boardWrapper = document.getElementById("tools-board");
+      const boardWipe = document.getElementById("boardWipe");
+      const fullscreenBtn = document.getElementById("homeFullscreenBtn");
 
-  // Give each note a small consistent random rotation using a data attribute
-  document.querySelectorAll(".note").forEach((note, index) => {
-    const existing = note.getAttribute("data-rot");
-    let rot = existing ? parseFloat(existing) : null;
-    if (rot === null || Number.isNaN(rot)) {
-      // simple seeded variation based on index
-      const base = (index * 13) % 7 - 3; // between about -3 and +3
-      rot = base;
-      note.setAttribute("data-rot", String(rot));
-    }
-    note.style.setProperty("--note-rot", rot + "deg");
-    note.classList.add("note-new");
-  });
+      // Seed a small, consistent rotation and wobble on load
+      notes.forEach((note, index) => {
+        const base = ((index * 13) % 7) - 3; // between about -3 and +3
+        note.style.setProperty("--note-rot", base + "deg");
+        note.classList.add("tool-note-enter");
+      });
 
-  // Whiteboard fullscreen toggle
-  const boardWrapper = document.querySelector(".board-wrapper");
-  const fsButtons = document.querySelectorAll("[data-fullscreen-btn]");
-
-  function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      if (boardWrapper && boardWrapper.requestFullscreen) {
-        boardWrapper.requestFullscreen();
+      // Fullscreen toggle just for the board area
+      if (fullscreenBtn && boardWrapper && boardWrapper.requestFullscreen) {
+        fullscreenBtn.addEventListener("click", function () {
+          if (!document.fullscreenElement) {
+            boardWrapper.requestFullscreen();
+          } else if (document.exitFullscreen) {
+            document.exitFullscreen();
+          }
+        });
       }
-    } else if (document.exitFullscreen) {
-      document.exitFullscreen();
-    }
-  }
 
-  fsButtons.forEach(btn => {
-    btn.addEventListener("click", toggleFullscreen);
-  });
+      // Helper: animate notes dropping + board wipe, then navigate
+      function animateExitAndNavigate(targetHref) {
+        if (!targetHref) return;
 
-  // Navigation fall off animation for notes before changing page
-  function attachFallTransition(selector) {
-    document.querySelectorAll(selector).forEach(link => {
-      link.addEventListener("click", evt => {
-        const href = link.getAttribute("href");
-        if (!href || href.startsWith("#")) {
+        notes.forEach((note) => {
+          note.classList.remove("tool-note-enter");
+          note.classList.add("tool-note-drop");
+        });
+
+        if (boardWipe) {
+          boardWipe.classList.add("board-wipe-active");
+        }
+
+        setTimeout(function () {
+          window.location.href = targetHref;
+        }, 420);
+      }
+
+      // Intercept clicks on home board note links
+      document.addEventListener("click", function (event) {
+        const link = event.target.closest("a");
+        if (!link) return;
+
+        const href = link.getAttribute("href") || "";
+        const isBoardLink = link.hasAttribute("data-board-nav");
+
+        // Skip if no href, mailto, external, or hash-only
+        if (!href || href.startsWith("mailto:") || href.startsWith("http") || href.startsWith("#")) {
           return;
         }
-        evt.preventDefault();
 
-        const notes = document.querySelectorAll(".note");
-        notes.forEach(n => n.classList.add("note-fall"));
+        const current = window.location.pathname.split("/").pop() || "index.html";
+        if (!isBoardLink && !link.closest(".site-nav")) {
+          // Not a board link, not from shared header: let it behave normally.
+          return;
+        }
 
-        setTimeout(() => {
-          window.location.href = href;
-        }, 380);
+        // Do nothing if already on this page
+        if (href === current) return;
+
+        event.preventDefault();
+        animateExitAndNavigate(href);
       });
     });
-  }
-
-  attachFallTransition("nav a");
-  attachFallTransition(".note-link");
-</script>
+  </script>
 </body>
 </html>
-
-
-
