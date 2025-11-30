@@ -1,7 +1,11 @@
 (function () {
+  "use strict";
+
   // Inject header/footer partials
   async function injectPartials() {
     const nodes = document.querySelectorAll("[data-include]");
+    if (!nodes.length) return;
+
     for (const el of nodes) {
       const url = el.getAttribute("data-include");
       if (!url) continue;
@@ -16,26 +20,23 @@
     }
   }
 
-  // Collapsibles
+  // Simple collapsible helper (optional, for pages that use it)
   function initCollapsibles() {
-    document.querySelectorAll("[data-collapsible]").forEach(section => {
-      const toggle = section.querySelector(".collapsible-toggle");
-      const body = section.querySelector(".collapsible-body");
-      if (!toggle || !body) return;
+    const toggles = document.querySelectorAll("[data-collapsible-toggle]");
+    toggles.forEach(function (toggle) {
+      const targetSelector = toggle.getAttribute("data-collapsible-target");
+      if (!targetSelector) return;
+      const body = document.querySelector(targetSelector);
+      if (!body) return;
 
-      // if labelBase not set yet, derive from initial text minus +/- prefix
-      if (!toggle.dataset.labelBase) {
-        toggle.dataset.labelBase = toggle.textContent.replace(/^[+−]\s*/, "");
-      }
-
+      const baseLabel = toggle.getAttribute("data-label-base") || toggle.textContent || "";
       function setLabel(open) {
-        toggle.textContent =
-          (open ? "− " : "+ ") + (toggle.dataset.labelBase || "");
+        toggle.textContent = (open ? "- " : "+ ") + baseLabel;
       }
 
-      setLabel(false);
+      setLabel(body.classList.contains("open"));
 
-      toggle.addEventListener("click", () => {
+      toggle.addEventListener("click", function () {
         const open = !body.classList.contains("open");
         body.classList.toggle("open", open);
         setLabel(open);
@@ -43,56 +44,102 @@
     });
   }
 
-  // Draggable notes helper
+  // Counter API integration, expects:
+  // - body[data-counter-key="unique_key"]
+  // - span#toolUsageCount in footer partial
+  async function initToolCounter() {
+    const body = document.body;
+    if (!body) return;
+    const key = body.getAttribute("data-counter-key");
+    if (!key) return;
+
+    const span = document.getElementById("toolUsageCount");
+    if (!span) return;
+
+    try {
+      const url =
+        "https://api.counterapi.dev/v1/imthebus/" +
+        encodeURIComponent(key) +
+        "/up";
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Counter API bad status " + res.status);
+      const data = await res.json();
+      const value =
+        data.count != null
+          ? data.count
+          : data.value != null
+          ? data.value
+          : data.counter != null
+          ? data.counter
+          : null;
+      span.textContent = value != null ? String(value) : "?";
+    } catch (err) {
+      console.warn("Tool counter could not be loaded", err);
+      span.textContent = "?";
+    }
+  }
+
+  // Generic draggable notes helper
+  // options = {
+  //   boardEl: HTMLElement (required),
+  //   noteSelector: string (defaults to ".note"),
+  //   onDrop: function (noteEl, xNorm, yNorm) {}
+  // }
   function initDraggableNotes(options) {
-    const boardEl = options.boardEl;
-    const onDrop = options.onDrop; // (noteEl, xNorm, yNorm) -> void
+    const boardEl = options && options.boardEl;
     if (!boardEl) return;
 
+    const noteSelector = options.noteSelector || ".note";
+    const onDrop =
+      typeof options.onDrop === "function" ? options.onDrop : function () {};
+
     let dragging = null;
+    let topZ = 10;
 
     function onMouseDown(e) {
-      const el = e.target.closest(".note");
+      const el = e.target.closest(noteSelector);
       if (!el || e.button !== 0) return;
-      if (el.classList.contains("removing")) return;
+
+      const boardRect = boardEl.getBoundingClientRect();
+      const noteRect = el.getBoundingClientRect();
+
       dragging = {
-        el,
-        startX: e.clientX,
-        startY: e.clientY
+        el: el,
+        boardRect: boardRect,
+        offsetX: e.clientX - noteRect.left,
+        offsetY: e.clientY - noteRect.top
       };
-      const rect = el.getBoundingClientRect();
-      dragging.originLeft = rect.left;
-      dragging.originTop = rect.top;
-      dragging.boardRect = boardEl.getBoundingClientRect();
+
+      topZ += 1;
+      el.style.zIndex = String(topZ);
       el.classList.add("dragging");
+
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     }
 
     function onMouseMove(e) {
       if (!dragging) return;
-      const { el, startX, startY, originLeft, originTop, boardRect } = dragging;
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-      const newLeft = originLeft + dx;
-      const newTop = originTop + dy;
-      const noteWidth = el.offsetWidth;
-      const noteHeight = el.offsetHeight;
+      const el = dragging.el;
+      const boardRect = dragging.boardRect;
 
-      const clampedLeft = Math.min(
-        Math.max(newLeft, boardRect.left),
-        boardRect.right - noteWidth
-      );
-      const clampedTop = Math.min(
-        Math.max(newTop, boardRect.top),
-        boardRect.bottom - noteHeight
-      );
+      const noteWidth = el.offsetWidth || 140;
+      const noteHeight = el.offsetHeight || 60;
 
-      el.style.left = clampedLeft - boardRect.left + "px";
-      el.style.top = clampedTop - boardRect.top + "px";
+      let left = e.clientX - boardRect.left - dragging.offsetX;
+      let top = e.clientY - boardRect.top - dragging.offsetY;
 
-      const centerX = clampedLeft - boardRect.left + noteWidth / 2;
-      const centerY = clampedTop - boardRect.top + noteHeight / 2;
+      const maxLeft = boardRect.width - noteWidth;
+      const maxTop = boardRect.height - noteHeight;
+
+      left = Math.max(0, Math.min(left, maxLeft));
+      top = Math.max(0, Math.min(top, maxTop));
+
+      el.style.left = left + "px";
+      el.style.top = top + "px";
+
+      const centerX = left + noteWidth / 2;
+      const centerY = top + noteHeight / 2;
 
       dragging.xNorm = centerX / boardRect.width;
       dragging.yNorm = centerY / boardRect.height;
@@ -100,63 +147,34 @@
 
     function onMouseUp() {
       if (!dragging) return;
-      const { el, xNorm, yNorm } = dragging;
+      const el = dragging.el;
       el.classList.remove("dragging");
+
+      const x = typeof dragging.xNorm === "number" ? dragging.xNorm : null;
+      const y = typeof dragging.yNorm === "number" ? dragging.yNorm : null;
+      dragging = null;
+
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mouseup", onMouseUp);
 
-      if (typeof onDrop === "function" && xNorm != null && yNorm != null) {
-        onDrop(el, xNorm, yNorm);
-      }
-      dragging = null;
+      if (x == null || y == null) return;
+      onDrop(el, x, y);
     }
 
     boardEl.addEventListener("mousedown", onMouseDown);
   }
 
-  // Counter API – tracks how many times each tool page is loaded
-  function initToolCounter() {
-    const span = document.getElementById("toolUsageCount");
-    if (!span || typeof fetch === "undefined") return;
-
-    const namespace = "imthebus-tools";
-    const body = document.body || document.documentElement;
-    const keyFromBody = body.dataset.counterKey;
-    const pathKey = window.location.pathname.replace(/^\//, "").replace(/\W+/g, "_");
-    const key = keyFromBody || pathKey || "unknown";
-
-    const url =
-      "https://api.counterapi.dev/v1/" +
-      encodeURIComponent(namespace) +
-      "/" +
-      encodeURIComponent(key) +
-      "/up";
-
-    fetch(url)
-      .then(r => r.json())
-      .then(data => {
-        if (typeof data.count === "number") {
-          span.textContent = data.count.toLocaleString();
-        } else {
-          span.textContent = "?";
-        }
-      })
-      .catch(() => {
-        span.textContent = "—";
-      });
-  }
-
   // Expose helpers for tool pages
   window.imthebusCore = {
-    initCollapsibles,
-    initDraggableNotes
+    initCollapsibles: initCollapsibles,
+    initDraggableNotes: initDraggableNotes
   };
 
-  document.addEventListener("DOMContentLoaded", () => {
-    injectPartials().then(() => {
+  document.addEventListener("DOMContentLoaded", function () {
+    injectPartials().then(function () {
       initCollapsibles();
       initToolCounter();
-      // per-page JS runs after this
+      // per page scripts run after this via their own script tags
     });
   });
 })();
