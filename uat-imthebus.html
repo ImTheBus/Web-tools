@@ -203,73 +203,103 @@
   <script src="assets/imthebus-core.js"></script>
 
   <!-- Page specific JS to exercise the shared behaviour -->
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const board = document.getElementById("uatBoard");
-      const inner = document.getElementById("uatBoardInner");
-      const addBtn = document.getElementById("uatAddNoteBtn");
+<script src="assets/imthebus-core.js"></script>
 
-      let noteCounter = 0;
-      let topZ = 10;
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const board = document.getElementById("uatBoard");
+    const inner = document.getElementById("uatBoardInner");
+    const addBtn = document.getElementById("uatAddNoteBtn");
 
-      function createNote(text, xNorm, yNorm, cssClass) {
-        const boardRect = board.getBoundingClientRect();
+    let noteCounter = 0;
+    let topZ = 10;
 
-        const el = document.createElement("div");
-        el.className = "note note-new " + (cssClass || "");
-        el.dataset.id = "note_" + Date.now() + "_" + Math.random().toString(16).slice(2);
-        el.style.setProperty("--note-rot", (Math.random() * 8 - 4).toFixed(2) + "deg");
-
-        const body = document.createElement("div");
-        body.textContent = text;
-        el.appendChild(body);
-
-        const meta = document.createElement("div");
-        meta.className = "uat-note-meta";
-        meta.textContent = "x " + xNorm.toFixed(2) + " · y " + yNorm.toFixed(2);
-        el.appendChild(meta);
-
-        const width = 150;
-        const height = 70;
-        const left = xNorm * boardRect.width - width / 2;
-        const top = yNorm * boardRect.height - height / 2;
-
-        el.style.width = width + "px";
-        el.style.minHeight = height + "px";
-        el.style.left = left + "px";
-        el.style.top = top + "px";
-        el.style.zIndex = ++topZ;
-
-        inner.appendChild(el);
-      }
-
-      // Seed a couple of notes
-      createNote("Do it example", 0.25, 0.25, "uat-note-do");
-      createNote("Schedule example", 0.75, 0.25, "uat-note-sched");
-      createNote("Delegate example", 0.25, 0.75, "uat-note-del");
-      createNote("Delete example", 0.75, 0.75, "uat-note-drop");
-
-      // Wire add button
-      addBtn.addEventListener("click", () => {
-        noteCounter += 1;
-        const x = 0.2 + 0.6 * Math.random();
-        const y = 0.2 + 0.6 * Math.random();
-        createNote("New note " + noteCounter, x, y, "uat-note-do");
+    function makeRemoveButton(el) {
+      const btn = document.createElement("button");
+      btn.className = "note-remove";
+      btn.type = "button";
+      btn.textContent = "×";
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        if (el.classList.contains("removing")) return;
+        el.classList.add("removing");
+        setTimeout(() => {
+          el.remove();
+        }, 650);
       });
+      el.appendChild(btn);
+    }
 
-      // Hook into shared draggable logic
-      if (window.imthebusCore && typeof window.imthebusCore.initDraggableNotes === "function") {
-        window.imthebusCore.initDraggableNotes({
-          boardEl: board,
-          onDrop: (el, xNorm, yNorm) => {
-            const meta = el.querySelector(".uat-note-meta");
-            if (meta) {
-              meta.textContent = "x " + xNorm.toFixed(2) + " · y " + yNorm.toFixed(2);
-            }
-          }
-        });
-      }
+    function createNote(text, xNorm, yNorm, cssClass) {
+      const boardRect = board.getBoundingClientRect();
+
+      const el = document.createElement("div");
+      el.className = "note note-new " + (cssClass || "");
+      el.dataset.id =
+        "note_" + Date.now() + "_" + Math.random().toString(16).slice(2);
+      el.style.setProperty(
+        "--note-rot",
+        (Math.random() * 8 - 4).toFixed(2) + "deg"
+      );
+
+      const body = document.createElement("div");
+      body.textContent = text;
+      el.appendChild(body);
+
+      const meta = document.createElement("div");
+      meta.className = "uat-note-meta";
+      meta.textContent = "x " + xNorm.toFixed(2) + " · y " + yNorm.toFixed(2);
+      el.appendChild(meta);
+
+      makeRemoveButton(el);
+
+      const width = 150;
+      const height = 70;
+      const left = xNorm * boardRect.width - width / 2;
+      const top = yNorm * boardRect.height - height / 2;
+
+      el.style.width = width + "px";
+      el.style.minHeight = height + "px";
+      el.style.left = left + "px";
+      el.style.top = top + "px";
+      el.style.zIndex = ++topZ;
+
+      inner.appendChild(el);
+    }
+
+    // Seed a couple of notes
+    createNote("Do it example", 0.25, 0.25, "uat-note-do");
+    createNote("New note 1", 0.35, 0.28, "uat-note-do");
+    createNote("New note 2", 0.55, 0.72, "uat-note-sched");
+    createNote("Delegate example", 0.25, 0.75, "uat-note-del");
+    createNote("Delete example", 0.75, 0.75, "uat-note-drop");
+
+    // Add button -> new note somewhere in the middle area
+    addBtn.addEventListener("click", () => {
+      noteCounter += 1;
+      const x = 0.2 + 0.6 * Math.random();
+      const y = 0.2 + 0.6 * Math.random();
+      createNote("New note " + noteCounter, x, y, "uat-note-do");
     });
-  </script>
+
+    // Hook into shared draggable logic
+    if (
+      window.imthebusCore &&
+      typeof window.imthebusCore.initDraggableNotes === "function"
+    ) {
+      window.imthebusCore.initDraggableNotes({
+        boardEl: board,
+        onDrop: (el, xNorm, yNorm) => {
+          const meta = el.querySelector(".uat-note-meta");
+          if (meta) {
+            meta.textContent =
+              "x " + xNorm.toFixed(2) + " · y " + yNorm.toFixed(2);
+          }
+        }
+      });
+    }
+  });
+</script>
+
 </body>
 </html>
