@@ -17,13 +17,6 @@
       margin: 0 0 8px;
     }
 
-    .home-sidebar-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-
     .home-sidebar-section {
       border-top: 1px solid rgba(0, 0, 0, 0.12);
       padding-top: 8px;
@@ -37,11 +30,6 @@
       align-items: baseline;
       font-weight: 600;
       font-size: 0.86rem;
-    }
-
-    .home-sidebar-section-hint {
-      font-size: 0.75rem;
-      color: #6b7280;
     }
 
     .home-sidebar-section-body {
@@ -236,27 +224,9 @@
         A shared whiteboard of simple browser tools to help you think, decide, and manage with other humans.
       </p>
 
-      <div class="home-sidebar-actions">
-        <button
-          class="btn btn-primary"
-          type="button"
-          onclick="document.getElementById('tools-board').scrollIntoView({ behavior: 'smooth' });"
-        >
-          Browse tools
-        </button>
-        <button
-          class="btn"
-          type="button"
-          onclick="window.location.href='mailto:contact@imthebus.co.uk?subject=Tool%20idea%20or%20bug';"
-        >
-          Suggest a tool or report a bug
-        </button>
-      </div>
-
       <section class="home-sidebar-section">
         <div class="home-sidebar-section-header">
           <div>About this site</div>
-          <div class="home-sidebar-section-hint">shared across tools</div>
         </div>
         <div class="home-sidebar-section-body">
           <p>
@@ -271,23 +241,6 @@
           </ul>
         </div>
       </section>
-
-      <section class="home-sidebar-section">
-        <div class="home-sidebar-section-header">
-          <div>Whiteboard tips</div>
-          <div class="home-sidebar-section-hint">patterns used on other pages</div>
-        </div>
-        <div class="home-sidebar-section-body">
-          <p>
-            Most tools use the same whiteboard frame and note patterns.
-            Common shortcuts include using <strong>1-4</strong> for quadrants, <strong>Enter</strong> to add,
-            and dragging notes to fine tune where they sit.
-          </p>
-          <p>
-            The home board just shows which tools are pinned and what each one is for.
-          </p>
-        </div>
-      </section>
     </aside>
 
     <!-- Whiteboard with pinned tools -->
@@ -299,9 +252,6 @@
       <div class="board-inner-shell">
         <div class="home-board-header">
           <h2 class="page-title" style="margin-bottom:0;">Tools pinned to the board</h2>
-          <button class="btn-pill-small" type="button" id="homeFullscreenBtn">
-            Fullscreen board
-          </button>
         </div>
 
         <div class="home-board-meta">
@@ -415,25 +365,25 @@
       const notes = Array.from(document.querySelectorAll(".tool-note"));
       const boardWrapper = document.getElementById("tools-board");
       const boardWipe = document.getElementById("boardWipe");
-      const fullscreenBtn = document.getElementById("homeFullscreenBtn");
 
-      // Seed a small, consistent rotation and wobble on load
-      notes.forEach((note, index) => {
-        const base = ((index * 13) % 7) - 3; // between about -3 and +3
-        note.style.setProperty("--note-rot", base + "deg");
-        note.classList.add("tool-note-enter");
-      });
-
-      // Fullscreen toggle just for the board area
-      if (fullscreenBtn && boardWrapper && boardWrapper.requestFullscreen) {
-        fullscreenBtn.addEventListener("click", function () {
-          if (!document.fullscreenElement) {
-            boardWrapper.requestFullscreen();
-          } else if (document.exitFullscreen) {
-            document.exitFullscreen();
-          }
+      function seedNotes() {
+        notes.forEach((note, index) => {
+          const base = ((index * 13) % 7) - 3; // between about -3 and +3
+          note.classList.remove("tool-note-drop");
+          note.classList.remove("tool-note-enter");
+          note.style.setProperty("--note-rot", base + "deg");
+          // force reflow so the enter animation restarts
+          void note.offsetWidth;
+          note.classList.add("tool-note-enter");
         });
+
+        if (boardWipe) {
+          boardWipe.classList.remove("board-wipe-active");
+          boardWipe.style.transform = "";
+        }
       }
+
+      seedNotes();
 
       // Helper: animate notes dropping + board wipe, then navigate
       function animateExitAndNavigate(targetHref) {
@@ -477,6 +427,13 @@
 
         event.preventDefault();
         animateExitAndNavigate(href);
+      });
+
+      // When returning via back/forward cache, re-seed notes so board is never blank
+      window.addEventListener("pageshow", function (event) {
+        if (event.persisted || performance.getEntriesByType("navigation")[0]?.type === "back_forward") {
+          seedNotes();
+        }
       });
     });
   </script>
