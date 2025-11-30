@@ -5,16 +5,14 @@
   <title>Important vs Urgent – IMTHEBUS Toolbox</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Site-wide base styles -->
+  <!-- Shared styles and core helpers -->
   <link rel="stylesheet" href="assets/imthebus-base.css" />
+  <script src="assets/imthebus-core.js" defer></script>
 
   <!-- jsPDF for PDF export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 
-  <!-- Core helpers: partials, collapsibles, counter, draggable notes -->
-  <script src="assets/imthebus-core.js" defer></script>
-
-  <!-- Page specific styling -->
+  <!-- Page-specific styles -->
   <style>
     :root {
       --muted: #4b5563;
@@ -75,10 +73,16 @@
       border: 1px solid #000000;
       padding: 6px 6px 4px;
       display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .task-item-header {
+      display: flex;
       justify-content: space-between;
+      align-items: flex-start;
       gap: 6px;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.9);
     }
 
     .task-main {
@@ -102,6 +106,7 @@
       display: flex;
       gap: 4px;
       align-items: center;
+      flex-wrap: nowrap;
     }
 
     .pill {
@@ -110,6 +115,7 @@
       border: 1px solid #000000;
       font-size: 0.7rem;
       white-space: nowrap;
+      background: #ffffff;
     }
 
     .pill-q1 { background: var(--q1-note); }
@@ -148,16 +154,40 @@
       margin: 4px 0;
     }
 
-    .question-panel {
-      margin-top: 10px;
+    .task-status {
+      min-height: 1.1em;
+      margin-top: 4px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .task-status.flash {
+      animation: statusFlash 0.3s ease-out;
+    }
+
+    @keyframes statusFlash {
+      from {
+        opacity: 0;
+        transform: translateY(-2px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Inline assessment panel */
+
+    .assessment-panel {
+      margin-top: 6px;
       border-radius: 8px;
       border: 1px solid #000000;
       padding: 8px 8px 10px;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.96);
       font-size: 0.78rem;
     }
 
-    .question-header {
+    .assessment-header {
       display: flex;
       justify-content: space-between;
       gap: 6px;
@@ -165,23 +195,21 @@
       margin-bottom: 4px;
     }
 
-    .question-task-name {
+    .assessment-task-name {
       font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .question-body {
-      max-height: 260px;
-      overflow-y: auto;
-      padding-right: 2px;
+    .assessment-body {
+      margin-top: 2px;
     }
 
     .question-row {
-      border-top: 1px dashed rgba(0, 0, 0, 0.2);
       padding-top: 4px;
       margin-top: 4px;
+      border-top: 1px dashed rgba(0, 0, 0, 0.16);
     }
 
     .question-row:first-of-type {
@@ -190,8 +218,8 @@
       padding-top: 0;
     }
 
-    .question-title {
-      font-weight: 500;
+    .question-text {
+      margin-bottom: 2px;
     }
 
     .question-scale {
@@ -214,7 +242,7 @@
       margin-bottom: 1px;
     }
 
-    .question-footer {
+    .assessment-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -223,6 +251,12 @@
       gap: 6px;
       flex-wrap: wrap;
     }
+
+    .task-item--active {
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5) inset;
+    }
+
+    /* Board / priority panel text */
 
     .board-header-row {
       display: flex;
@@ -247,16 +281,6 @@
       font-size: 0.78rem;
       color: var(--muted);
       margin-top: 4px;
-    }
-
-    .board-toolbar {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .task-note {
-      /* extends shared .note in CSS */
     }
 
     .task-note[data-quadrant="q1"] { background-color: var(--q1-note); }
@@ -356,7 +380,7 @@
 </head>
 
 <body data-counter-key="important_vs_urgent">
-  <!-- Shared header/nav -->
+  <!-- Shared header -->
   <header data-include="partials/header.html"></header>
 
   <main class="page">
@@ -364,7 +388,7 @@
     <aside class="sidebar-card">
       <div class="sidebar-title">Important vs Urgent</div>
       <div class="sidebar-subtitle">
-        Capture tasks, answer six sliders, then work from the priority list.
+        Capture tasks, answer sliders, then work from the priority list.
       </div>
 
       <div class="step-heading">Step 1 · Tasks</div>
@@ -401,7 +425,7 @@
         <p><strong>Delete it</strong> · Less important and not urgent. Distractions, nice to haves, or things to question.</p>
       </div>
 
-      <div id="questionPanelContainer" style="margin-top:10px;"></div>
+      <div class="task-status" id="taskStatus"></div>
     </aside>
 
     <!-- Board and priority -->
@@ -414,8 +438,8 @@
               Grid: Important (vertical) vs Urgent (horizontal). Do → Schedule → Delegate → Delete.
             </div>
           </div>
-          <div class="board-toolbar">
-            <button class="btn" id="exportPdfButton">PDF</button>
+          <div>
+            <button class="btn btn-pill-small" id="exportPdfButton">PDF</button>
           </div>
         </div>
 
@@ -469,7 +493,7 @@
       const clearAllButton = document.getElementById("clearAllButton");
       const taskList = document.getElementById("taskList");
       const noTasksMessage = document.getElementById("noTasksMessage");
-      const questionPanelContainer = document.getElementById("questionPanelContainer");
+      const taskStatus = document.getElementById("taskStatus");
       const quadrantExplainerToggle = document.getElementById("quadrantExplainerToggle");
       const quadrantExplainerBody = document.getElementById("quadrantExplainerBody");
 
@@ -485,47 +509,49 @@
       const questions = [
         {
           id: "impImpact",
-          title: "Impact if ignored",
           question: "If this task never happened at all, what would the impact be?",
           dimension: "importance",
           labels: ["Very low", "Low", "Medium", "High", "Very high"]
         },
         {
           id: "impStake",
-          title: "Who it affects",
           question: "How many people or groups are meaningfully affected?",
           dimension: "importance",
           labels: ["Just me", "Small group", "One team", "Many teams", "Whole business or key customers"]
         },
         {
           id: "impGoal",
-          title: "Strategic fit",
           question: "How directly does this support your current priorities?",
           dimension: "importance",
           labels: ["Not at all", "Loosely", "Somewhat", "Strongly", "Directly delivers"]
         },
         {
           id: "urgDeadline",
-          title: "Real deadline",
           question: "How soon does this genuinely need to be done?",
           dimension: "urgency",
           labels: ["No date", "More than a month", "Two weeks", "This week", "Today or tomorrow"]
         },
         {
           id: "urgBlock",
-          title: "Others waiting",
           question: "How blocked are other people by this?",
           dimension: "urgency",
           labels: ["No one", "Would like it", "Expecting soon", "One team blocked", "Many people blocked"]
         },
         {
           id: "urgDelay",
-          title: "Cost of delay",
           question: "If you push this back by a week, how bad is the impact?",
           dimension: "urgency",
           labels: ["None", "Minor", "Noticeable", "Significant", "Serious"]
         }
       ];
+
+      function setStatus(msg) {
+        if (!taskStatus) return;
+        taskStatus.textContent = msg || "";
+        taskStatus.classList.remove("flash");
+        void taskStatus.offsetWidth;
+        taskStatus.classList.add("flash");
+      }
 
       function cleanTaskName(raw) {
         const s = raw.trim().replace(/\s+/g, " ");
@@ -551,7 +577,10 @@
 
       function addTaskFromInput() {
         const cleaned = cleanTaskName(taskInput.value);
-        if (!cleaned) return;
+        if (!cleaned) {
+          setStatus("Nothing to add yet.");
+          return;
+        }
         const task = {
           id: String(Date.now()) + Math.random().toString(16).slice(2),
           name: cleaned,
@@ -566,23 +595,30 @@
         taskInput.value = "";
         assessmentState = null;
         renderAll();
+        setStatus("Added task: " + cleaned);
         taskInput.focus();
       }
 
       function clearAllTasks() {
-        if (!tasks.length) return;
+        if (!tasks.length) {
+          setStatus("Nothing to clear.");
+          return;
+        }
         if (!confirm("Clear all tasks?")) return;
         tasks = [];
         assessmentState = null;
         renderAll();
+        setStatus("All tasks cleared.");
       }
 
       function deleteTask(id) {
-        tasks = tasks.filter(function (t) { return t.id !== id; });
+        const t = tasks.find(function (x) { return x.id === id; });
+        tasks = tasks.filter(function (x) { return x.id !== id; });
         if (assessmentState && assessmentState.taskId === id) {
           assessmentState = null;
         }
         renderAll();
+        setStatus("Removed task" + (t ? ": " + t.name : "."));
       }
 
       function startAssessment(taskId) {
@@ -593,11 +629,14 @@
           answers: defaultAnswers(task.answers)
         };
         renderAll();
+        setStatus("Now assessing: " + task.name);
       }
 
       function cancelAssessment() {
+        if (!assessmentState) return;
         assessmentState = null;
         renderAll();
+        setStatus("Assessment cancelled.");
       }
 
       function handleRadioChange(questionId, value) {
@@ -624,10 +663,10 @@
       function quadrantFromScores(importance, urgency) {
         const impHigh = importance >= 3;
         const urgHigh = urgency >= 3;
-        if (impHigh && urgHigh) return "q1"; // Do
-        if (impHigh && !urgHigh) return "q2"; // Schedule
-        if (!impHigh && urgHigh) return "q3"; // Delegate
-        return "q4"; // Delete
+        if (impHigh && urgHigh) return "q1";
+        if (impHigh && !urgHigh) return "q2";
+        if (!impHigh && urgHigh) return "q3";
+        return "q4";
       }
 
       function quadrantMeta(q) {
@@ -682,6 +721,13 @@
 
         assessmentState = null;
         renderAll();
+        setStatus("Saved assessment for: " + task.name);
+      }
+
+      function ensureNoteDefaults(task) {
+        if (task.rotation == null) {
+          task.rotation = (Math.random() * 8 - 4).toFixed(2);
+        }
       }
 
       function renderTasks() {
@@ -695,6 +741,14 @@
         tasks.forEach(function (task) {
           const li = document.createElement("li");
           li.className = "task-item";
+          li.dataset.id = task.id;
+
+          if (assessmentState && assessmentState.taskId === task.id) {
+            li.classList.add("task-item--active");
+          }
+
+          const header = document.createElement("div");
+          header.className = "task-item-header";
 
           const main = document.createElement("div");
           main.className = "task-main";
@@ -708,7 +762,8 @@
           if (task.importance == null || task.urgency == null) {
             metaEl.textContent = "Not assessed yet";
           } else {
-            metaEl.textContent = quadrantMeta(task.quadrant).label;
+            const qMeta = quadrantMeta(task.quadrant);
+            metaEl.textContent = qMeta.label;
           }
 
           main.appendChild(nameEl);
@@ -730,78 +785,74 @@
           const assessBtn = document.createElement("button");
           assessBtn.className = "btn btn-pill-small";
           assessBtn.textContent =
-            task.importance == null || task.urgency == null ? "Assess" : "Revisit";
+            task.importance == null || task.urgency == null ? "Assess" : "Reassess";
           assessBtn.addEventListener("click", function () {
             startAssessment(task.id);
           });
 
+          const revisitBtn = document.createElement("button");
+          revisitBtn.className = "btn icon-btn";
+          revisitBtn.setAttribute("title", "Reassess task");
+          revisitBtn.innerHTML =
+            '<span aria-hidden="true">↻</span><span class="sr-only">Reassess</span>';
+          revisitBtn.addEventListener("click", function () {
+            startAssessment(task.id);
+          });
+
           const deleteBtn = document.createElement("button");
-          deleteBtn.className = "btn btn-pill-small";
-          deleteBtn.textContent = "Remove";
-          deleteBtn.style.borderColor = "#b91c1c";
-          deleteBtn.style.color = "#b91c1c";
+          deleteBtn.className = "btn icon-btn icon-btn-remove";
+          deleteBtn.setAttribute("title", "Remove task");
+          deleteBtn.innerHTML =
+            '<span aria-hidden="true">×</span><span class="sr-only">Remove task</span>';
           deleteBtn.addEventListener("click", function () {
             deleteTask(task.id);
           });
 
           actions.appendChild(pill);
           actions.appendChild(assessBtn);
+          actions.appendChild(revisitBtn);
           actions.appendChild(deleteBtn);
 
-          li.appendChild(main);
-          li.appendChild(actions);
+          header.appendChild(main);
+          header.appendChild(actions);
+          li.appendChild(header);
+
+          if (assessmentState && assessmentState.taskId === task.id) {
+            li.appendChild(buildAssessmentPanel(task, assessmentState.answers));
+          }
+
           taskList.appendChild(li);
         });
       }
 
-      function renderQuestionPanel() {
-        questionPanelContainer.innerHTML = "";
-
-        if (!assessmentState) {
-          if (tasks.length) {
-            const panel = document.createElement("div");
-            panel.className = "question-panel";
-            const text = document.createElement("div");
-            text.className = "empty-state";
-            text.textContent = "Select Assess on a task to answer the questions.";
-            panel.appendChild(text);
-            questionPanelContainer.appendChild(panel);
-          }
-          return;
-        }
-
-        const task = tasks.find(function (t) { return t.id === assessmentState.taskId; });
-        const answers = assessmentState.answers;
-
+      function buildAssessmentPanel(task, answers) {
         const panel = document.createElement("div");
-        panel.className = "question-panel";
+        panel.className = "assessment-panel";
+        panel.id = "assessmentPanel";
 
         const header = document.createElement("div");
-        header.className = "question-header";
+        header.className = "assessment-header";
 
-        const nameEl = document.createElement("div");
-        nameEl.className = "question-task-name";
-        nameEl.textContent = task ? task.name : "";
+        const title = document.createElement("div");
+        title.className = "assessment-task-name";
+        title.textContent = task.name;
 
-        const infoEl = document.createElement("div");
-        infoEl.textContent = "Six quick sliders. Middle is preselected.";
+        const headerHint = document.createElement("div");
+        headerHint.textContent = "Six quick sliders. Middle is preselected.";
 
-        header.appendChild(nameEl);
-        header.appendChild(infoEl);
+        header.appendChild(title);
+        header.appendChild(headerHint);
         panel.appendChild(header);
 
         const body = document.createElement("div");
-        body.className = "question-body";
+        body.className = "assessment-body";
 
         questions.forEach(function (q) {
           const row = document.createElement("div");
           row.className = "question-row";
 
-          const title = document.createElement("div");
-          title.className = "question-title";
-          title.textContent = q.title;
-
           const text = document.createElement("div");
+          text.className = "question-text";
           text.textContent = q.question;
 
           const scale = document.createElement("div");
@@ -814,7 +865,7 @@
 
             const input = document.createElement("input");
             input.type = "radio";
-            input.name = "q-" + q.id;
+            input.name = "q-" + q.id + "-" + task.id;
             input.value = String(val);
             input.checked = answers[q.id] === val;
             input.addEventListener("change", function () {
@@ -829,7 +880,6 @@
             scale.appendChild(opt);
           });
 
-          row.appendChild(title);
           row.appendChild(text);
           row.appendChild(scale);
           body.appendChild(row);
@@ -838,7 +888,7 @@
         panel.appendChild(body);
 
         const footer = document.createElement("div");
-        footer.className = "question-footer";
+        footer.className = "assessment-footer";
 
         const hint = document.createElement("div");
         hint.textContent = "Change only answers that feel clearly high or low.";
@@ -861,13 +911,7 @@
         footer.appendChild(actions);
         panel.appendChild(footer);
 
-        questionPanelContainer.appendChild(panel);
-      }
-
-      function ensureNoteDefaults(task) {
-        if (task.rotation == null) {
-          task.rotation = (Math.random() * 8 - 4).toFixed(2);
-        }
+        return panel;
       }
 
       function renderBoard() {
@@ -1020,6 +1064,7 @@
             task.quadrant = quadrantFromScores(task.importance, task.urgency);
             renderTasks();
             renderPriorities();
+            setStatus("Updated position for: " + task.name);
           }
         });
         dragInitialised = true;
@@ -1027,7 +1072,6 @@
 
       function renderAll() {
         renderTasks();
-        renderQuestionPanel();
         renderBoard();
         renderPriorities();
         setupDragging();
@@ -1206,6 +1250,7 @@
         const filename =
           "important-vs-urgent-" + formatDateForFilename(now) + ".pdf";
         doc.save(filename);
+        setStatus("PDF exported.");
       }
 
       addTaskButton.addEventListener("click", addTaskFromInput);
@@ -1232,6 +1277,7 @@
       });
 
       renderAll();
+      setStatus("Add a task to get started.");
     })();
   </script>
 </body>
