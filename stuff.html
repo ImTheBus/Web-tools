@@ -2,203 +2,439 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>ImTheBus – About & Info</title>
+  <title>IMTHEBUS – About & Info</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Shared site styles -->
   <link rel="stylesheet" href="assets/styles.css" />
 
-  <!-- Fonts consistent with other ImTheBus pages -->
-  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet" />
 
   <style>
-    /* Page specific layout that sits on top of your shared styles */
+    :root {
+      --ink: #111111;
+      --bg-plain: #fdfdfd;
+      --border-strong: #000000;
+      --accent-soft: #ffeaa7;
+      --accent-strong: #111111;
 
-    .about-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 2fr);
+      --note-yellow: #fff8a7;
+      --note-red: #ff8ba7;
+      --note-blue: #bde0fe;
+    }
+
+    body {
+      background: #f2f2f2;
+      color: var(--ink);
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .site-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 4rem;
+    }
+
+    /* Top nav to match main page a bit closer */
+    .top-nav {
+      display: flex;
+      justify-content: center;
       gap: 1.75rem;
-      align-items: flex-start;
-      margin-top: 1.5rem;
+      border-bottom: 2px solid #000;
+      padding-bottom: 0.6rem;
+      margin-bottom: 0.9rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .top-nav a {
+      text-decoration: none;
+      color: #000;
+      position: relative;
+    }
+
+    .top-nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -0.3rem;
+      width: 100%;
+      height: 2px;
+      background: #000;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.15s ease;
+    }
+
+    .top-nav a:hover::after,
+    .top-nav a[aria-current="page"]::after {
+      transform: scaleX(1);
+    }
+
+    .site-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1.4rem;
+      gap: 1rem;
+    }
+
+    .site-title-main {
+      font-family: "Permanent Marker", system-ui;
+      font-size: 2.2rem;
+      letter-spacing: 0.05em;
+    }
+
+    .site-title-tag {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      border: 2px solid #000;
+      padding: 0.25rem 0.8rem;
+      border-radius: 999px;
+      background: #fff;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3.5fr) minmax(0, 2.5fr);
+      gap: 2rem;
+      margin-top: 1.2rem;
     }
 
     @media (max-width: 900px) {
-      .about-layout {
+      .about-grid {
         grid-template-columns: minmax(0, 1fr);
+      }
+      .site-title-row {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
 
-    .whiteboard-card {
-      background: var(--bg-board, #fdfdfd);
-      border-radius: 1.25rem;
-      border: 2px solid var(--border-strong, #111);
+    .about-panel {
+      background: var(--bg-plain);
+      border-radius: 1.2rem;
+      border: 3px solid var(--border-strong);
       box-shadow:
-        0 20px 35px rgba(0, 0, 0, 0.14),
-        0 0 0 3px rgba(255, 255, 255, 0.8) inset;
-      padding: 1.5rem 1.75rem;
+        6px 6px 0 #000,
+        inset 0 0 0 1px #fff;
+      padding: 1.4rem 1.6rem 1.8rem;
       position: relative;
-      overflow: hidden;
     }
 
-    .whiteboard-card::before {
+    .about-panel::before {
       content: "";
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at 15% 0, rgba(255, 255, 255, 0.8), transparent 55%),
-        radial-gradient(circle at 85% 0, rgba(255, 255, 255, 0.6), transparent 50%);
+        repeating-linear-gradient(
+          -45deg,
+          rgba(0, 0, 0, 0.03),
+          rgba(0, 0, 0, 0.03) 1px,
+          transparent 1px,
+          transparent 4px
+        );
+      mix-blend-mode: multiply;
+      opacity: 0.8;
       pointer-events: none;
-      mix-blend-mode: screen;
-      opacity: 0.9;
     }
 
-    .whiteboard-card > * {
+    .about-panel > * {
       position: relative;
       z-index: 1;
     }
 
     .about-heading {
       font-family: "Permanent Marker", system-ui;
-      font-size: 1.9rem;
-      margin-bottom: 0.75rem;
+      font-size: 1.6rem;
+      margin-bottom: 0.3rem;
     }
 
     .about-subheading {
       font-weight: 600;
-      margin-top: 1.25rem;
+      margin-top: 1.1rem;
       margin-bottom: 0.35rem;
-      font-size: 1.05rem;
-      letter-spacing: 0.01em;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
     }
 
     .about-text {
-      font-size: 0.98rem;
+      font-size: 0.96rem;
       line-height: 1.6;
-      color: #222;
+    }
+
+    .about-list {
+      padding-left: 1rem;
+      margin: 0.3rem 0 0.6rem;
+      font-size: 0.95rem;
+    }
+
+    .about-list li + li {
+      margin-top: 0.22rem;
+    }
+
+    .label-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-strong);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      margin-bottom: 0.6rem;
     }
 
     .pill-link {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.45rem;
       padding: 0.45rem 0.9rem;
       border-radius: 999px;
-      border: 1px solid rgba(0, 0, 0, 0.12);
-      background: rgba(255, 255, 255, 0.8);
-      font-size: 0.9rem;
+      border: 2px solid #000;
       text-decoration: none;
-      color: inherit;
+      color: #000;
+      background: #fff;
+      font-size: 0.9rem;
       margin-top: 0.75rem;
-      backdrop-filter: blur(6px);
-      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+      box-shadow: 4px 4px 0 #000;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
     }
 
     .pill-link:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
-      border-color: rgba(0, 0, 0, 0.25);
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 #000;
     }
 
     .pill-link span.icon {
       font-size: 1.1rem;
     }
 
-    .list-tight {
-      padding-left: 1.15rem;
-      margin: 0.25rem 0 0.75rem 0;
-      font-size: 0.95rem;
-    }
-
-    .list-tight li + li {
-      margin-top: 0.25rem;
-    }
-
-    .highlight-note {
-      display: inline-block;
-      padding: 0.2rem 0.55rem;
-      border-radius: 0.5rem;
-      background: rgba(254, 243, 199, 0.8);
-      border: 1px solid rgba(180, 118, 20, 0.45);
-      font-size: 0.9rem;
-    }
-
-    /* Ko fi style section */
     .support-block {
-      margin-top: 1rem;
-      padding: 0.85rem 1rem;
-      border-radius: 0.9rem;
-      border: 1px dashed rgba(0, 0, 0, 0.16);
-      background: rgba(252, 252, 252, 0.9);
+      margin-top: 0.9rem;
+      padding: 0.9rem 1rem;
+      border-radius: 0.8rem;
+      border: 2px solid #000;
+      background: #faf5ff;
+      box-shadow: 4px 4px 0 #000;
     }
 
-    .support-block strong {
-      display: block;
+    .support-title {
+      font-weight: 600;
+      font-size: 0.95rem;
       margin-bottom: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
     }
 
     .support-cta {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      margin-top: 0.6rem;
+      gap: 0.45rem;
+      margin-top: 0.55rem;
       padding: 0.4rem 0.9rem;
       border-radius: 999px;
       font-size: 0.9rem;
       text-decoration: none;
-      cursor: pointer;
-      border: 1px solid rgba(0, 0, 0, 0.2);
+      border: 2px solid #000;
       background: linear-gradient(135deg, #ffecd5, #ffe5f1);
-      box-shadow: 0 4px 9px rgba(0, 0, 0, 0.16);
+      color: #000;
+      box-shadow: 3px 3px 0 #000;
+      cursor: pointer;
     }
 
     .support-cta:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 #000;
     }
 
-    /* Sticky note mini game */
-
-    .game-heading {
-      font-family: "Permanent Marker", system-ui;
-      font-size: 1.6rem;
-      margin-bottom: 0.4rem;
+    .mono {
+      font-family: "Courier New", ui-monospace, monospace;
     }
 
-    .game-subtext {
-      font-size: 0.9rem;
+    .footer-text {
+      margin-top: 2.2rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      border-top: 2px solid #000;
+      padding-top: 0.8rem;
+    }
+
+    /* Retro mode */
+
+    body.retro-mode {
+      background:
+        radial-gradient(circle at 0 0, #3a0ca3, transparent 65%),
+        radial-gradient(circle at 100% 0, #f72585, transparent 60%),
+        radial-gradient(circle at 50% 100%, #4895ef, #000011);
+      color: #f6f6ff;
+    }
+
+    body.retro-mode .about-panel {
+      background: rgba(3, 4, 25, 0.95);
+      border-color: #00f5d4;
+      box-shadow:
+        0 0 0 2px #000,
+        0 0 18px rgba(0, 245, 212, 0.75);
+    }
+
+    body.retro-mode .about-panel::before {
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(0, 245, 212, 0.12),
+          rgba(0, 245, 212, 0.12) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+      mix-blend-mode: screen;
       opacity: 0.9;
-      margin-bottom: 0.9rem;
     }
 
-    .game-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 0.85rem;
+    body.retro-mode .top-nav,
+    body.retro-mode .footer-text {
+      border-color: #00f5d4;
     }
 
-    .game-top-row {
+    body.retro-mode .top-nav a,
+    body.retro-mode .site-title-main,
+    body.retro-mode .site-title-tag {
+      color: #f6f6ff;
+    }
+
+    body.retro-mode .top-nav a::after {
+      background: #00f5d4;
+    }
+
+    body.retro-mode .site-title-tag {
+      border-color: #00f5d4;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    body.retro-mode .pill-link,
+    body.retro-mode .support-cta {
+      background: rgba(0, 0, 0, 0.65);
+      color: #f6f6ff;
+      border-color: #00f5d4;
+      box-shadow:
+        0 0 10px rgba(0, 245, 212, 0.75),
+        0 0 0 2px #000;
+    }
+
+    body.retro-mode .support-block {
+      background: rgba(0, 0, 0, 0.8);
+      border-color: #00f5d4;
+      box-shadow: 0 0 16px rgba(0, 245, 212, 0.7);
+    }
+
+    body.retro-mode .footer-text {
+      color: #f6f6ff;
+    }
+
+    /* Floating sticky notes */
+
+    .sticky-note {
+      position: fixed;
+      width: 82px;
+      height: 78px;
+      border-radius: 6px;
+      box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.35),
+        0 0 0 2px rgba(0, 0, 0, 0.5);
+      transform-origin: center top;
+      cursor: pointer;
+      z-index: 5;
+      user-select: none;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 0.75rem;
-      flex-wrap: wrap;
+      justify-content: center;
+      font-family: "Permanent Marker", system-ui;
+      font-size: 0.8rem;
+      color: rgba(0, 0, 0, 0); /* invisible text */
+      transition: box-shadow 0.12s ease;
     }
+
+    .sticky-note::before {
+      content: "";
+      position: absolute;
+      width: 28px;
+      height: 11px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.15);
+      top: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .note-yellow { background: var(--note-yellow); }
+    .note-red { background: var(--note-red); }
+    .note-blue { background: var(--note-blue); }
+
+    .note-tilt-left { transform: rotate(-5deg); }
+    .note-tilt-right { transform: rotate(4deg); }
+
+    .note-edge-flash {
+      animation: edgeFlash 0.26s ease-out;
+    }
+
+    @keyframes edgeFlash {
+      0% {
+        box-shadow:
+          0 0 0 2px rgba(0, 0, 0, 0.5),
+          0 0 0 4px rgba(0, 0, 0, 0);
+      }
+      50% {
+        box-shadow:
+          0 0 0 2px #000,
+          0 0 0 6px #00f5d4;
+      }
+      100% {
+        box-shadow:
+          0 6px 10px rgba(0, 0, 0, 0.35),
+          0 0 0 2px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    body.retro-mode .sticky-note {
+      box-shadow:
+        0 0 12px rgba(0, 0, 0, 0.9),
+        0 0 0 2px rgba(0, 245, 212, 0.7);
+    }
+
+    .note-fade-out {
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+    }
+
+    /* Retro scoreboard */
 
     .scoreboard {
-      font-family: "Courier New", ui-monospace, monospace;
-      padding: 0.4rem 0.75rem;
-      border-radius: 0.6rem;
-      background: #050707;
-      border: 2px solid #00ff99;
-      color: #00ff99;
-      font-size: 0.95rem;
-      letter-spacing: 0.12em;
-      box-shadow: 0 0 6px rgba(0, 255, 153, 0.6);
+      position: fixed;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: #05070a;
+      border-radius: 0.7rem;
+      border: 2px solid #00f5d4;
+      padding: 0.5rem 0.8rem 0.45rem;
+      font-family: "Press Start 2P", system-ui, monospace;
+      font-size: 0.6rem;
+      color: #00f5d4;
+      letter-spacing: 0.16em;
+      box-shadow: 0 0 12px rgba(0, 245, 212, 0.85);
       opacity: 0;
-      transform: translateY(-4px);
-      transition: opacity 0.16s ease, transform 0.16s ease;
-      min-width: 180px;
+      transform: translateY(-8px);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      z-index: 20;
     }
 
     .scoreboard.visible {
@@ -206,529 +442,493 @@
       transform: translateY(0);
     }
 
-    .scoreboard-label {
-      opacity: 0.8;
-    }
-
-    .scoreboard-value {
-      font-size: 1.1rem;
-      margin-left: 0.35rem;
-    }
-
-    .scoreboard-meta {
-      font-size: 0.7rem;
-      opacity: 0.7;
-      margin-left: 0.35rem;
-    }
-
-    .game-legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.45rem;
-      font-size: 0.8rem;
-    }
-
-    .legend-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.2rem 0.5rem;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-    }
-
-    .legend-color {
-      width: 14px;
-      height: 14px;
-      border-radius: 3px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
-    }
-
-    .legend-yellow { background: #fff8a7; }
-    .legend-pink   { background: #ffb3c6; }
-    .legend-blue   { background: #bde0fe; }
-    .legend-green  { background: #c7f9cc; }
-
-    .game-board {
-      position: relative;
-      width: 100%;
-      height: 320px;
-      border-radius: 1rem;
-      border: 2px dashed rgba(0, 0, 0, 0.25);
-      background:
-        linear-gradient(transparent 0, transparent calc(100% - 26px), rgba(0, 0, 0, 0.06) calc(100% - 26px), rgba(0, 0, 0, 0.08) 100%),
-        repeating-linear-gradient(
-          to bottom,
-          rgba(0, 0, 0, 0.04),
-          rgba(0, 0, 0, 0.04) 1px,
-          transparent 1px,
-          transparent 20px
-        );
-      overflow: hidden;
-      box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.7),
-        0 14px 30px rgba(0, 0, 0, 0.22);
-      backdrop-filter: blur(8px);
-    }
-
-    .game-board::before {
-      content: "Click falling notes to increase the score and change the tempo.";
-      position: absolute;
-      left: 1rem;
-      top: 0.65rem;
-      font-size: 0.75rem;
-      font-style: italic;
-      color: rgba(0, 0, 0, 0.6);
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .falling-note {
-      position: absolute;
-      width: 80px;
-      height: 70px;
-      border-radius: 6px;
-      box-shadow:
-        0 6px 10px rgba(0, 0, 0, 0.35),
-        0 0 0 1px rgba(0, 0, 0, 0.16);
-      transform-origin: center top;
-      cursor: pointer;
-      padding: 0.4rem 0.5rem;
-      font-size: 0.75rem;
-      font-family: "Permanent Marker", system-ui;
-      text-align: center;
-      line-height: 1.2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      z-index: 2;
-      animation-name: noteFall;
-      animation-timing-function: linear;
-    }
-
-    .falling-note::before {
-      content: "";
-      position: absolute;
-      width: 26px;
-      height: 10px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.12);
-      top: -6px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    .note-yellow {
-      background: #fff8a7;
-    }
-
-    .note-pink {
-      background: #ffb3c6;
-    }
-
-    .note-blue {
-      background: #bde0fe;
-    }
-
-    .note-green {
-      background: #c7f9cc;
-    }
-
-    .note-tilt-left {
-      transform: rotate(-5deg);
-    }
-
-    .note-tilt-right {
-      transform: rotate(4deg);
-    }
-
-    .note-crumpled {
-      box-shadow:
-        0 6px 10px rgba(0, 0, 0, 0.35),
-        inset 0 0 0 1px rgba(0, 0, 0, 0.24);
-      filter: saturate(0.9) contrast(1.05);
-    }
-
-    .note-dogear::after {
-      content: "";
-      position: absolute;
-      right: 0;
-      top: 0;
-      border-width: 0 16px 16px 0;
-      border-style: solid;
-      border-color: transparent rgba(0, 0, 0, 0.18) transparent transparent;
-      opacity: 0.6;
-    }
-
-    @keyframes noteFall {
-      from {
-        transform: translateY(-90px);
-      }
-      to {
-        transform: translateY(360px);
-      }
-    }
-
-    .game-footer {
-      margin-top: 0.6rem;
-      font-size: 0.75rem;
-      opacity: 0.7;
+    .score-line {
       display: flex;
       justify-content: space-between;
       gap: 0.75rem;
-      flex-wrap: wrap;
+      margin-bottom: 0.2rem;
     }
 
-    .game-footer span {
-      white-space: nowrap;
+    .score-label {
+      opacity: 0.8;
     }
 
-    .mono {
-      font-family: "Courier New", ui-monospace, monospace;
+    .score-value {
+      min-width: 4ch;
+      text-align: right;
+    }
+
+    .score-small {
+      font-size: 0.5rem;
+      margin-top: 0.15rem;
+      opacity: 0.75;
+    }
+
+    /* Game over overlay */
+
+    .gameover-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 30;
+      overflow: hidden;
+    }
+
+    .gameover-inner {
+      font-family: "Press Start 2P", system-ui, monospace;
+      text-align: center;
+      color: #f6f6ff;
+      text-shadow:
+        0 0 6px #000,
+        0 0 18px #ff006e;
+      padding: 1.4rem 1rem 2.4rem;
+      opacity: 0;
+      transform: translateY(120%);
+    }
+
+    .gameover-inner.visible {
+      animation: gameoverRise 6s ease-out forwards;
+    }
+
+    @keyframes gameoverRise {
+      0% {
+        opacity: 0;
+        transform: translateY(120%);
+      }
+      20% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      70% {
+        opacity: 1;
+        transform: translateY(-10%);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-120%);
+      }
+    }
+
+    .gameover-title {
+      font-size: 1.4rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .gameover-score {
+      font-size: 0.7rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .highscore-stamp {
+      position: fixed;
+      bottom: 0.7rem;
+      right: 0.9rem;
+      font-family: "Press Start 2P", system-ui, monospace;
+      font-size: 0.55rem;
+      color: #f6f6ff;
+      padding: 0.4rem 0.6rem;
+      border-radius: 0.5rem;
+      border: 2px solid #00f5d4;
+      background: rgba(0, 0, 0, 0.8);
+      box-shadow: 0 0 10px rgba(0, 245, 212, 0.8);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 25;
+    }
+
+    .highscore-stamp.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
   </style>
 </head>
 
 <body>
-  <div class="site-wrapper fade-in">
-    <header class="site-header">
-      <div class="site-title-group">
-        <h1 class="site-title">ImTheBus Management Tools</h1>
-        <p class="site-tagline">About this whiteboard, the tools, and how to use them responsibly.</p>
-      </div>
-      <nav class="site-nav">
-        <a href="index.html">Home</a>
-        <a href="important-vs-urgent.html">Tools</a>
-        <a href="about.html" aria-current="page">About</a>
-      </nav>
-    </header>
+  <div class="site-wrapper">
+    <nav class="top-nav">
+      <a href="index.html">Home</a>
+      <a href="tools.html">Tools</a>
+      <a href="about.html" aria-current="page">About</a>
+    </nav>
 
-    <main class="site-main">
-      <div class="about-layout">
-        <!-- About / terms / privacy -->
-        <section class="whiteboard-card">
-          <h2 class="about-heading">About ImTheBus</h2>
-          <p class="about-text">
-            ImTheBus is a small collection of practical tools that live on a shared whiteboard.
-            They exist to help managers and teams think more clearly about work, decisions, and
-            how people operate together. The goal is simple: fewer vague conversations, more
-            useful ones.
-          </p>
+    <div class="site-title-row">
+      <h1 class="site-title-main">IMTHEBUS toolbox</h1>
+      <div class="site-title-tag">About this site</div>
+    </div>
 
-          <h3 class="about-subheading">Why this site exists</h3>
-          <p class="about-text">
-            The tools on this site are built around a few simple ideas:
-          </p>
-          <ul class="list-tight about-text">
-            <li>Make fuzzy topics feel concrete enough to talk about.</li>
-            <li>Give teams a neutral place to put thoughts and decisions.</li>
-            <li>Encourage experiments instead of grand plans.</li>
-            <li>Help people bring others with them, not leave them behind.</li>
-          </ul>
-          <p class="about-text">
-            ImTheBus is not a polished product. It is a working bench of prototypes, frameworks,
-            and little experiments that might be useful in real organisations.
-          </p>
+    <div class="about-grid">
+      <section class="about-panel">
+        <div class="label-chip">Why this exists</div>
+        <h2 class="about-heading">About IMTHEBUS</h2>
+        <p class="about-text">
+          IMTHEBUS is a small, evolving collection of tools built for practical use in day to day work.
+          The focus is on managers and teams who want clearer conversations and simpler decisions
+          without another full platform or login.
+        </p>
 
-          <a class="pill-link" href="https://rougvie.com" target="_blank" rel="noopener noreferrer">
-            <span class="icon">🕹️</span>
-            <span>Visit <strong>Rougvie.com</strong> for more experiments</span>
+        <h3 class="about-subheading">Design principles</h3>
+        <ul class="about-list">
+          <li><strong>Lightweight</strong> open it in a browser and it is ready.</li>
+          <li><strong>Focused</strong> each tool solves one problem instead of trying to do everything.</li>
+          <li><strong>Conversation first</strong> made to be used with other humans, not just quietly solo.</li>
+          <li><strong>Brutalist on purpose</strong> clear boxes, visible structure, honest interface.</li>
+        </ul>
+
+        <p class="about-text">
+          The whiteboard metaphor runs across the site. New tools are pinned as notes, prototypes can be
+          rough, and everything is open to revision. Nothing here is finished forever.
+        </p>
+
+        <a class="pill-link" href="https://rougvie.com" target="_blank" rel="noopener noreferrer">
+          <span class="icon">🕹️</span>
+          <span>Visit <strong>Rougvie.com</strong> for other experiments</span>
+        </a>
+
+        <h3 class="about-subheading">Terms of use</h3>
+        <p class="about-text">
+          This site is experimental. By using it you accept that:
+        </p>
+        <ul class="about-list">
+          <li>You use all tools at your own risk and judgement.</li>
+          <li>Nothing here replaces legal, HR, medical, or financial advice.</li>
+          <li>You are responsible for any decisions taken using ideas from this site.</li>
+          <li>The site may change, break, or vanish without notice.</li>
+        </ul>
+
+        <h3 class="about-subheading">Privacy</h3>
+        <p class="about-text">
+          The current tools are built to run in your browser without collecting personal data.
+        </p>
+        <ul class="about-list">
+          <li>Where possible, inputs stay in your browser and are not stored on a server.</li>
+          <li>Analytics, if added later, will focus on aggregated usage of tools, not individuals.</li>
+          <li>Any later account or team features will have a clear, specific privacy notice.</li>
+          <li>You should still treat anything typed into a tool like any other web form.</li>
+        </ul>
+
+        <p class="about-text">
+          A more formal policy may be added as the project grows. It will be linked from this page.
+        </p>
+      </section>
+
+      <section class="about-panel">
+        <div class="label-chip">Support</div>
+        <h2 class="about-heading">Ko fi and support</h2>
+        <p class="about-text">
+          If these tools help your work or spark useful conversations, you can nudge future experiments
+          along by supporting the project.
+        </p>
+        <div class="support-block">
+          <div class="support-title">Tip jar</div>
+          <p class="about-text" style="font-size:0.92rem;">
+            A small one off Ko fi helps justify time spent building and refining the toolbox.
+            No subscriptions, no special tiers, just a simple thank you.
+          </p>
+          <a class="support-cta" href="https://ko-fi.com/" target="_blank" rel="noopener noreferrer">
+            <span>☕</span>
+            <span>Support IMTHEBUS on Ko fi</span>
           </a>
-
-          <h3 class="about-subheading">Terms of use</h3>
-          <p class="about-text">
-            This site is offered as is, with no guarantees. In plain language:
+          <p class="about-text" style="font-size:0.8rem;margin-top:0.45rem;opacity:0.8;">
+            Using the tools, sharing them with others, or sending feedback is also valuable support.
           </p>
-          <ul class="list-tight about-text">
-            <li>Use the tools at your own risk and judgement.</li>
-            <li>The tools do not replace legal, HR, medical, or financial advice.</li>
-            <li>You are responsible for how you apply anything from this site in your workplace.</li>
-            <li>The site may change, break, or disappear without notice.</li>
-          </ul>
+        </div>
 
-          <h3 class="about-subheading">Privacy and data</h3>
-          <p class="about-text">
-            The default assumption is that your data belongs to you.
-          </p>
-          <ul class="list-tight about-text">
-            <li>The tools are designed to run in your browser with minimal data collection.</li>
-            <li>Any future sign in or team features will be clearly explained and optional.</li>
-            <li>Analytics, if used, will focus on broad usage, not tracking individuals.</li>
-            <li>If you type confidential information into any tool, treat it as you would any other web form.</li>
-          </ul>
-          <p class="about-text">
-            If a more formal privacy notice is added later, it will be linked clearly from this page.
-          </p>
+        <h3 class="about-subheading">How to use the tools</h3>
+        <ul class="about-list">
+          <li>Open a tool while you are in the conversation, not after it.</li>
+          <li>Write in language that everyone in the room would recognise.</li>
+          <li>Treat everything you put on the board as draft, not a verdict.</li>
+          <li>Move outcomes into your own systems once you are done.</li>
+        </ul>
 
-          <h3 class="about-subheading">Supporting the project</h3>
-          <div class="support-block about-text">
-            <strong>Ko fi and support</strong>
-            <p>
-              If you find these tools useful and want to nudge more experiments into existence,
-              you can choose to support the project with a small tip.
-            </p>
-            <a class="support-cta" href="https://ko-fi.com/" target="_blank" rel="noopener noreferrer">
-              <span>☕</span>
-              <span>Support ImTheBus on Ko fi</span>
-            </a>
-            <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.8;">
-              Completely optional. Using the tools, sharing them, and giving feedback also helps.
-            </p>
-          </div>
+        <p class="about-text">
+          The rest of this page quietly hosts a small browser based sticky note distraction.
+          It does not need instructions.
+        </p>
+      </section>
+    </div>
 
-          <h3 class="about-subheading">Using this whiteboard well</h3>
-          <p class="about-text">
-            These tools work best when you:
-          </p>
-          <ul class="list-tight about-text">
-            <li>Share the screen and draw together, rather than filling it in alone.</li>
-            <li>Write in simple language that everyone in the room understands.</li>
-            <li>Treat everything as a draft that can be revisited or thrown away.</li>
-            <li>Capture outcomes somewhere sensible afterwards, such as your own notes or systems.</li>
-          </ul>
-          <p class="about-text">
-            The <span class="highlight-note">About</span> page is just one more sticky on the board.
-            If something here does not work for you, you are encouraged to adapt it.
-          </p>
-        </section>
-
-        <!-- Mini game: falling post it notes -->
-        <section class="whiteboard-card">
-          <div class="game-wrapper">
-            <div class="game-top-row">
-              <div>
-                <h2 class="game-heading">Sticky Scoreboard</h2>
-                <p class="game-subtext">
-                  Post it notes drift down the whiteboard. Click them to wake up the retro scoreboard,
-                  speed up the flow, and see how long you can keep up.
-                </p>
-              </div>
-              <div id="scoreboard" class="scoreboard" aria-live="polite">
-                <span class="scoreboard-label">SCORE</span>
-                <span class="scoreboard-value mono" id="score-value">0000</span>
-                <span class="scoreboard-meta">LVL <span id="level-value">01</span></span>
-              </div>
-            </div>
-
-            <div class="game-legend">
-              <div class="legend-chip">
-                <span class="legend-color legend-yellow"></span>
-                <span>Yellow: +1 point, small speed up</span>
-              </div>
-              <div class="legend-chip">
-                <span class="legend-color legend-pink"></span>
-                <span>Pink: +3 points, bigger speed up</span>
-              </div>
-              <div class="legend-chip">
-                <span class="legend-color legend-blue"></span>
-                <span>Blue: calm things down a little</span>
-              </div>
-              <div class="legend-chip">
-                <span class="legend-color legend-green"></span>
-                <span>Green: tidy up a few notes</span>
-              </div>
-            </div>
-
-            <div id="sticky-board" class="game-board" aria-label="Falling sticky notes game area"></div>
-
-            <div class="game-footer">
-              <span>Tip: treat this like a warm up for the real work on the other tools.</span>
-              <span class="mono">New notes added periodically.</span>
-            </div>
-          </div>
-        </section>
-      </div>
-    </main>
-
-    <footer class="site-footer">
-      <p class="footer-text">
-        ImTheBus is an experimental toolkit for managers and teams. No logins yet, no promises, just tools.
-      </p>
-    </footer>
+    <p class="footer-text">
+      IMTHEBUS is an experimental whiteboard of tools for people who manage, coach, and organise other humans.
+    </p>
   </div>
+
+  <!-- Retro scoreboard -->
+  <div id="scoreboard" class="scoreboard" aria-live="polite">
+    <div class="score-line">
+      <span class="score-label">SCORE</span>
+      <span id="score-value" class="score-value">0000</span>
+    </div>
+    <div class="score-line">
+      <span class="score-label">HIGH</span>
+      <span id="highscore-value" class="score-value">0000</span>
+    </div>
+    <div class="score-small">ImTheBus highscore: 7,556</div>
+  </div>
+
+  <!-- Game over overlay -->
+  <div class="gameover-overlay" aria-hidden="true">
+    <div id="gameover-inner" class="gameover-inner">
+      <div class="gameover-title">GAME OVER</div>
+      <div id="gameover-score" class="gameover-score"></div>
+      <div id="gameover-high" class="gameover-score"></div>
+      <div class="gameover-score">ImTheBus highscore: 7,556</div>
+    </div>
+  </div>
+
+  <!-- High score stamp after overlay -->
+  <div id="highscore-stamp" class="highscore-stamp"></div>
 
   <script>
     (function () {
-      const board = document.getElementById("sticky-board");
-      const scoreboard = document.getElementById("scoreboard");
-      const scoreValue = document.getElementById("score-value");
-      const levelValue = document.getElementById("level-value");
+      const scoreboardEl = document.getElementById("scoreboard");
+      const scoreValueEl = document.getElementById("score-value");
+      const highValueEl = document.getElementById("highscore-value");
+      const gameoverInner = document.getElementById("gameover-inner");
+      const gameoverScoreEl = document.getElementById("gameover-score");
+      const gameoverHighEl = document.getElementById("gameover-high");
+      const highStampEl = document.getElementById("highscore-stamp");
 
-      if (!board) return;
+      const NOTE_WIDTH = 82;
+      const NOTE_HEIGHT = 78;
 
-      let score = 0;
-      let level = 1;
-      let fallDuration = 10000; // ms for the neutral speed
-      let spawnDelay = 2200; // ms between spawns
-      const minFallDuration = 2500;
-      const maxFallDuration = 14000;
-      const minSpawnDelay = 700;
-      const maxSpawnDelay = 3500;
+      const notes = [];
+      let lastTime = null;
       let spawnTimer = null;
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
 
-      const colorTypes = [
-        {
-          name: "yellow",
-          className: "note-yellow",
-          label: "Think fast",
-          scoreDelta: 1,
-          effect: "speedUpSmall"
-        },
-        {
-          name: "pink",
-          className: "note-pink",
-          label: "Big idea",
-          scoreDelta: 3,
-          effect: "speedUpBig"
-        },
-        {
-          name: "blue",
-          className: "note-blue",
-          label: "Deep breath",
-          scoreDelta: 0,
-          effect: "slowDown"
-        },
-        {
-          name: "green",
-          className: "note-green",
-          label: "Tidy up",
-          scoreDelta: 2,
-          effect: "clearSome"
-        }
-      ];
+      const state = {
+        score: 0,
+        highScore: 0,
+        retroMode: false,
+        gameOver: false,
+        baseSpeed: 55,
+        spawnInterval: 2200
+      };
 
-      function formatScore(n) {
+      const storedHigh = parseInt(localStorage.getItem("itb_sticky_highscore") || "0", 10);
+      if (!Number.isNaN(storedHigh)) {
+        state.highScore = storedHigh;
+      }
+
+      function fmtScore(n) {
         return String(Math.max(0, Math.floor(n))).padStart(4, "0");
       }
 
       function updateScoreboard() {
-        scoreValue.textContent = formatScore(score);
-        levelValue.textContent = String(level).padStart(2, "0");
-        if (!scoreboard.classList.contains("visible") && score > 0) {
-          scoreboard.classList.add("visible");
-        }
+        scoreValueEl.textContent = fmtScore(state.score);
+        highValueEl.textContent = fmtScore(state.highScore);
       }
 
-      function adjustGameSpeed(effect) {
-        if (effect === "speedUpSmall") {
-          fallDuration *= 0.93;
-          spawnDelay *= 0.95;
-        } else if (effect === "speedUpBig") {
-          fallDuration *= 0.88;
-          spawnDelay *= 0.9;
-        } else if (effect === "slowDown") {
-          fallDuration *= 1.16;
-          spawnDelay *= 1.08;
-        }
+      updateScoreboard();
 
-        fallDuration = Math.min(Math.max(fallDuration, minFallDuration), maxFallDuration);
-        spawnDelay = Math.min(Math.max(spawnDelay, minSpawnDelay), maxSpawnDelay);
+      function enterRetroMode() {
+        if (state.retroMode) return;
+        state.retroMode = true;
+        state.baseSpeed = 95;
+        state.spawnInterval = 1300;
 
-        const newLevel = 1 + Math.floor((10000 - fallDuration) / 1000);
-        if (newLevel !== level) {
-          level = Math.max(1, newLevel);
-        }
+        document.body.classList.add("retro-mode");
+        scoreboardEl.classList.add("visible");
 
-        if (spawnTimer) {
-          clearInterval(spawnTimer);
-        }
-        spawnTimer = setInterval(spawnNote, spawnDelay);
-        updateScoreboard();
+        if (spawnTimer) clearInterval(spawnTimer);
+        spawnTimer = setInterval(spawnNote, state.spawnInterval);
       }
 
-      function clearSomeNotes() {
-        const notes = board.querySelectorAll(".falling-note");
-        let removed = 0;
-        notes.forEach((note) => {
-          if (removed >= 3) return;
-          if (Math.random() < 0.4) {
-            note.remove();
-            removed += 1;
-          }
-        });
+      function scheduleSpawn() {
+        if (spawnTimer) clearInterval(spawnTimer);
+        spawnTimer = setInterval(spawnNote, state.spawnInterval);
       }
 
-      function createNoteElement(type) {
-        const note = document.createElement("div");
-        note.classList.add("falling-note", type.className);
+      function randomType() {
+        const r = Math.random();
+        if (r < 0.6) return "yellow";
+        if (r < 0.8) return "blue";
+        return "red";
+      }
 
-        // Small random imperfections
-        if (Math.random() < 0.5) {
-          note.classList.add("note-tilt-left");
-        } else {
-          note.classList.add("note-tilt-right");
-        }
-        if (Math.random() < 0.35) {
-          note.classList.add("note-crumpled");
-        }
-        if (Math.random() < 0.25) {
-          note.classList.add("note-dogear");
-        }
+      function createNote() {
+        const type = randomType();
+        const el = document.createElement("div");
+        el.classList.add("sticky-note");
 
-        const boardWidth = board.clientWidth || 360;
-        const maxLeft = Math.max(0, boardWidth - 90);
-        const left = Math.random() * maxLeft;
+        if (type === "yellow") el.classList.add("note-yellow");
+        else if (type === "red") el.classList.add("note-red");
+        else el.classList.add("note-blue");
 
-        note.style.left = left + "px";
-        note.style.top = "-90px";
-        note.style.animationDuration = fallDuration + "ms";
+        if (Math.random() < 0.5) el.classList.add("note-tilt-left");
+        else el.classList.add("note-tilt-right");
 
-        note.textContent = type.label;
+        const startX = Math.random() * (window.innerWidth - NOTE_WIDTH);
+        const startY = -NOTE_HEIGHT - Math.random() * 120;
 
-        note.dataset.effect = type.effect;
-        note.dataset.scoreDelta = String(type.scoreDelta);
+        const speed = state.baseSpeed + Math.random() * 35;
+        const horizontalDrift = (Math.random() - 0.5) * 20;
+        const rotation = (Math.random() - 0.5) * 8;
 
-        note.addEventListener("animationend", () => {
-          note.remove();
-        });
+        const note = {
+          el,
+          type,
+          x: startX,
+          y: startY,
+          vy: speed,
+          vx: horizontalDrift,
+          rotation,
+          hp: type === "red" ? 3 : 1
+        };
 
-        note.addEventListener("click", (event) => {
+        el.style.left = startX + "px";
+        el.style.top = startY + "px";
+        el.style.transform = `translate(0px, 0px) rotate(${rotation}deg)`;
+
+        el.addEventListener("click", function (event) {
           event.stopPropagation();
-          const delta = parseInt(note.dataset.scoreDelta || "0", 10);
-          score += delta;
-          updateScoreboard();
+          if (state.gameOver) return;
 
-          const effectName = note.dataset.effect;
-          if (effectName === "clearSome") {
-            clearSomeNotes();
+          // First contact flips into retro mode
+          enterRetroMode();
+
+          el.classList.remove("note-edge-flash");
+          void el.offsetWidth;
+          el.classList.add("note-edge-flash");
+
+          if (note.type === "red") {
+            note.hp -= 1;
+            if (note.hp <= 0) {
+              state.score += 5;
+              removeNote(note);
+            }
           } else {
-            adjustGameSpeed(effectName);
+            state.score += 1;
+            removeNote(note);
           }
 
-          note.remove();
+          if (state.score > state.highScore) {
+            state.highScore = state.score;
+            localStorage.setItem("itb_sticky_highscore", String(state.highScore));
+          }
+          updateScoreboard();
         });
 
-        return note;
+        document.body.appendChild(el);
+        notes.push(note);
+      }
+
+      function removeNote(note) {
+        const idx = notes.indexOf(note);
+        if (idx !== -1) notes.splice(idx, 1);
+        if (note.el && note.el.parentNode) {
+          note.el.parentNode.removeChild(note.el);
+        }
       }
 
       function spawnNote() {
-        const type = colorTypes[Math.floor(Math.random() * colorTypes.length)];
-        const note = createNoteElement(type);
-        board.appendChild(note);
+        if (state.gameOver) return;
+        createNote();
       }
 
-      // Start with a few drifting notes
+      function triggerGameOver() {
+        if (state.gameOver) return;
+        state.gameOver = true;
+
+        if (spawnTimer) {
+          clearInterval(spawnTimer);
+          spawnTimer = null;
+        }
+
+        notes.forEach((n) => {
+          n.el.classList.add("note-fade-out");
+        });
+
+        if (state.score > state.highScore) {
+          state.highScore = state.score;
+          localStorage.setItem("itb_sticky_highscore", String(state.highScore));
+          updateScoreboard();
+        }
+
+        gameoverScoreEl.textContent = "Your high score: " + state.score.toLocaleString();
+        gameoverHighEl.textContent = "Stored high score: " + state.highScore.toLocaleString();
+
+        gameoverInner.classList.add("visible");
+
+        setTimeout(() => {
+          highStampEl.textContent = "High score: " + state.highScore.toLocaleString();
+          highStampEl.classList.add("visible");
+        }, 5200);
+      }
+
+      function loop(timestamp) {
+        if (!lastTime) {
+          lastTime = timestamp;
+          requestAnimationFrame(loop);
+          return;
+        }
+        const dt = (timestamp - lastTime) / 1000;
+        lastTime = timestamp;
+
+        if (!state.gameOver) {
+          const height = window.innerHeight;
+
+          for (let i = notes.length - 1; i >= 0; i--) {
+            const note = notes[i];
+
+            if (note.type === "blue") {
+              const dx = note.x + NOTE_WIDTH / 2 - mouseX;
+              const dy = note.y + NOTE_HEIGHT / 2 - mouseY;
+              const distSq = dx * dx + dy * dy;
+              const avoidRadius = 200 * 200;
+
+              if (distSq < avoidRadius) {
+                const factor = 120 / Math.sqrt(distSq + 1);
+                note.vx += (dx / Math.sqrt(distSq + 1)) * factor;
+              } else {
+                note.vx *= 0.98;
+              }
+            }
+
+            note.y += note.vy * dt;
+            note.x += note.vx * dt;
+
+            if (note.x < -30) note.x = -30;
+            if (note.x > window.innerWidth - NOTE_WIDTH + 30) note.x = window.innerWidth - NOTE_WIDTH + 30;
+
+            note.el.style.transform = `translate(${note.x}px, ${note.y}px) rotate(${note.rotation}deg)`;
+
+            if (note.y > height) {
+              removeNote(note);
+              if (state.retroMode) {
+                triggerGameOver();
+              }
+            }
+          }
+        }
+
+        requestAnimationFrame(loop);
+      }
+
+      document.addEventListener("mousemove", (event) => {
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+      });
+
+      window.addEventListener("resize", () => {
+        notes.forEach((note) => {
+          if (note.x > window.innerWidth - NOTE_WIDTH) {
+            note.x = window.innerWidth - NOTE_WIDTH;
+          }
+        });
+      });
+
       for (let i = 0; i < 4; i++) {
         setTimeout(spawnNote, 400 * i);
       }
-
-      spawnTimer = setInterval(spawnNote, spawnDelay);
-
-      // Make sure notes keep spawning even if the tab was inactive
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
-          if (spawnTimer) {
-            clearInterval(spawnTimer);
-            spawnTimer = null;
-          }
-        } else {
-          if (!spawnTimer) {
-            spawnTimer = setInterval(spawnNote, spawnDelay);
-          }
-        }
-      });
+      scheduleSpawn();
+      requestAnimationFrame(loop);
     })();
   </script>
 </body>
