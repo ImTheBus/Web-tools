@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>ImTheBus – About & Info</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Shared site styles -->
+  <link rel="stylesheet" href="assets/styles.css" />
+
+  <!-- Fonts consistent with other ImTheBus pages -->
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* Page specific layout that sits on top of your shared styles */
+
+    .about-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 2fr);
+      gap: 1.75rem;
+      align-items: flex-start;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .about-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .whiteboard-card {
+      background: var(--bg-board, #fdfdfd);
+      border-radius: 1.25rem;
+      border: 2px solid var(--border-strong, #111);
+      box-shadow:
+        0 20px 35px rgba(0, 0, 0, 0.14),
+        0 0 0 3px rgba(255, 255, 255, 0.8) inset;
+      padding: 1.5rem 1.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .whiteboard-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 0, rgba(255, 255, 255, 0.8), transparent 55%),
+        radial-gradient(circle at 85% 0, rgba(255, 255, 255, 0.6), transparent 50%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0.9;
+    }
+
+    .whiteboard-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .about-heading {
+      font-family: "Permanent Marker", system-ui;
+      font-size: 1.9rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .about-subheading {
+      font-weight: 600;
+      margin-top: 1.25rem;
+      margin-bottom: 0.35rem;
+      font-size: 1.05rem;
+      letter-spacing: 0.01em;
+    }
+
+    .about-text {
+      font-size: 0.98rem;
+      line-height: 1.6;
+      color: #222;
+    }
+
+    .pill-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      background: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: inherit;
+      margin-top: 0.75rem;
+      backdrop-filter: blur(6px);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+    }
+
+    .pill-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+      border-color: rgba(0, 0, 0, 0.25);
+    }
+
+    .pill-link span.icon {
+      font-size: 1.1rem;
+    }
+
+    .list-tight {
+      padding-left: 1.15rem;
+      margin: 0.25rem 0 0.75rem 0;
+      font-size: 0.95rem;
+    }
+
+    .list-tight li + li {
+      margin-top: 0.25rem;
+    }
+
+    .highlight-note {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 0.5rem;
+      background: rgba(254, 243, 199, 0.8);
+      border: 1px solid rgba(180, 118, 20, 0.45);
+      font-size: 0.9rem;
+    }
+
+    /* Ko fi style section */
+    .support-block {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 0.9rem;
+      border: 1px dashed rgba(0, 0, 0, 0.16);
+      background: rgba(252, 252, 252, 0.9);
+    }
+
+    .support-block strong {
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .support-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      background: linear-gradient(135deg, #ffecd5, #ffe5f1);
+      box-shadow: 0 4px 9px rgba(0, 0, 0, 0.16);
+    }
+
+    .support-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Sticky note mini game */
+
+    .game-heading {
+      font-family: "Permanent Marker", system-ui;
+      font-size: 1.6rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .game-subtext {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-bottom: 0.9rem;
+    }
+
+    .game-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .game-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .scoreboard {
+      font-family: "Courier New", ui-monospace, monospace;
+      padding: 0.4rem 0.75rem;
+      border-radius: 0.6rem;
+      background: #050707;
+      border: 2px solid #00ff99;
+      color: #00ff99;
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+      box-shadow: 0 0 6px rgba(0, 255, 153, 0.6);
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity 0.16s ease, transform 0.16s ease;
+      min-width: 180px;
+    }
+
+    .scoreboard.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .scoreboard-label {
+      opacity: 0.8;
+    }
+
+    .scoreboard-value {
+      font-size: 1.1rem;
+      margin-left: 0.35rem;
+    }
+
+    .scoreboard-meta {
+      font-size: 0.7rem;
+      opacity: 0.7;
+      margin-left: 0.35rem;
+    }
+
+    .game-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      font-size: 0.8rem;
+    }
+
+    .legend-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
+    }
+
+    .legend-yellow { background: #fff8a7; }
+    .legend-pink   { background: #ffb3c6; }
+    .legend-blue   { background: #bde0fe; }
+    .legend-green  { background: #c7f9cc; }
+
+    .game-board {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      border-radius: 1rem;
+      border: 2px dashed rgba(0, 0, 0, 0.25);
+      background:
+        linear-gradient(transparent 0, transparent calc(100% - 26px), rgba(0, 0, 0, 0.06) calc(100% - 26px), rgba(0, 0, 0, 0.08) 100%),
+        repeating-linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.04),
+          rgba(0, 0, 0, 0.04) 1px,
+          transparent 1px,
+          transparent 20px
+        );
+      overflow: hidden;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+        0 14px 30px rgba(0, 0, 0, 0.22);
+      backdrop-filter: blur(8px);
+    }
+
+    .game-board::before {
+      content: "Click falling notes to increase the score and change the tempo.";
+      position: absolute;
+      left: 1rem;
+      top: 0.65rem;
+      font-size: 0.75rem;
+      font-style: italic;
+      color: rgba(0, 0, 0, 0.6);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .falling-note {
+      position: absolute;
+      width: 80px;
+      height: 70px;
+      border-radius: 6px;
+      box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(0, 0, 0, 0.16);
+      transform-origin: center top;
+      cursor: pointer;
+      padding: 0.4rem 0.5rem;
+      font-size: 0.75rem;
+      font-family: "Permanent Marker", system-ui;
+      text-align: center;
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      z-index: 2;
+      animation-name: noteFall;
+      animation-timing-function: linear;
+    }
+
+    .falling-note::before {
+      content: "";
+      position: absolute;
+      width: 26px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.12);
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .note-yellow {
+      background: #fff8a7;
+    }
+
+    .note-pink {
+      background: #ffb3c6;
+    }
+
+    .note-blue {
+      background: #bde0fe;
+    }
+
+    .note-green {
+      background: #c7f9cc;
+    }
+
+    .note-tilt-left {
+      transform: rotate(-5deg);
+    }
+
+    .note-tilt-right {
+      transform: rotate(4deg);
+    }
+
+    .note-crumpled {
+      box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.35),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.24);
+      filter: saturate(0.9) contrast(1.05);
+    }
+
+    .note-dogear::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 0;
+      border-width: 0 16px 16px 0;
+      border-style: solid;
+      border-color: transparent rgba(0, 0, 0, 0.18) transparent transparent;
+      opacity: 0.6;
+    }
+
+    @keyframes noteFall {
+      from {
+        transform: translateY(-90px);
+      }
+      to {
+        transform: translateY(360px);
+      }
+    }
+
+    .game-footer {
+      margin-top: 0.6rem;
+      font-size: 0.75rem;
+      opacity: 0.7;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .game-footer span {
+      white-space: nowrap;
+    }
+
+    .mono {
+      font-family: "Courier New", ui-monospace, monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="site-wrapper fade-in">
+    <header class="site-header">
+      <div class="site-title-group">
+        <h1 class="site-title">ImTheBus Management Tools</h1>
+        <p class="site-tagline">About this whiteboard, the tools, and how to use them responsibly.</p>
+      </div>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="important-vs-urgent.html">Tools</a>
+        <a href="about.html" aria-current="page">About</a>
+      </nav>
+    </header>
+
+    <main class="site-main">
+      <div class="about-layout">
+        <!-- About / terms / privacy -->
+        <section class="whiteboard-card">
+          <h2 class="about-heading">About ImTheBus</h2>
+          <p class="about-text">
+            ImTheBus is a small collection of practical tools that live on a shared whiteboard.
+            They exist to help managers and teams think more clearly about work, decisions, and
+            how people operate together. The goal is simple: fewer vague conversations, more
+            useful ones.
+          </p>
+
+          <h3 class="about-subheading">Why this site exists</h3>
+          <p class="about-text">
+            The tools on this site are built around a few simple ideas:
+          </p>
+          <ul class="list-tight about-text">
+            <li>Make fuzzy topics feel concrete enough to talk about.</li>
+            <li>Give teams a neutral place to put thoughts and decisions.</li>
+            <li>Encourage experiments instead of grand plans.</li>
+            <li>Help people bring others with them, not leave them behind.</li>
+          </ul>
+          <p class="about-text">
+            ImTheBus is not a polished product. It is a working bench of prototypes, frameworks,
+            and little experiments that might be useful in real organisations.
+          </p>
+
+          <a class="pill-link" href="https://rougvie.com" target="_blank" rel="noopener noreferrer">
+            <span class="icon">🕹️</span>
+            <span>Visit <strong>Rougvie.com</strong> for more experiments</span>
+          </a>
+
+          <h3 class="about-subheading">Terms of use</h3>
+          <p class="about-text">
+            This site is offered as is, with no guarantees. In plain language:
+          </p>
+          <ul class="list-tight about-text">
+            <li>Use the tools at your own risk and judgement.</li>
+            <li>The tools do not replace legal, HR, medical, or financial advice.</li>
+            <li>You are responsible for how you apply anything from this site in your workplace.</li>
+            <li>The site may change, break, or disappear without notice.</li>
+          </ul>
+
+          <h3 class="about-subheading">Privacy and data</h3>
+          <p class="about-text">
+            The default assumption is that your data belongs to you.
+          </p>
+          <ul class="list-tight about-text">
+            <li>The tools are designed to run in your browser with minimal data collection.</li>
+            <li>Any future sign in or team features will be clearly explained and optional.</li>
+            <li>Analytics, if used, will focus on broad usage, not tracking individuals.</li>
+            <li>If you type confidential information into any tool, treat it as you would any other web form.</li>
+          </ul>
+          <p class="about-text">
+            If a more formal privacy notice is added later, it will be linked clearly from this page.
+          </p>
+
+          <h3 class="about-subheading">Supporting the project</h3>
+          <div class="support-block about-text">
+            <strong>Ko fi and support</strong>
+            <p>
+              If you find these tools useful and want to nudge more experiments into existence,
+              you can choose to support the project with a small tip.
+            </p>
+            <a class="support-cta" href="https://ko-fi.com/" target="_blank" rel="noopener noreferrer">
+              <span>☕</span>
+              <span>Support ImTheBus on Ko fi</span>
+            </a>
+            <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.8;">
+              Completely optional. Using the tools, sharing them, and giving feedback also helps.
+            </p>
+          </div>
+
+          <h3 class="about-subheading">Using this whiteboard well</h3>
+          <p class="about-text">
+            These tools work best when you:
+          </p>
+          <ul class="list-tight about-text">
+            <li>Share the screen and draw together, rather than filling it in alone.</li>
+            <li>Write in simple language that everyone in the room understands.</li>
+            <li>Treat everything as a draft that can be revisited or thrown away.</li>
+            <li>Capture outcomes somewhere sensible afterwards, such as your own notes or systems.</li>
+          </ul>
+          <p class="about-text">
+            The <span class="highlight-note">About</span> page is just one more sticky on the board.
+            If something here does not work for you, you are encouraged to adapt it.
+          </p>
+        </section>
+
+        <!-- Mini game: falling post it notes -->
+        <section class="whiteboard-card">
+          <div class="game-wrapper">
+            <div class="game-top-row">
+              <div>
+                <h2 class="game-heading">Sticky Scoreboard</h2>
+                <p class="game-subtext">
+                  Post it notes drift down the whiteboard. Click them to wake up the retro scoreboard,
+                  speed up the flow, and see how long you can keep up.
+                </p>
+              </div>
+              <div id="scoreboard" class="scoreboard" aria-live="polite">
+                <span class="scoreboard-label">SCORE</span>
+                <span class="scoreboard-value mono" id="score-value">0000</span>
+                <span class="scoreboard-meta">LVL <span id="level-value">01</span></span>
+              </div>
+            </div>
+
+            <div class="game-legend">
+              <div class="legend-chip">
+                <span class="legend-color legend-yellow"></span>
+                <span>Yellow: +1 point, small speed up</span>
+              </div>
+              <div class="legend-chip">
+                <span class="legend-color legend-pink"></span>
+                <span>Pink: +3 points, bigger speed up</span>
+              </div>
+              <div class="legend-chip">
+                <span class="legend-color legend-blue"></span>
+                <span>Blue: calm things down a little</span>
+              </div>
+              <div class="legend-chip">
+                <span class="legend-color legend-green"></span>
+                <span>Green: tidy up a few notes</span>
+              </div>
+            </div>
+
+            <div id="sticky-board" class="game-board" aria-label="Falling sticky notes game area"></div>
+
+            <div class="game-footer">
+              <span>Tip: treat this like a warm up for the real work on the other tools.</span>
+              <span class="mono">New notes added periodically.</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p class="footer-text">
+        ImTheBus is an experimental toolkit for managers and teams. No logins yet, no promises, just tools.
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const board = document.getElementById("sticky-board");
+      const scoreboard = document.getElementById("scoreboard");
+      const scoreValue = document.getElementById("score-value");
+      const levelValue = document.getElementById("level-value");
+
+      if (!board) return;
+
+      let score = 0;
+      let level = 1;
+      let fallDuration = 10000; // ms for the neutral speed
+      let spawnDelay = 2200; // ms between spawns
+      const minFallDuration = 2500;
+      const maxFallDuration = 14000;
+      const minSpawnDelay = 700;
+      const maxSpawnDelay = 3500;
+      let spawnTimer = null;
+
+      const colorTypes = [
+        {
+          name: "yellow",
+          className: "note-yellow",
+          label: "Think fast",
+          scoreDelta: 1,
+          effect: "speedUpSmall"
+        },
+        {
+          name: "pink",
+          className: "note-pink",
+          label: "Big idea",
+          scoreDelta: 3,
+          effect: "speedUpBig"
+        },
+        {
+          name: "blue",
+          className: "note-blue",
+          label: "Deep breath",
+          scoreDelta: 0,
+          effect: "slowDown"
+        },
+        {
+          name: "green",
+          className: "note-green",
+          label: "Tidy up",
+          scoreDelta: 2,
+          effect: "clearSome"
+        }
+      ];
+
+      function formatScore(n) {
+        return String(Math.max(0, Math.floor(n))).padStart(4, "0");
+      }
+
+      function updateScoreboard() {
+        scoreValue.textContent = formatScore(score);
+        levelValue.textContent = String(level).padStart(2, "0");
+        if (!scoreboard.classList.contains("visible") && score > 0) {
+          scoreboard.classList.add("visible");
+        }
+      }
+
+      function adjustGameSpeed(effect) {
+        if (effect === "speedUpSmall") {
+          fallDuration *= 0.93;
+          spawnDelay *= 0.95;
+        } else if (effect === "speedUpBig") {
+          fallDuration *= 0.88;
+          spawnDelay *= 0.9;
+        } else if (effect === "slowDown") {
+          fallDuration *= 1.16;
+          spawnDelay *= 1.08;
+        }
+
+        fallDuration = Math.min(Math.max(fallDuration, minFallDuration), maxFallDuration);
+        spawnDelay = Math.min(Math.max(spawnDelay, minSpawnDelay), maxSpawnDelay);
+
+        const newLevel = 1 + Math.floor((10000 - fallDuration) / 1000);
+        if (newLevel !== level) {
+          level = Math.max(1, newLevel);
+        }
+
+        if (spawnTimer) {
+          clearInterval(spawnTimer);
+        }
+        spawnTimer = setInterval(spawnNote, spawnDelay);
+        updateScoreboard();
+      }
+
+      function clearSomeNotes() {
+        const notes = board.querySelectorAll(".falling-note");
+        let removed = 0;
+        notes.forEach((note) => {
+          if (removed >= 3) return;
+          if (Math.random() < 0.4) {
+            note.remove();
+            removed += 1;
+          }
+        });
+      }
+
+      function createNoteElement(type) {
+        const note = document.createElement("div");
+        note.classList.add("falling-note", type.className);
+
+        // Small random imperfections
+        if (Math.random() < 0.5) {
+          note.classList.add("note-tilt-left");
+        } else {
+          note.classList.add("note-tilt-right");
+        }
+        if (Math.random() < 0.35) {
+          note.classList.add("note-crumpled");
+        }
+        if (Math.random() < 0.25) {
+          note.classList.add("note-dogear");
+        }
+
+        const boardWidth = board.clientWidth || 360;
+        const maxLeft = Math.max(0, boardWidth - 90);
+        const left = Math.random() * maxLeft;
+
+        note.style.left = left + "px";
+        note.style.top = "-90px";
+        note.style.animationDuration = fallDuration + "ms";
+
+        note.textContent = type.label;
+
+        note.dataset.effect = type.effect;
+        note.dataset.scoreDelta = String(type.scoreDelta);
+
+        note.addEventListener("animationend", () => {
+          note.remove();
+        });
+
+        note.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const delta = parseInt(note.dataset.scoreDelta || "0", 10);
+          score += delta;
+          updateScoreboard();
+
+          const effectName = note.dataset.effect;
+          if (effectName === "clearSome") {
+            clearSomeNotes();
+          } else {
+            adjustGameSpeed(effectName);
+          }
+
+          note.remove();
+        });
+
+        return note;
+      }
+
+      function spawnNote() {
+        const type = colorTypes[Math.floor(Math.random() * colorTypes.length)];
+        const note = createNoteElement(type);
+        board.appendChild(note);
+      }
+
+      // Start with a few drifting notes
+      for (let i = 0; i < 4; i++) {
+        setTimeout(spawnNote, 400 * i);
+      }
+
+      spawnTimer = setInterval(spawnNote, spawnDelay);
+
+      // Make sure notes keep spawning even if the tab was inactive
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          if (spawnTimer) {
+            clearInterval(spawnTimer);
+            spawnTimer = null;
+          }
+        } else {
+          if (!spawnTimer) {
+            spawnTimer = setInterval(spawnNote, spawnDelay);
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
