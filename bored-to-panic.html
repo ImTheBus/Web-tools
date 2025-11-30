@@ -10,13 +10,10 @@
   <script src="assets/imthebus-core.js" defer></script>
 
   <!-- External libs used only on this page -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 
   <style>
-    /* Page-specific layout layered on top of shared styles */
-
     main.page {
       align-items: flex-start;
     }
@@ -90,7 +87,7 @@
       margin-top: 0.2rem;
     }
 
-    /* Sidebar collapsible sections (keeps the behaviour from the original page) */
+    /* Sidebar collapsible sections */
 
     .sidebar-section {
       border-radius: 18px;
@@ -247,7 +244,7 @@
       gap: 0.55rem;
     }
 
-    /* Question sections and table layout */
+    /* Question sections */
 
     .question-section {
       border-radius: 16px;
@@ -315,29 +312,6 @@
       text-align: left;
     }
 
-    .scale-label-row th {
-      font-weight: 500;
-    }
-
-    .scale-label-row th:nth-child(3) {
-      text-align: center;
-    }
-
-    .scale-label-row th span {
-      display: block;
-    }
-
-    .scale-label-row th span.label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-
-    .scale-label-row th span.caption {
-      font-size: 0.7rem;
-      color: #666;
-    }
-
     .response-cell {
       text-align: center;
     }
@@ -390,7 +364,7 @@
       transform: translateY(1px);
     }
 
-    /* Right column: ring chart and results */
+    /* Right column panels */
 
     .donut-panel {
       border-radius: 16px;
@@ -515,13 +489,6 @@
       background: #f5f5f5;
     }
 
-    #entriesChart {
-      width: 100%;
-      height: 160px;
-      margin-top: 0.45rem;
-      display: none;
-    }
-
     /* Export tweaks */
 
     .export-header {
@@ -585,26 +552,8 @@
           work feels and where pressure is landing.
         </p>
 
-        <div class="sidebar-section open">
-          <button type="button" class="sidebar-section-header">
-            <span class="sidebar-section-title">About this tool</span>
-            <span class="sidebar-section-toggle">+</span>
-          </button>
-          <div class="sidebar-section-body">
-            <p>
-              Both Bored and Panic are zones we do not enjoy. They are not places where we feel safely
-              challenged or comfortable, and they rarely support learning.
-            </p>
-            <p>
-              We spend time in <strong>Stretch</strong> to expand our Comfort zone, and we learn how to
-              recover when we have to visit <strong>Stress</strong>. This assessment is about understanding
-              where you currently spend your time and whether the daily “exercise” of work is helping or
-              hindering that growth.
-            </p>
-          </div>
-        </div>
-
-        <div class="sidebar-section">
+        <!-- Details first, open by default -->
+        <div class="sidebar-section open" id="detailsSection">
           <button type="button" class="sidebar-section-header">
             <span class="sidebar-section-title">Details for this assessment</span>
             <span class="sidebar-section-toggle">+</span>
@@ -651,6 +600,26 @@
           </div>
         </div>
 
+        <!-- About second -->
+        <div class="sidebar-section" id="aboutSection">
+          <button type="button" class="sidebar-section-header">
+            <span class="sidebar-section-title">About this tool</span>
+            <span class="sidebar-section-toggle">+</span>
+          </button>
+          <div class="sidebar-section-body">
+            <p>
+              Both Bored and Panic are zones we do not enjoy. They are not places where we feel safely
+              challenged or comfortable, and they rarely support learning.
+            </p>
+            <p>
+              We spend time in <strong>Stretch</strong> to expand our Comfort zone, and we learn how to
+              recover when we have to visit <strong>Stress</strong>. This assessment is about understanding
+              where you currently spend your time and whether the daily “exercise” of work is helping or
+              hindering that growth.
+            </p>
+          </div>
+        </div>
+
         <div class="sidebar-section">
           <button type="button" class="sidebar-section-header">
             <span class="sidebar-section-title">Saved assessments</span>
@@ -667,7 +636,6 @@
             <div class="sidebar-buttons">
               <button id="saveEntry" type="button" class="primary">Save current view</button>
               <button id="exportCsv" type="button">Export CSV</button>
-              <!-- PDF button is now in the board toolbar -->
               <button id="clearEntries" type="button" class="danger">Clear all</button>
             </div>
 
@@ -746,11 +714,8 @@
                     <th>Panic%</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <!-- Populated by script -->
-                </tbody>
+                <tbody></tbody>
               </table>
-              <canvas id="entriesChart"></canvas>
             </div>
           </div>
         </div>
@@ -762,7 +727,7 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      /* Sidebar collapsibles (same behaviour as original page) */
+      /* Sidebar collapsibles */
       document.querySelectorAll(".sidebar-section").forEach(section => {
         const header = section.querySelector(".sidebar-section-header");
         header.addEventListener("click", () => {
@@ -783,7 +748,7 @@
         }
       });
 
-      /* ---------- Question data ---------- */
+      /* Question data */
 
       const questions = [
         { id: 1,  text: "I regularly take on tasks that feel stretching but achievable." },
@@ -872,7 +837,8 @@
         panic: "Panic"
       };
 
-      /* Same hues, bolder opacity for the ring chart */
+      /* Ring chart colours */
+
       const zoneColors = {
         bored:   { fill: "rgba(17,24,39,0.35)", stroke: "#111827" },
         comfort: { fill: "rgba(96,165,250,0.8)", stroke: "#1d4ed8" },
@@ -911,7 +877,6 @@
       const boardWrapper = document.getElementById("boardWrapper");
       const boardInner = document.getElementById("boardInner");
       const assessmentCountSpan = document.getElementById("assessmentCount");
-      const entriesChartCanvas = document.getElementById("entriesChart");
 
       let latestZonePercents = null;
       let latestZoneRaw = null;
@@ -920,7 +885,6 @@
       let latestResponses = null;
       let latestScaleScore = null;
       let latestFollowupText = "";
-      let entriesChart = null;
 
       /* Assessment counter */
 
@@ -985,7 +949,6 @@
           const thText = document.createElement("th");
           thText.className = "question-text";
           thText.textContent = "Statement";
-
           headRow.appendChild(thText);
 
           responseOptions.forEach(opt => {
@@ -1061,7 +1024,7 @@
 
       buildQuestions();
 
-      /* Concentric ring chart (canvas) */
+      /* Ring chart */
 
       const ringCanvas = document.getElementById("zoneRing");
       const ringCtx = ringCanvas.getContext("2d");
@@ -1124,7 +1087,7 @@
       drawRingChart(null);
       updateRingLegend(null, "Equal starting pattern. Updates after calculation.");
 
-      /* Scoring logic */
+      /* Scoring */
 
       function getResponses() {
         const responses = {};
@@ -1429,7 +1392,7 @@
         overallResult.innerHTML = html;
       }
 
-      /* Local storage for entries */
+      /* Local storage */
 
       function loadEntries() {
         try {
@@ -1466,69 +1429,6 @@
           opt.textContent = `${entry.timestamp}`;
           loadSelect.appendChild(opt);
         });
-
-        updateEntriesChart(entries);
-      }
-
-      function updateEntriesChart(entries) {
-        entries = entries || loadEntries();
-        if (!entries || entries.length < 2) {
-          if (entriesChart) {
-            entriesChart.destroy();
-            entriesChart = null;
-          }
-          entriesChartCanvas.style.display = "none";
-          return;
-        }
-
-        const labels = entries.map(e => e.timestamp);
-        const boredData = entries.map(e => e.zonePercents?.bored ?? null);
-        const comfortData = entries.map(e => e.zonePercents?.comfort ?? null);
-        const stretchData = entries.map(e => e.zonePercents?.stretch ?? null);
-        const stressData = entries.map(e => e.zonePercents?.stress ?? null);
-        const panicData = entries.map(e => e.zonePercents?.panic ?? null);
-
-        const datasets = [
-          { label: "Bored", data: boredData, borderColor: zoneColors.bored.stroke },
-          { label: "Comfort", data: comfortData, borderColor: zoneColors.comfort.stroke },
-          { label: "Stretch", data: stretchData, borderColor: zoneColors.stretch.stroke },
-          { label: "Stress", data: stressData, borderColor: zoneColors.stress.stroke },
-          { label: "Panic", data: panicData, borderColor: zoneColors.panic.stroke }
-        ].map(ds => ({
-          ...ds,
-          fill: false,
-          tension: 0.2,
-          pointRadius: 2,
-          borderWidth: 1.5
-        }));
-
-        const ctx = entriesChartCanvas.getContext("2d");
-        entriesChartCanvas.style.display = "block";
-
-        if (entriesChart) {
-          entriesChart.data.labels = labels;
-          entriesChart.data.datasets.forEach((ds, i) => {
-            ds.data = datasets[i].data;
-          });
-          entriesChart.update();
-        } else {
-          entriesChart = new Chart(ctx, {
-            type: "line",
-            data: { labels, datasets },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: true, position: "bottom" } },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  max: 100,
-                  ticks: { stepSize: 20 }
-                }
-              }
-            }
-          });
-        }
       }
 
       renderEntriesTableAndDropdown();
@@ -1600,15 +1500,15 @@
         entries.forEach(entry => {
           const zp = entry.zonePercents || {};
           const responses = entry.responses || {};
+          const top = Object.entries(zp).sort((a, b) => b[1] - a[1])[0];
+          const topLabel = top ? zoneLabels[top[0]] : "";
           const row = [
             entry.timestamp,
             entry.name || "",
             entry.roleLevel || "",
             entry.context || "",
             entry.score,
-            zoneLabels[
-              Object.entries(zp).sort((a, b) => b[1] - a[1])[0]?.[0] || ""
-            ] || "",
+            topLabel,
             zp.bored ?? "",
             zp.comfort ?? "",
             zp.stretch ?? "",
@@ -1716,17 +1616,11 @@
       clearButton.addEventListener("click", handleClearEntries);
       loadSelect.addEventListener("change", handleLoadEntry);
 
-      /* Calculation */
+      /* Calculate – default role to L1 if not set */
 
       function handleCalculate() {
         if (!roleLevelSelect.value) {
-          roleLevelSelect.focus();
-          roleLevelSelect.scrollIntoView({ behavior: "smooth", block: "center" });
-          roleLevelSelect.style.borderColor = "#b91c1c";
-          setTimeout(() => {
-            roleLevelSelect.style.borderColor = "#000000";
-          }, 1200);
-          return;
+          roleLevelSelect.value = "L1";   // assume Operator
         }
 
         const responses = getResponses();
@@ -1780,7 +1674,7 @@
         }
       });
 
-      /* PDF export – header/footer, works even before calculation (template mode) */
+      /* PDF export */
 
       async function handleExportPdf() {
         const { jsPDF } = window.jspdf;
@@ -1905,4 +1799,3 @@
   </script>
 </body>
 </html>
-
