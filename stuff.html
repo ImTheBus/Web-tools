@@ -5,7 +5,1029 @@
   <title>IMTHEBUS – About & Info</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- Shared site styles --><!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>IMTHEBUS – About & Info</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <!-- Shared site styles -->
+  <link rel="stylesheet" href="assets/styles.css" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --ink: #111111;
+      --bg-plain: #fdfdfd;
+      --border-strong: #000000;
+      --accent-soft: #ffeaa7;
+      --accent-strong: #111111;
+
+      --note-yellow: #fff8a7;
+      --note-red: #ff8ba7;
+      --note-blue: #bde0fe;
+    }
+
+    body {
+      background: #f2f2f2;
+      color: var(--ink);
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .site-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 4rem;
+    }
+
+    /* Top nav */
+    .top-nav {
+      display: flex;
+      justify-content: center;
+      gap: 1.75rem;
+      border-bottom: 2px solid #000;
+      padding-bottom: 0.6rem;
+      margin-bottom: 0.9rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .top-nav a {
+      text-decoration: none;
+      color: #000;
+      position: relative;
+    }
+
+    .top-nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -0.3rem;
+      width: 100%;
+      height: 2px;
+      background: #000;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.15s ease;
+    }
+
+    .top-nav a:hover::after,
+    .top-nav a[aria-current="page"]::after {
+      transform: scaleX(1);
+    }
+
+    .site-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1.4rem;
+      gap: 1rem;
+    }
+
+    .site-title-main {
+      font-family: "Permanent Marker", system-ui;
+      font-size: 2.2rem;
+      letter-spacing: 0.05em;
+    }
+
+    .site-title-tag {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      border: 2px solid #000;
+      padding: 0.25rem 0.8rem;
+      border-radius: 999px;
+      background: #fff;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3.5fr) minmax(0, 2.5fr);
+      gap: 2rem;
+      margin-top: 1.2rem;
+    }
+
+    @media (max-width: 900px) {
+      .about-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .site-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    .about-panel {
+      background: var(--bg-plain);
+      border-radius: 1.2rem;
+      border: 3px solid var(--border-strong);
+      box-shadow:
+        6px 6px 0 #000,
+        inset 0 0 0 1px #fff;
+      padding: 1.4rem 1.6rem 1.8rem;
+      position: relative;
+    }
+
+    .about-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          -45deg,
+          rgba(0, 0, 0, 0.03),
+          rgba(0, 0, 0, 0.03) 1px,
+          transparent 1px,
+          transparent 4px
+        );
+      mix-blend-mode: multiply;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .about-panel > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .about-heading {
+      font-family: "Permanent Marker", system-ui;
+      font-size: 1.6rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .about-subheading {
+      font-weight: 600;
+      margin-top: 1.1rem;
+      margin-bottom: 0.35rem;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+    }
+
+    .about-text {
+      font-size: 0.96rem;
+      line-height: 1.6;
+    }
+
+    .about-list {
+      padding-left: 1rem;
+      margin: 0.3rem 0 0.6rem;
+      font-size: 0.95rem;
+    }
+
+    .about-list li + li {
+      margin-top: 0.22rem;
+    }
+
+    .label-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-strong);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      margin-bottom: 0.6rem;
+    }
+
+    .pill-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      border: 2px solid #000;
+      text-decoration: none;
+      color: #000;
+      background: #fff;
+      font-size: 0.9rem;
+      margin-top: 0.75rem;
+      box-shadow: 4px 4px 0 #000;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .pill-link:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 #000;
+    }
+
+    .pill-link span.icon {
+      font-size: 1.1rem;
+    }
+
+    .support-block {
+      margin-top: 0.9rem;
+      padding: 0.9rem 1rem;
+      border-radius: 0.8rem;
+      border: 2px solid #000;
+      background: #faf5ff;
+      box-shadow: 4px 4px 0 #000;
+    }
+
+    .support-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .support-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-top: 0.55rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      text-decoration: none;
+      border: 2px solid #000;
+      background: linear-gradient(135deg, #ffecd5, #ffe5f1);
+      color: #000;
+      box-shadow: 3px 3px 0 #000;
+      cursor: pointer;
+    }
+
+    .support-cta:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 #000;
+    }
+
+    .footer-text {
+      margin-top: 2.2rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      border-top: 2px solid #000;
+      padding-top: 0.8rem;
+    }
+
+    /* Retro mode */
+
+    body.retro-mode {
+      background:
+        radial-gradient(circle at 0 0, #3a0ca3, transparent 65%),
+        radial-gradient(circle at 100% 0, #f72585, transparent 60%),
+        radial-gradient(circle at 50% 100%, #4895ef, #000011);
+      color: #f6f6ff;
+    }
+
+    body.retro-mode .about-panel {
+      background: rgba(3, 4, 25, 0.95);
+      border-color: #00f5d4;
+      box-shadow:
+        0 0 0 2px #000,
+        0 0 18px rgba(0, 245, 212, 0.75);
+    }
+
+    body.retro-mode .about-panel::before {
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(0, 245, 212, 0.12),
+          rgba(0, 245, 212, 0.12) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+      mix-blend-mode: screen;
+      opacity: 0.9;
+    }
+
+    body.retro-mode .top-nav,
+    body.retro-mode .footer-text {
+      border-color: #00f5d4;
+    }
+
+    body.retro-mode .top-nav a,
+    body.retro-mode .site-title-main,
+    body.retro-mode .site-title-tag {
+      color: #f6f6ff;
+    }
+
+    body.retro-mode .top-nav a::after {
+      background: #00f5d4;
+    }
+
+    body.retro-mode .site-title-tag {
+      border-color: #00f5d4;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    body.retro-mode .pill-link,
+    body.retro-mode .support-cta {
+      background: rgba(0, 0, 0, 0.65);
+      color: #f6f6ff;
+      border-color: #00f5d4;
+      box-shadow:
+        0 0 10px rgba(0, 245, 212, 0.75),
+        0 0 0 2px #000;
+    }
+
+    body.retro-mode .support-block {
+      background: rgba(0, 0, 0, 0.8);
+      border-color: #00f5d4;
+      box-shadow: 0 0 16px rgba(0, 245, 212, 0.7);
+    }
+
+    body.retro-mode .footer-text {
+      color: #f6f6ff;
+    }
+
+    /* Floating sticky notes */
+
+    .sticky-note {
+      position: fixed;
+      width: 82px;
+      height: 78px;
+      border-radius: 6px;
+      box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.35),
+        0 0 0 2px rgba(0, 0, 0, 0.5);
+      transform-origin: center top;
+      cursor: pointer;
+      z-index: 5;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      font-family: "Permanent Marker", system-ui;
+      font-size: 0.7rem;
+      text-align: center;
+      color: rgba(0, 0, 0, 0.85);
+      transition: box-shadow 0.12s ease;
+    }
+
+    .sticky-note::before {
+      content: "";
+      position: absolute;
+      width: 28px;
+      height: 11px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.15);
+      top: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .note-yellow { background: var(--note-yellow); }
+    .note-red { background: var(--note-red); }
+    .note-blue { background: var(--note-blue); }
+
+    .note-tilt-left { transform: rotate(-5deg); }
+    .note-tilt-right { transform: rotate(4deg); }
+
+    .note-edge-flash {
+      animation: edgeFlash 0.26s ease-out;
+    }
+
+    @keyframes edgeFlash {
+      0% {
+        box-shadow:
+          0 0 0 2px rgba(0, 0, 0, 0.5),
+          0 0 0 4px rgba(0, 0, 0, 0);
+      }
+      50% {
+        box-shadow:
+          0 0 0 2px #000,
+          0 0 0 6px #00f5d4;
+      }
+      100% {
+        box-shadow:
+          0 6px 10px rgba(0, 0, 0, 0.35),
+          0 0 0 2px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    body.retro-mode .sticky-note {
+      box-shadow:
+        0 0 12px rgba(0, 0, 0, 0.9),
+        0 0 0 2px rgba(0, 245, 212, 0.7);
+    }
+
+    .note-fade-out {
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+    }
+
+    /* Retro scoreboard */
+
+    .scoreboard {
+      position: fixed;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: #05070a;
+      border-radius: 0.7rem;
+      border: 2px solid #00f5d4;
+      padding: 0.5rem 0.8rem 0.45rem;
+      font-family: "Press Start 2P", system-ui, monospace;
+      font-size: 0.6rem;
+      color: #00f5d4;
+      letter-spacing: 0.16em;
+      box-shadow: 0 0 12px rgba(0, 245, 212, 0.85);
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      z-index: 20;
+    }
+
+    .scoreboard.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .score-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .score-label {
+      opacity: 0.8;
+    }
+
+    .score-value {
+      min-width: 4ch;
+      text-align: right;
+    }
+
+    .score-small {
+      font-size: 0.5rem;
+      margin-top: 0.15rem;
+      opacity: 0.75;
+    }
+
+    /* Game over overlay */
+
+    .gameover-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 30;
+      overflow: hidden;
+    }
+
+    .gameover-inner {
+      font-family: "Press Start 2P", system-ui, monospace;
+      text-align: center;
+      color: #f6f6ff;
+      text-shadow:
+        0 0 6px #000,
+        0 0 18px #ff006e;
+      padding: 1.4rem 1rem 2.4rem;
+      opacity: 0;
+      transform: translateY(120%);
+    }
+
+    .gameover-inner.visible {
+      animation: gameoverRise 6s ease-out forwards;
+    }
+
+    @keyframes gameoverRise {
+      0% {
+        opacity: 0;
+        transform: translateY(120%);
+      }
+      20% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      70% {
+        opacity: 1;
+        transform: translateY(-10%);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-120%);
+      }
+    }
+
+    .gameover-title {
+      font-size: 1.4rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .gameover-score {
+      font-size: 0.7rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .highscore-stamp {
+      position: fixed;
+      bottom: 0.7rem;
+      right: 0.9rem;
+      font-family: "Press Start 2P", system-ui, monospace;
+      font-size: 0.55rem;
+      color: #f6f6ff;
+      padding: 0.4rem 0.6rem;
+      border-radius: 0.5rem;
+      border: 2px solid #00f5d4;
+      background: rgba(0, 0, 0, 0.8);
+      box-shadow: 0 0 10px rgba(0, 245, 212, 0.8);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      pointer-events: auto;
+    }
+
+    .highscore-stamp.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reset-btn {
+      border: 1px solid #00f5d4;
+      background: #05070a;
+      color: #00f5d4;
+      border-radius: 999px;
+      padding: 2px 6px;
+      font-size: 0.55rem;
+      cursor: pointer;
+    }
+
+    .reset-btn:hover {
+      background: #00f5d4;
+      color: #05070a;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="site-wrapper">
+    <nav class="top-nav">
+      <a href="index.html">Home</a>
+      <a href="tools.html">Tools</a>
+      <a href="about.html" aria-current="page">About</a>
+    </nav>
+
+    <div class="site-title-row">
+      <h1 class="site-title-main">IMTHEBUS toolbox</h1>
+      <div class="site-title-tag">About this site</div>
+    </div>
+
+    <div class="about-grid">
+      <section class="about-panel">
+        <div class="label-chip">Why this exists</div>
+        <h2 class="about-heading">About IMTHEBUS</h2>
+        <p class="about-text">
+          IMTHEBUS is a small, evolving collection of tools built for practical use in day to day work.
+          The focus is on managers and teams who want clearer conversations and simpler decisions
+          without another full platform or login.
+        </p>
+
+        <h3 class="about-subheading">Design principles</h3>
+        <ul class="about-list">
+          <li><strong>Lightweight</strong> open it in a browser and it is ready.</li>
+          <li><strong>Focused</strong> each tool solves one problem instead of trying to do everything.</li>
+          <li><strong>Conversation first</strong> made to be used with other humans, not just quietly solo.</li>
+          <li><strong>Brutalist on purpose</strong> clear boxes, visible structure, honest interface.</li>
+        </ul>
+
+        <p class="about-text">
+          The whiteboard metaphor runs across the site. New tools are pinned as notes, prototypes can be
+          rough, and everything is open to revision. Nothing here is finished forever.
+        </p>
+
+        <a class="pill-link" href="https://rougvie.com" target="_blank" rel="noopener noreferrer">
+          <span class="icon">🕹️</span>
+          <span>Visit <strong>Rougvie.com</strong> for other experiments</span>
+        </a>
+
+        <h3 class="about-subheading">Terms of use</h3>
+        <p class="about-text">
+          This site is experimental. By using it you accept that:
+        </p>
+        <ul class="about-list">
+          <li>You use all tools at your own risk and judgement.</li>
+          <li>Nothing here replaces legal, HR, medical, or financial advice.</li>
+          <li>You are responsible for any decisions taken using ideas from this site.</li>
+          <li>The site may change, break, or vanish without notice.</li>
+        </ul>
+
+        <h3 class="about-subheading">Privacy</h3>
+        <p class="about-text">
+          The current tools are built to run in your browser without collecting personal data.
+        </p>
+        <ul class="about-list">
+          <li>Where possible, inputs stay in your browser and are not stored on a server.</li>
+          <li>Analytics, if added later, will focus on aggregated usage of tools, not individuals.</li>
+          <li>Any later account or team features will have a clear, specific privacy notice.</li>
+          <li>You should still treat anything typed into a tool like any other web form.</li>
+        </ul>
+
+        <p class="about-text">
+          A more formal policy may be added as the project grows. It will be linked from this page.
+        </p>
+      </section>
+
+      <section class="about-panel">
+        <div class="label-chip">Support</div>
+        <h2 class="about-heading">Ko fi and support</h2>
+        <p class="about-text">
+          If these tools help your work or spark useful conversations, you can nudge future experiments
+          along by supporting the project.
+        </p>
+        <div class="support-block">
+          <div class="support-title">Tip jar</div>
+          <p class="about-text" style="font-size:0.92rem;">
+            A small one off Ko fi helps justify time spent building and refining the toolbox.
+            No subscriptions, no special tiers, just a simple thank you.
+          </p>
+          <a class="support-cta" href="https://ko-fi.com/" target="_blank" rel="noopener noreferrer">
+            <span>☕</span>
+            <span>Support IMTHEBUS on Ko fi</span>
+          </a>
+          <p class="about-text" style="font-size:0.8rem;margin-top:0.45rem;opacity:0.8;">
+            Using the tools, sharing them with others, or sending feedback is also valuable support.
+          </p>
+        </div>
+
+        <h3 class="about-subheading">How to use the tools</h3>
+        <ul class="about-list">
+          <li>Open a tool while you are in the conversation, not after it.</li>
+          <li>Write in language that everyone in the room would recognise.</li>
+          <li>Treat everything you put on the board as draft, not a verdict.</li>
+          <li>Move outcomes into your own systems once you are done.</li>
+        </ul>
+
+        <p class="about-text">
+          The rest of this page quietly hosts a small browser based sticky note distraction.
+          It does not need instructions.
+        </p>
+      </section>
+    </div>
+
+    <p class="footer-text">
+      IMTHEBUS is an experimental whiteboard of tools for people who manage, coach, and organise other humans.
+    </p>
+  </div>
+
+  <!-- Retro scoreboard -->
+  <div id="scoreboard" class="scoreboard" aria-live="polite">
+    <div class="score-line">
+      <span class="score-label">SCORE</span>
+      <span id="score-value" class="score-value">0000</span>
+    </div>
+    <div class="score-line">
+      <span class="score-label">HIGH</span>
+      <span id="highscore-value" class="score-value">0000</span>
+    </div>
+    <div class="score-small">ImTheBus highscore: 7,556</div>
+  </div>
+
+  <!-- Game over overlay -->
+  <div class="gameover-overlay" aria-hidden="true">
+    <div id="gameover-inner" class="gameover-inner">
+      <div class="gameover-title">GAME OVER</div>
+      <div id="gameover-score" class="gameover-score"></div>
+      <div id="gameover-high" class="gameover-score"></div>
+      <div class="gameover-score">ImTheBus highscore: 7,556</div>
+    </div>
+  </div>
+
+  <!-- High score stamp + reset -->
+  <div id="highscore-stamp" class="highscore-stamp">
+    <span id="highscore-stamp-text"></span>
+    <button id="reset-button" class="reset-btn" type="button">Reset</button>
+  </div>
+
+  <script>
+    (function () {
+      const scoreboardEl = document.getElementById("scoreboard");
+      const scoreValueEl = document.getElementById("score-value");
+      const highValueEl = document.getElementById("highscore-value");
+      const gameoverInner = document.getElementById("gameover-inner");
+      const gameoverScoreEl = document.getElementById("gameover-score");
+      const gameoverHighEl = document.getElementById("gameover-high");
+      const highStampEl = document.getElementById("highscore-stamp");
+      const highStampTextEl = document.getElementById("highscore-stamp-text");
+      const resetButton = document.getElementById("reset-button");
+
+      const NOTE_WIDTH = 82;
+      const NOTE_HEIGHT = 78;
+
+      const NOTE_LABELS = [
+        "Another meeting",
+        "Answer emails",
+        "Move this to next week",
+        "New initiative?",
+        "Snack break",
+        "Inbox zero (lol)",
+        "Deep work (maybe)",
+        "Ask for clarity",
+        "Scope creep",
+        "Just one more tab",
+        "Quick win™",
+        "Coffee first",
+        "Park this",
+        "Urgent!!",
+        "Nice to have"
+      ];
+
+      const notes = [];
+      let lastTime = null;
+      let spawnTimer = null;
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
+
+      const state = {
+        score: 0,
+        highScore: 0,
+        retroMode: false,
+        gameOver: false,
+        baseSpeed: 55,
+        spawnInterval: 2200
+      };
+
+      const storedHigh = parseInt(localStorage.getItem("itb_sticky_highscore") || "0", 10);
+      if (!Number.isNaN(storedHigh)) {
+        state.highScore = storedHigh;
+      }
+
+      function fmtScore(n) {
+        return String(Math.max(0, Math.floor(n))).padStart(4, "0");
+      }
+
+      function updateScoreboard() {
+        scoreValueEl.textContent = fmtScore(state.score);
+        highValueEl.textContent = fmtScore(state.highScore);
+      }
+
+      updateScoreboard();
+
+      function enterRetroMode() {
+        if (state.retroMode) return;
+        state.retroMode = true;
+        state.baseSpeed = 95;
+        state.spawnInterval = 1300;
+
+        document.body.classList.add("retro-mode");
+        scoreboardEl.classList.add("visible");
+
+        if (spawnTimer) clearInterval(spawnTimer);
+        spawnTimer = setInterval(spawnNote, state.spawnInterval);
+      }
+
+      function scheduleSpawn() {
+        if (spawnTimer) clearInterval(spawnTimer);
+        spawnTimer = setInterval(spawnNote, state.spawnInterval);
+      }
+
+      function randomType() {
+        const r = Math.random();
+        if (r < 0.6) return "yellow";
+        if (r < 0.8) return "blue";
+        return "red";
+      }
+
+      function randomLabel() {
+        return NOTE_LABELS[Math.floor(Math.random() * NOTE_LABELS.length)];
+      }
+
+      function createNote() {
+        const type = randomType();
+        const el = document.createElement("div");
+        el.classList.add("sticky-note");
+
+        if (type === "yellow") el.classList.add("note-yellow");
+        else if (type === "red") el.classList.add("note-red");
+        else el.classList.add("note-blue");
+
+        if (Math.random() < 0.5) el.classList.add("note-tilt-left");
+        else el.classList.add("note-tilt-right");
+
+        el.textContent = randomLabel();
+
+        const startX = Math.random() * (window.innerWidth - NOTE_WIDTH);
+        const startY = -NOTE_HEIGHT - Math.random() * 120;
+
+        const speed = state.baseSpeed + Math.random() * 35;
+        const horizontalDrift = (Math.random() - 0.5) * 20;
+        const rotation = (Math.random() - 0.5) * 8;
+
+        const note = {
+          el,
+          type,
+          x: startX,
+          y: startY,
+          vy: speed,
+          vx: horizontalDrift,
+          rotation,
+          hp: type === "red" ? 3 : 1
+        };
+
+        el.style.left = startX + "px";
+        el.style.top = startY + "px";
+        el.style.transform = `translate(0px, 0px) rotate(${rotation}deg)`;
+
+        el.addEventListener("click", function (event) {
+          event.stopPropagation();
+          if (state.gameOver) return;
+
+          // First contact flips into retro mode
+          enterRetroMode();
+
+          el.classList.remove("note-edge-flash");
+          void el.offsetWidth;
+          el.classList.add("note-edge-flash");
+
+          if (note.type === "red") {
+            note.hp -= 1;
+            if (note.hp <= 0) {
+              state.score += 5;
+              removeNote(note);
+            }
+          } else {
+            state.score += 1;
+            removeNote(note);
+          }
+
+          if (state.score > state.highScore) {
+            state.highScore = state.score;
+            localStorage.setItem("itb_sticky_highscore", String(state.highScore));
+          }
+          updateScoreboard();
+        });
+
+        document.body.appendChild(el);
+        notes.push(note);
+      }
+
+      function removeNote(note) {
+        const idx = notes.indexOf(note);
+        if (idx !== -1) notes.splice(idx, 1);
+        if (note.el && note.el.parentNode) {
+          note.el.parentNode.removeChild(note.el);
+        }
+      }
+
+      function spawnNote() {
+        if (state.gameOver) return;
+        createNote();
+      }
+
+      function triggerGameOver() {
+        if (state.gameOver) return;
+        state.gameOver = true;
+
+        if (spawnTimer) {
+          clearInterval(spawnTimer);
+          spawnTimer = null;
+        }
+
+        notes.forEach((n) => {
+          n.el.classList.add("note-fade-out");
+        });
+
+        if (state.score > state.highScore) {
+          state.highScore = state.score;
+          localStorage.setItem("itb_sticky_highscore", String(state.highScore));
+          updateScoreboard();
+        }
+
+        gameoverScoreEl.textContent = "Your high score: " + state.score.toLocaleString();
+        gameoverHighEl.textContent = "Stored high score: " + state.highScore.toLocaleString();
+
+        gameoverInner.classList.add("visible");
+
+        setTimeout(() => {
+          highStampTextEl.textContent = "High score: " + state.highScore.toLocaleString();
+          highStampEl.classList.add("visible");
+        }, 5200);
+      }
+
+      function resetGame() {
+        // Clear notes visually and logically
+        while (notes.length) {
+          const n = notes.pop();
+          if (n.el && n.el.parentNode) {
+            n.el.parentNode.removeChild(n.el);
+          }
+        }
+
+        state.score = 0;
+        state.gameOver = false;
+        state.retroMode = false;
+        state.baseSpeed = 55;
+        state.spawnInterval = 2200;
+
+        updateScoreboard();
+
+        document.body.classList.remove("retro-mode");
+        scoreboardEl.classList.remove("visible");
+        gameoverInner.classList.remove("visible");
+        highStampEl.classList.remove("visible");
+
+        lastTime = null;
+
+        for (let i = 0; i < 4; i++) {
+          setTimeout(spawnNote, 400 * i);
+        }
+        scheduleSpawn();
+      }
+
+      function loop(timestamp) {
+        if (!lastTime) {
+          lastTime = timestamp;
+          requestAnimationFrame(loop);
+          return;
+        }
+        const dt = (timestamp - lastTime) / 1000;
+        lastTime = timestamp;
+
+        if (!state.gameOver) {
+          const height = window.innerHeight;
+
+          for (let i = notes.length - 1; i >= 0; i--) {
+            const note = notes[i];
+
+            if (note.type === "blue") {
+              const dx = note.x + NOTE_WIDTH / 2 - mouseX;
+              const dy = note.y + NOTE_HEIGHT / 2 - mouseY;
+              const distSq = dx * dx + dy * dy;
+              const avoidRadius = 200 * 200;
+
+              if (distSq < avoidRadius) {
+                const factor = 120 / Math.sqrt(distSq + 1);
+                note.vx += (dx / Math.sqrt(distSq + 1)) * factor;
+              } else {
+                note.vx *= 0.98;
+              }
+            }
+
+            note.y += note.vy * dt;
+            note.x += note.vx * dt;
+
+            if (note.x < -30) note.x = -30;
+            if (note.x > window.innerWidth - NOTE_WIDTH + 30) {
+              note.x = window.innerWidth - NOTE_WIDTH + 30;
+            }
+
+            note.el.style.transform = `translate(${note.x}px, ${note.y}px) rotate(${note.rotation}deg)`;
+
+            if (note.y > height) {
+              removeNote(note);
+              if (state.retroMode) {
+                triggerGameOver();
+              }
+            }
+          }
+        }
+
+        requestAnimationFrame(loop);
+      }
+
+      document.addEventListener("mousemove", (event) => {
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+      });
+
+      window.addEventListener("resize", () => {
+        notes.forEach((note) => {
+          if (note.x > window.innerWidth - NOTE_WIDTH) {
+            note.x = window.innerWidth - NOTE_WIDTH;
+          }
+        });
+      });
+
+      resetButton.addEventListener("click", resetGame);
+
+      // Keyboard shortcut: R to reset after game over
+      document.addEventListener("keydown", (evt) => {
+        if ((evt.key === "r" || evt.key === "R") && state.gameOver) {
+          resetGame();
+        }
+      });
+
+      for (let i = 0; i < 4; i++) {
+        setTimeout(spawnNote, 400 * i);
+      }
+      scheduleSpawn();
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>
+
   <link rel="stylesheet" href="assets/styles.css" />
 
   <!-- Fonts -->
