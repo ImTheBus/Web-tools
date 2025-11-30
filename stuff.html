@@ -9,15 +9,15 @@
   <link rel="stylesheet" href="assets/imthebus-base.css" />
   <script src="assets/imthebus-core.js" defer></script>
 
-  <!-- Fonts just for this page/game -->
+  <!-- Fonts for this page / game -->
   <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet" />
 
   <style>
-    /* Layout and typography hooked into shared "sidebar-card" + "board-wrapper" */
+    /* Layout and typography using shared sidebar/board shell */
 
     .about-sidebar-title {
       font-family: "Archivo Black", system-ui, sans-serif;
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       text-transform: uppercase;
       letter-spacing: 0.06em;
       margin: 0 0 4px;
@@ -67,7 +67,8 @@
       margin-bottom: 4px;
     }
 
-    .about-pill-link {
+    .about-pill-link,
+    .about-contact-btn {
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -76,38 +77,20 @@
       border: 2px solid #000;
       background: #ffffff;
       font-size: 0.85rem;
-      margin-top: 8px;
+      margin-top: 6px;
       box-shadow: 4px 4px 0 #000;
       text-decoration: none;
+      cursor: pointer;
     }
 
-    .about-pill-link:hover {
+    .about-pill-link:hover,
+    .about-contact-btn:hover {
       transform: translate(-2px, -2px);
       box-shadow: 6px 6px 0 #000;
     }
 
     .about-pill-link span.icon {
       font-size: 1.1rem;
-    }
-
-    .support-card-shell {
-      height: 100%;
-    }
-
-    .support-card {
-      border-radius: 12px;
-      border: 2px solid #000000;
-      background: rgba(255, 255, 255, 0.96);
-      padding: 10px 12px 12px;
-      box-shadow: 5px 5px 0 #000000;
-      font-size: 0.9rem;
-    }
-
-    .support-subtitle {
-      font-size: 0.8rem;
-      color: #4b5563;
-      margin-top: 2px;
-      margin-bottom: 6px;
     }
 
     .support-block {
@@ -117,6 +100,7 @@
       border: 2px solid #000;
       background: #faf5ff;
       box-shadow: 4px 4px 0 #000;
+      font-size: 0.9rem;
     }
 
     .support-title {
@@ -154,7 +138,69 @@
       color: #4b5563;
     }
 
-    /* Retro mode overrides the global background but keeps whiteboard “frame” look */
+    /* Static post-it notes that do not affect the game */
+
+    .static-notes-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .static-note {
+      position: relative;
+      border-radius: 7px;
+      border: 2px solid #000;
+      padding: 6px 7px 7px;
+      width: 120px;
+      min-height: 70px;
+      box-shadow:
+        0 5px 10px rgba(0, 0, 0, 0.25),
+        0 0 0 2px rgba(0, 0, 0, 0.5);
+      font-family: "Permanent Marker", system-ui;
+      font-size: 0.75rem;
+      line-height: 1.2;
+      text-align: center;
+      cursor: pointer;
+      background: #fff8a7;
+      transform-origin: center top;
+    }
+
+    .static-note::before {
+      content: "";
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 26px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .static-note-blue {
+      background: #bde0fe;
+    }
+
+    .static-note-red {
+      background: #ffb3c1;
+    }
+
+    .static-note-tilt-left {
+      transform: rotate(-4deg);
+    }
+
+    .static-note-tilt-right {
+      transform: rotate(3deg);
+    }
+
+    .static-note-flash {
+      animation: edgeFlash 0.28s ease-out;
+    }
+
+    /* Retro mode overrides */
+
     body.retro-mode {
       background:
         radial-gradient(circle at 0 0, #3a0ca3, transparent 65%),
@@ -172,7 +218,6 @@
         0 0 18px rgba(0, 245, 212, 0.75);
     }
 
-    body.retro-mode .support-card,
     body.retro-mode .support-block {
       background: rgba(0, 0, 0, 0.82);
       border-color: #00f5d4;
@@ -189,7 +234,7 @@
         0 0 0 2px #000;
     }
 
-    /* Floating sticky notes */
+    /* Falling sticky-note game */
 
     .sticky-note {
       position: fixed;
@@ -266,6 +311,25 @@
       opacity: 0;
       transition: opacity 0.6s ease;
       pointer-events: none;
+    }
+
+    .note-bottom-hit {
+      border-color: #ef4444;
+      box-shadow:
+        0 0 0 2px #ef4444,
+        0 0 14px rgba(239, 68, 68, 0.85);
+      animation: bottomHitFlash 0.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes bottomHitFlash {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-4px) scale(1.03);
+        opacity: 0.95;
+      }
     }
 
     /* Retro scoreboard */
@@ -423,88 +487,126 @@
   <header data-include="partials/header.html"></header>
 
   <main class="page">
-    <!-- Left: about copy in shared sidebar style -->
+    <!-- LEFT: Ko-fi / Rougvie / contact -->
     <aside class="sidebar-card">
-      <div class="about-sidebar-title">About IMTHEBUS</div>
+      <div class="about-sidebar-title">Support & contact</div>
       <p class="about-sidebar-subtitle">
-        A whiteboard of small tools for people who manage, coach, and organise other humans.
+        If these tools help your work, you can nudge future experiments along here.
       </p>
 
-      <div class="chip-label">Why this exists</div>
-      <p class="about-text">
-        IMTHEBUS is a small, evolving set of tools built for practical use in day to day work.
-        The focus is on managers and teams who want clearer conversations and simpler decisions
-        without another platform, login, or training course.
+      <button
+        class="about-contact-btn"
+        type="button"
+        onclick="window.location.href='mailto:contact@imthebus.co.uk?subject=IMTHEBUS%20feedback%20or%20chat';"
+      >
+        <span>✉️</span>
+        <span>Contact me with bugs, ideas, or general chit chat</span>
+      </button>
+
+      <div style="margin-top:10px;">
+        <a
+          class="about-pill-link"
+          href="https://rougvie.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="icon">🕹️</span>
+          <span>Visit <strong>Rougvie hub</strong> for other experiments</span>
+        </a>
+        <p class="about-text" style="font-size:0.86rem;margin-top:6px;">
+          Rougvie.com hosts other side projects, prototypes, and odd little tools.
+          IMTHEBUS is the part that leans hardest into management and decision making.
+        </p>
+      </div>
+
+      <div class="support-block">
+        <div class="support-title">Ko-fi tip jar</div>
+        <p class="about-text" style="font-size:0.86rem;">
+          A small one off Ko-fi helps justify time spent building and refining the toolbox.
+          No subscriptions, no tiers, just a simple “this is useful”.
+        </p>
+        <a
+          class="support-cta"
+          href="https://ko-fi.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span>☕</span>
+          <span>Support IMTHEBUS on Ko-fi</span>
+        </a>
+        <p class="about-text" style="font-size:0.8rem;margin-top:0.45rem;opacity:0.8;">
+          Using the tools, sharing links, or sending feedback is also real support.
+        </p>
+      </div>
+
+      <p class="about-footer-note">
+        Somewhere behind this page, a few falling notes are trying not to hit the bottom.
+        The static notes below are safe to click and do not affect the game.
       </p>
 
-      <h2 class="about-heading">Design principles</h2>
-      <ul class="about-list">
-        <li><strong>Lightweight</strong> open a link and it is ready. No accounts by default.</li>
-        <li><strong>Focused</strong> each tool exists to solve one problem in one conversation.</li>
-        <li><strong>Conversation first</strong> designed to sit in the middle of a group, not quietly solo.</li>
-        <li><strong>Brutalist on purpose</strong> clear boxes, visible structure, and honest interface edges.</li>
-      </ul>
-
-      <p class="about-text">
-        The whiteboard runs across the site. Different tools feel like sections of the same wall.
-        Notes move between tools, prototypes can be rough, and nothing is treated as finished forever.
-      </p>
-
-      <a class="about-pill-link" href="https://rougvie.com" target="_blank" rel="noopener noreferrer">
-        <span class="icon">🕹️</span>
-        <span>Visit <strong>Rougvie.com</strong> for other experiments</span>
-      </a>
-
-      <h2 class="about-heading">Terms of use</h2>
-      <p class="about-text">
-        This is an experimental project. By using it you accept that:
-      </p>
-      <ul class="about-list">
-        <li>You use all tools at your own risk and judgement.</li>
-        <li>Nothing here replaces legal, HR, medical, or financial advice.</li>
-        <li>You are responsible for any decisions taken using ideas from this site.</li>
-        <li>The site may change, break, or vanish without notice.</li>
-      </ul>
-
-      <h2 class="about-heading">Privacy</h2>
-      <p class="about-text">
-        Current tools are built to run in your browser and avoid collecting personal data.
-      </p>
-      <ul class="about-list">
-        <li>Where possible, inputs stay in your browser and are not stored on a server.</li>
-        <li>Any analytics added later will focus on aggregated usage, not individuals.</li>
-        <li>Future account or team features will ship with a clear privacy notice.</li>
-        <li>Anything you type should still be treated like any other web form.</li>
-      </ul>
-
-      <p class="about-text">
-        A more formal policy will be added as the project grows and linked from this page.
-      </p>
+      <div class="static-notes-row">
+        <div class="static-note static-note-tilt-left">
+          Draft ideas live here.
+        </div>
+        <div class="static-note static-note-blue">
+          “We should park this.”
+        </div>
+        <div class="static-note static-note-red static-note-tilt-right">
+          Check the real problem first.
+        </div>
+      </div>
     </aside>
 
-    <!-- Right: support info + “hidden” sticky-note game, inside shared board shell -->
+    <!-- RIGHT: main About / Terms / Privacy content inside board shell -->
     <section class="board-wrapper">
-      <div class="board-inner-shell support-card-shell">
-        <div class="support-card">
-          <div class="about-heading" style="margin-top:0;">Support & experiments</div>
-          <p class="support-subtitle">
-            The tools are free to use. Support just nudges new experiments higher in the pile.
+      <div class="board-inner-shell">
+        <section>
+          <div class="chip-label">Why this exists</div>
+          <h1 class="about-heading" style="margin-top:4px;">About IMTHEBUS</h1>
+          <p class="about-text">
+            IMTHEBUS is a small, evolving set of tools built for practical use in day to day work.
+            The focus is on managers and teams who want clearer conversations and simpler decisions
+            without another platform, login, or training course.
           </p>
 
-          <div class="support-block">
-            <div class="support-title">Ko-fi tip jar</div>
-            <p class="about-text" style="font-size:0.86rem;">
-              A small one off Ko-fi helps justify time spent building and refining the toolbox.
-              No subscriptions or tiers, just a simple “this is useful”.
-            </p>
-            <a class="support-cta" href="https://ko-fi.com/" target="_blank" rel="noopener noreferrer">
-              <span>☕</span>
-              <span>Support IMTHEBUS on Ko-fi</span>
-            </a>
-            <p class="about-text" style="font-size:0.8rem;margin-top:0.45rem;opacity:0.8;">
-              Using the tools, sharing links, or sending feedback is also real support.
-            </p>
-          </div>
+          <h2 class="about-heading">Design principles</h2>
+          <ul class="about-list">
+            <li><strong>Lightweight</strong> open a link and it is ready. No accounts by default.</li>
+            <li><strong>Focused</strong> each tool exists to solve one problem in one conversation.</li>
+            <li><strong>Conversation first</strong> designed to sit in the middle of a group, not quietly solo.</li>
+            <li><strong>Brutalist on purpose</strong> clear boxes, visible structure, and honest interface edges.</li>
+          </ul>
+
+          <p class="about-text">
+            The whiteboard metaphor runs across the site. Different tools feel like sections of the same wall.
+            Notes move between tools, prototypes can be rough, and nothing is treated as finished forever.
+          </p>
+
+          <h2 class="about-heading">Terms of use</h2>
+          <p class="about-text">
+            This is an experimental project. By using it you accept that:
+          </p>
+          <ul class="about-list">
+            <li>You use all tools at your own risk and judgement.</li>
+            <li>Nothing here replaces legal, HR, medical, or financial advice.</li>
+            <li>You are responsible for any decisions taken using ideas from this site.</li>
+            <li>The site may change, break, or vanish without notice.</li>
+          </ul>
+
+          <h2 class="about-heading">Privacy</h2>
+          <p class="about-text">
+            Current tools are built to run in your browser and avoid collecting personal data.
+          </p>
+          <ul class="about-list">
+            <li>Where possible, inputs stay in your browser and are not stored on a server.</li>
+            <li>Any analytics added later will focus on aggregated usage, not individuals.</li>
+            <li>Future account or team features will ship with a clear privacy notice.</li>
+            <li>Anything you type should still be treated like any other web form.</li>
+          </ul>
+
+          <p class="about-text">
+            A more formal policy will be added as the project grows and linked from this page.
+          </p>
 
           <h2 class="about-heading">Using the tools well</h2>
           <ul class="about-list">
@@ -514,10 +616,11 @@
             <li>Move outcomes into your own systems once you are done.</li>
           </ul>
 
-          <p class="about-footer-note">
-            Somewhere behind this card, a few sticky notes are quietly falling. They do not need instructions.
+          <p class="about-text" style="margin-top:10px;">
+            The rest of this page quietly hosts a small browser-based sticky note distraction.
+            It still does not need instructions.
           </p>
-        </div>
+        </section>
       </div>
     </section>
   </main>
@@ -728,7 +831,7 @@
         createNote();
       }
 
-      function triggerGameOver() {
+      function handleBottomHit(note) {
         if (state.gameOver) return;
         state.gameOver = true;
 
@@ -737,9 +840,16 @@
           spawnTimer = null;
         }
 
+        // Freeze all notes in place
         notes.forEach((n) => {
-          n.el.classList.add("note-fade-out");
+          n.vy = 0;
+          n.vx = 0;
         });
+
+        // Highlight the one that hit the bottom
+        if (note && note.el) {
+          note.el.classList.add("note-bottom-hit");
+        }
 
         if (state.score > state.highScore) {
           state.highScore = state.score;
@@ -747,10 +857,12 @@
           updateScoreboard();
         }
 
-        gameoverScoreEl.textContent = "Your high score: " + state.score.toLocaleString();
-        gameoverHighEl.textContent = "Stored high score: " + state.highScore.toLocaleString();
-
-        gameoverInner.classList.add("visible");
+        // Brief pause so the bottom note is visible, then show GAME OVER
+        setTimeout(() => {
+          gameoverScoreEl.textContent = "Your high score: " + state.score.toLocaleString();
+          gameoverHighEl.textContent = "Stored high score: " + state.highScore.toLocaleString();
+          gameoverInner.classList.add("visible");
+        }, 600);
 
         setTimeout(() => {
           highStampTextEl.textContent = "High score: " + state.highScore.toLocaleString();
@@ -824,15 +936,22 @@
               note.x = window.innerWidth - NOTE_WIDTH + 30;
             }
 
+            // Clamp at bottom edge
+            if (note.y > height - NOTE_HEIGHT) {
+              note.y = height - NOTE_HEIGHT;
+              note.el.style.transform =
+                `translate(${note.x}px, ${note.y}px) rotate(${note.rotation}deg)`;
+
+              if (state.retroMode) {
+                handleBottomHit(note);
+              } else {
+                removeNote(note);
+              }
+              continue;
+            }
+
             note.el.style.transform =
               `translate(${note.x}px, ${note.y}px) rotate(${note.rotation}deg)`;
-
-            if (note.y > height) {
-              removeNote(note);
-              if (state.retroMode) {
-                triggerGameOver();
-              }
-            }
           }
         }
 
@@ -860,6 +979,16 @@
         }
       });
 
+      // Click feedback for static notes (do not affect the game)
+      document.querySelectorAll(".static-note").forEach((el) => {
+        el.addEventListener("click", () => {
+          el.classList.remove("static-note-flash");
+          void el.offsetWidth;
+          el.classList.add("static-note-flash");
+        });
+      });
+
+      // Initial spawn
       for (let i = 0; i < 4; i++) {
         setTimeout(spawnNote, 400 * i);
       }
