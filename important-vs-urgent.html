@@ -2,23 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Important vs Urgent – IMTHEBUS Toolbox</title>
+  <title>Important vs Urgent Board - IMTHEBUS Toolbox</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Marker style font + body font -->
+  <!-- Marker style font -->
   <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- jsPDF for PDF export -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 
   <style>
     :root {
-      /* Whiteboard look */
-      --bg-board: #fdfdfd;
       --ink: #111111;
       --border-strong: #000000;
 
-      /* Sticky-ish quadrant colours */
       --do-bg: #c7f9cc;
       --schedule-bg: #bde0fe;
       --delegate-bg: #ffeaa7;
@@ -28,23 +25,10 @@
       --schedule-tag: #1d4ed8;
       --delegate-tag: #b45309;
       --delete-tag: #b91c1c;
-
-      /* IvU-specific palette */
-      --bg: #fdfdfd;
-      --card-bg: rgba(255, 255, 255, 0.96);
-      --accent: #111827;
-      --text: #111111;
-      --muted: #555555;
-      --border: #000000;
-      --danger: #ef4444;
-      --success: #22c55e;
-      --warning: #f59e0b;
     }
 
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     body {
@@ -53,12 +37,12 @@
       background:
         url("assets/whiteboard-noise.png") repeat,
         url("assets/whiteboard-texture.jpg") repeat,
-        var(--bg-board);
+        #fdfdfd;
       background-size: 600px, 1200px;
       color: var(--ink);
     }
 
-    /* NAVIGATION (from SWOT) */
+    /* NAVIGATION */
 
     nav {
       position: sticky;
@@ -71,7 +55,7 @@
       padding: 10px 20px;
       background:
         url("assets/whiteboard-noise.png") repeat,
-        url("assets/whiteboard.jpg") repeat,
+        url("assets/whiteboard-texture.jpg") repeat,
         #ffffff;
       background-size: 600px, 1200px;
       border-bottom: 3px solid var(--border-strong);
@@ -101,7 +85,7 @@
       font-weight: 700;
     }
 
-    /* PAGE LAYOUT (from SWOT) */
+    /* PAGE LAYOUT */
 
     .page {
       max-width: 1200px;
@@ -114,17 +98,23 @@
       position: relative;
     }
 
-    /* SIDEBAR SHELL */
+    @media (max-width: 900px) {
+      .page {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    /* SIDEBAR */
 
     .sidebar {
       position: relative;
       z-index: 5;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       border-radius: 10px;
       border: 2px solid #000000;
-      padding: 14px 14px 16px;
+      padding: 12px 12px 14px;
       box-shadow: 0 8px 14px rgba(0, 0, 0, 0.22);
       background:
         url("assets/whiteboard-noise.png") repeat,
@@ -133,26 +123,308 @@
       background-size: 600px, 1200px;
     }
 
-    .sidebar-header-title {
+    .sidebar-title {
       font-family: "Permanent Marker", system-ui, sans-serif;
       font-size: 1.4rem;
-      letter-spacing: -0.02em;
+      letter-spacing: 0.02em;
       margin-bottom: 2px;
     }
 
-    .sidebar-header-subtitle {
-      font-size: 0.85rem;
+    .sidebar-subtitle {
+      font-size: 0.8rem;
       color: #555;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    .section-divider {
-      height: 1px;
-      margin: 8px 0;
-      border-bottom: 1px dashed rgba(0, 0, 0, 0.2);
+    .section-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 4px 0;
     }
 
-    /* BOARD WRAPPER SHELL */
+    .task-input-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .task-input-row input[type="text"] {
+      flex: 1 1 180px;
+      padding: 7px 9px;
+      border-radius: 999px;
+      border: 1px solid #000000;
+      font-size: 0.85rem;
+    }
+
+    .btn-pill {
+      border-radius: 999px;
+      border: 1px solid #000000;
+      background: #ffffff;
+      font-size: 0.8rem;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    .btn-pill:hover {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    .btn-pill.secondary {
+      opacity: 0.8;
+    }
+
+    .task-list {
+      list-style: none;
+      margin: 4px 0 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 170px;
+      overflow-y: auto;
+    }
+
+    .task-list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.45);
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 0.8rem;
+    }
+
+    .task-main {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .task-name {
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .task-meta {
+      font-size: 0.7rem;
+      color: #555;
+      white-space: nowrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.45);
+      font-size: 0.7rem;
+      white-space: nowrap;
+    }
+
+    .pill-unassessed {
+      background: #f3f4f6;
+      color: #555;
+    }
+
+    .pill-q1 {
+      border-color: var(--do-tag);
+      color: var(--do-tag);
+    }
+
+    .pill-q2 {
+      border-color: var(--schedule-tag);
+      color: var(--schedule-tag);
+    }
+
+    .pill-q3 {
+      border-color: var(--delegate-tag);
+      color: var(--delegate-tag);
+    }
+
+    .pill-q4 {
+      border-color: var(--delete-tag);
+      color: var(--delete-tag);
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .btn-small {
+      padding: 3px 6px;
+      font-size: 0.7rem;
+    }
+
+    .task-empty {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    .hint-chip {
+      margin-top: 4px;
+      font-size: 0.72rem;
+      color: #555;
+    }
+
+    .hint-chip span {
+      font-weight: 500;
+    }
+
+    /* collapsible guidance */
+
+    .details-shell {
+      margin-top: 4px;
+      border-top: 1px dashed rgba(0, 0, 0, 0.2);
+      padding-top: 4px;
+    }
+
+    .details-shell summary {
+      font-size: 0.72rem;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .details-shell summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .details-shell summary::before {
+      content: "+";
+      display: inline-block;
+      margin-right: 4px;
+    }
+
+    .details-shell[open] summary::before {
+      content: "-";
+    }
+
+    .details-shell p {
+      font-size: 0.72rem;
+      color: #555;
+      margin: 3px 0 2px;
+    }
+
+    /* QUESTION PANEL */
+
+    .question-panel {
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.45);
+      background: rgba(255, 255, 255, 0.96);
+      padding: 8px 8px 6px;
+      font-size: 0.78rem;
+    }
+
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .question-task-name {
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .question-step {
+      font-size: 0.7rem;
+      color: #666;
+      white-space: nowrap;
+    }
+
+    .question-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .question-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+      gap: 4px;
+      align-items: center;
+      padding: 3px 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .question-row:first-of-type {
+      border-top: none;
+    }
+
+    .question-title {
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .question-scale {
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
+    .scale-option {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.68rem;
+      text-align: center;
+    }
+
+    .scale-option input[type="radio"] {
+      margin-bottom: 1px;
+      cursor: pointer;
+      accent-color: #111111;
+    }
+
+    .scale-option span {
+      white-space: nowrap;
+    }
+
+    .question-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-size: 0.72rem;
+      color: #555;
+    }
+
+    .question-footer .btn-pill {
+      font-size: 0.72rem;
+    }
+
+    @media (max-width: 800px) {
+      .question-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .question-scale {
+        justify-content: space-around;
+      }
+    }
+
+    /* BOARD */
 
     .board-wrapper {
       position: relative;
@@ -161,14 +433,24 @@
       border: 2px solid #000000;
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
       overflow: hidden;
-      min-height: 520px;
+      height: 620px;
       background:
         url("assets/whiteboard-noise.png") repeat,
         url("assets/whiteboard-texture.jpg") repeat,
         rgba(255, 255, 255, 0.96);
       background-size: 600px, 1200px;
-      display: flex;
-      flex-direction: column;
+    }
+
+    @media (max-width: 900px) {
+      .board-wrapper {
+        height: 520px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .board-wrapper {
+        height: 460px;
+      }
     }
 
     .board-title-display {
@@ -178,25 +460,26 @@
       letter-spacing: -0.03em;
     }
 
-    .board-meta-bar {
-      font-size: 0.8rem;
+    .board-meta-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 4px 16px 6px;
-      gap: 8px;
+      margin: 0 16px 4px;
+      font-size: 0.78rem;
       color: #555;
     }
 
+    .board-meta-row small {
+      white-space: nowrap;
+    }
+
     .board-toolbar {
-      display: flex;
+      display: inline-flex;
       gap: 4px;
-      padding: 4px 6px;
+      padding: 3px 4px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.98);
       border: 1px solid #000000;
-      font-size: 0.75rem;
-      align-items: center;
+      background: rgba(255, 255, 255, 0.95);
     }
 
     .board-toolbar button {
@@ -213,515 +496,167 @@
       color: #ffffff;
     }
 
-    .board-main {
-      flex: 1;
-      padding: 4px 16px 12px;
+    .board {
+      position: relative;
+      width: 100%;
+      height: calc(100% - 48px);
+      padding: 6px 16px 10px;
       display: grid;
       grid-template-rows: minmax(260px, 1fr) auto;
-      gap: 10px;
-    }
-
-    /* IVU CONTENT: TASK INPUT + LIST + QUESTIONS */
-
-    .section-title {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    .section-subtitle {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    .task-input-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .task-input-row input[type="text"] {
-      flex: 1 1 200px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.9);
-      color: var(--text);
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
-    }
-
-    .task-input-row input[type="text"]::placeholder {
-      color: #9ca3af;
-    }
-
-    .task-input-row input[type="text"]:focus {
-      border-color: #000000;
-      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.9);
-      transform: translateY(-1px);
-    }
-
-    button {
-      border: 1px solid #000000;
-      border-radius: 999px;
-      padding: 7px 14px;
-      background: #ffffff;
-      color: #111111;
-      font-size: 0.8rem;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
       gap: 6px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-      white-space: nowrap;
     }
 
-    button:hover {
-      background: #000000;
-      color: #ffffff;
-    }
-
-    button.small {
-      padding: 4px 10px;
-      font-size: 0.75rem;
-    }
-
-    button.secondary {
-      background: #ffffff;
-      color: #111111;
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 10px;
-      border-radius: 999px;
-      border: 1px dashed rgba(0, 0, 0, 0.35);
-      background: rgba(255, 255, 255, 0.9);
-      font-size: 0.75rem;
-      color: var(--muted);
-      gap: 4px;
-      margin-bottom: 6px;
-    }
-
-    .chip-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #000000;
-    }
-
-    .task-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 6px;
-      margin-bottom: 4px;
-      max-height: 160px;
-      overflow-y: auto;
-    }
-
-    .task-list-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 6px 8px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid rgba(0, 0, 0, 0.3);
-      font-size: 0.8rem;
-    }
-
-    .task-main {
-      display: flex;
-      flex: 1;
-      min-width: 0;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .task-name {
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .task-meta {
-      font-size: 0.72rem;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(0, 0, 0, 0.4);
-      font-size: 0.7rem;
-      white-space: nowrap;
-      background: #ffffff;
-    }
-
-    .pill-q1 { border-color: var(--do-tag); color: var(--do-tag); }
-    .pill-q2 { border-color: var(--schedule-tag); color: var(--schedule-tag); }
-    .pill-q3 { border-color: var(--delegate-tag); color: var(--delegate-tag); }
-    .pill-q4 { border-color: var(--delete-tag); color: var(--delete-tag); }
-
-    .pill-unassessed {
-      border-style: dashed;
-      color: var(--muted);
-    }
-
-    .empty-state {
-      font-size: 0.75rem;
-      color: var(--muted);
-      padding-top: 4px;
-    }
-
-    /* Question panel */
-
-    .question-panel {
-      margin-top: 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(0, 0, 0, 0.3);
-      background: rgba(255, 255, 255, 0.96);
-      padding: 10px 10px 8px;
-    }
-
-    .question-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 4px;
-    }
-
-    .question-task-name {
-      font-size: 0.85rem;
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .question-step {
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-
-    .question-body {
-      margin-top: 2px;
-    }
-
-    .scale-header-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.8fr);
-      align-items: flex-end;
-      margin-bottom: 2px;
-      font-size: 0.72rem;
-      color: var(--muted);
-    }
-
-    .scale-header-labels {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 0 4px 0 4px;
-    }
-
-    .scale-header-labels span {
-      flex: 1;
-      text-align: center;
-      white-space: nowrap;
-    }
-
-    .question-rows {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .question-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.8fr);
-      gap: 8px;
-      align-items: center;
-      padding: 4px 0;
-      border-top: 1px dotted rgba(0, 0, 0, 0.18);
-    }
-
-    .question-row:first-of-type {
-      border-top: none;
-    }
-
-    .question-left {
-      padding-right: 4px;
-    }
-
-    .question-title {
-      font-size: 0.8rem;
-      font-weight: 500;
-      margin-bottom: 1px;
-    }
-
-    .question-text {
-      font-size: 0.76rem;
-      color: var(--muted);
-    }
-
-    .question-scale {
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
-      padding: 0 4px;
-    }
-
-    .scale-option {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-size: 0.68rem;
-      text-align: center;
-    }
-
-    .scale-option input[type="radio"] {
-      margin-bottom: 2px;
-      cursor: pointer;
-      accent-color: #000000;
-    }
-
-    .scale-option span {
-      white-space: nowrap;
-    }
-
-    .question-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 6px;
-      font-size: 0.75rem;
-      color: var(--muted);
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .question-actions {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    @media (max-width: 900px) {
-      .page {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    @media (max-width: 640px) {
-      nav {
-        gap: 12px;
-        font-size: 0.8rem;
-      }
-      .sidebar {
-        padding: 10px 10px 12px;
-      }
-    }
-
-    /* GRID AREA – 2x2 important vs urgent */
-
-    .grid-header-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: var(--muted);
-      margin: 0 18px 4px;
-    }
-
-    .grid-header-cell {
-      text-align: center;
-    }
+    /* grid area */
 
     .grid-wrapper {
       position: relative;
       border-radius: 10px;
       border: 1px solid #000000;
       background: transparent;
-      padding: 18px 16px 12px 30px;
-      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      padding: 4px 10px 8px;
+    }
+
+    .grid-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      font-size: 0.78rem;
+      text-align: center;
+      margin-bottom: 2px;
+    }
+
+    .grid-header span {
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      letter-spacing: 0.08em;
+    }
+
+    .grid-body {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 4px;
+      font-size: 0.8rem;
     }
 
     .grid-y-label {
       position: absolute;
-      left: 4px;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: var(--muted);
-      transform: rotate(-90deg);
-      transform-origin: left top;
-    }
-
-    .grid-y-label-top {
-      top: 70px;
-    }
-
-    .grid-y-label-bottom {
-      bottom: 40px;
-    }
-
-    .grid {
-      position: relative;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-template-rows: repeat(2, minmax(120px, 1fr));
-      gap: 8px;
-      font-size: 0.8rem;
-    }
-
-    .grid::before,
-    .grid::after {
-      content: "";
-      position: absolute;
-      background: rgba(0, 0, 0, 0.3);
-      pointer-events: none;
-    }
-
-    .grid::before {
-      width: 1px;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-0.5px);
-    }
-
-    .grid::after {
-      height: 1px;
-      left: 0;
-      right: 0;
+      left: -10px;
       top: 50%;
-      transform: translateY(-0.5px);
+      transform: translate(-50%, -50%) rotate(-90deg);
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
     }
 
     .grid-cell {
       border-radius: 8px;
-      padding: 10px 10px 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      padding: 6px 8px 4px;
       position: relative;
       overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) inset;
     }
 
     .grid-cell.do {
       background: var(--do-bg);
-      border: 1px solid rgba(0, 0, 0, 0.45);
     }
 
     .grid-cell.schedule {
       background: var(--schedule-bg);
-      border: 1px solid rgba(0, 0, 0, 0.45);
     }
 
     .grid-cell.delegate {
       background: var(--delegate-bg);
-      border: 1px solid rgba(0, 0, 0, 0.45);
     }
 
     .grid-cell.delete {
       background: var(--delete-bg);
-      border: 1px solid rgba(0, 0, 0, 0.45);
     }
 
     .grid-cell-header {
-      font-size: 0.95rem;
-      font-weight: 600;
       font-family: "Permanent Marker", system-ui, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 4px;
+      font-size: 1rem;
+      margin-bottom: 2px;
     }
 
     .grid-tasks {
       list-style: none;
-      margin-top: 4px;
-      max-height: 120px;
+      margin: 0;
+      padding: 0 2px 0 10px;
+      max-height: 110px;
       overflow-y: auto;
-      padding-left: 0;
-      padding-right: 4px;
     }
 
     .grid-tasks li {
       font-size: 0.78rem;
-      padding: 3px 6px;
-      margin-bottom: 4px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.75);
-      box-shadow:
-        0 3px 5px rgba(0, 0, 0, 0.25),
-        0 1px 0 rgba(255, 255, 255, 0.8) inset;
+      padding: 1px 0;
       white-space: nowrap;
-      overflow: hidden;
       text-overflow: ellipsis;
-      font-family: "Permanent Marker", system-ui, sans-serif;
-      transform-origin: center left;
+      overflow: hidden;
     }
 
-    /* we’ll randomise rotation a bit in JS */
+    /* priority area */
 
-    .grid-descriptions {
-      margin-top: 8px;
+    .priority-panel {
+      border-radius: 8px;
+      border: 1px solid #000000;
+      background: rgba(255, 255, 255, 0.96);
+      padding: 6px 8px 6px;
       font-size: 0.78rem;
-      color: var(--muted);
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 6px 24px;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 4px 10px;
     }
 
-    .grid-descriptions strong {
-      color: #111111;
+    @media (max-width: 800px) {
+      .priority-panel {
+        grid-template-columns: minmax(0, 1fr);
+      }
     }
 
-    /* Priority list */
-
-    .priority-section-title {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: var(--muted);
-      margin-top: 6px;
+    .priority-header {
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 1rem;
       margin-bottom: 2px;
     }
 
-    .priority-section-subtitle {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 4px;
+    .priority-summary {
+      font-size: 0.75rem;
+      color: #555;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
     }
+
+    .priority-summary span {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      white-space: nowrap;
+    }
+
+    .priority-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #000000;
+    }
+
+    .priority-dot.do { background: var(--do-tag); }
+    .priority-dot.schedule { background: var(--schedule-tag); }
+    .priority-dot.delegate { background: var(--delegate-tag); }
+    .priority-dot.delete { background: var(--delete-tag); }
 
     .priority-list {
       list-style: none;
+      margin: 2px 0 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      font-size: 0.8rem;
-      margin-top: 2px;
-      margin-bottom: 4px;
-      max-height: 160px;
+      gap: 4px;
+      max-height: 130px;
       overflow-y: auto;
     }
 
@@ -729,26 +664,27 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      padding: 6px 8px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.96);
-      border: 1px solid rgba(0, 0, 0, 0.25);
+      gap: 6px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      background: #f9fafb;
+      font-size: 0.78rem;
     }
 
     .priority-main {
       display: flex;
       align-items: center;
-      gap: 8px;
-      flex: 1;
+      gap: 6px;
       min-width: 0;
+      flex: 1;
     }
 
     .priority-rank {
-      width: 18px;
+      width: 20px;
       text-align: right;
       font-size: 0.75rem;
-      color: var(--muted);
+      color: #555;
     }
 
     .priority-name {
@@ -759,40 +695,30 @@
     }
 
     .priority-meta {
-      font-size: 0.7rem;
-      color: var(--muted);
+      font-size: 0.72rem;
+      color: #555;
       white-space: nowrap;
     }
 
     .priority-pill {
-      font-size: 0.7rem;
-      padding: 2px 8px;
+      font-size: 0.72rem;
+      padding: 1px 7px;
       border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.3);
       background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.35);
       white-space: nowrap;
     }
 
-    @media (max-width: 800px) {
-      .scale-header-row,
-      .question-row {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .scale-header-labels {
-        justify-content: space-around;
-      }
-
-      .question-scale {
-        justify-content: space-around;
-      }
+    .priority-empty {
+      font-size: 0.75rem;
+      color: #666;
     }
   </style>
 </head>
 <body>
 <nav>
   <div class="nav-left">
-    <a href="important-vs-urgent.html">Important vs Urgent</a>
+    <a href="important-urgent.html">Important vs Urgent</a>
     <a href="swot.html">SWOT</a>
     <a href="index.html#tools">Tools</a>
     <a href="index.html#about">About</a>
@@ -801,130 +727,101 @@
 </nav>
 
 <div class="page">
-  <!-- Sidebar: tasks + questions -->
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div>
-      <div class="sidebar-header-title">Important vs Urgent</div>
-      <div class="sidebar-header-subtitle">
-        Capture your tasks, answer six quick questions, and map them onto an Important vs Urgent grid.
+      <div class="sidebar-title">Important vs Urgent</div>
+      <div class="sidebar-subtitle">
+        Capture tasks on the left, see them land on the board, then work from the priority list.
       </div>
     </div>
 
-    <div class="section-divider"></div>
-
     <div>
-      <div class="section-title">Step 1 · Capture and assess tasks</div>
-      <p class="section-subtitle">
-        Add everything on your plate. Select a task to answer the six questions.
-      </p>
-
+      <div class="section-label">Step 1 - Tasks</div>
       <div class="task-input-row">
         <input
           type="text"
           id="taskInput"
-          placeholder="Type a task, for example: Draft Q1 board report"
+          placeholder="Example: Draft Q1 board report"
           autocomplete="off"
         />
-        <button id="addTaskButton">+ Add task</button>
-        <button id="clearAllButton" class="secondary small">Clear</button>
+        <button class="btn-pill" id="addTaskButton">Add</button>
+        <button class="btn-pill secondary" id="clearAllButton">Clear</button>
       </div>
-
-      <div class="chip">
-        <span class="chip-dot"></span>
-        <span>Tasks are cleaned automatically. Questions default to the middle answer.</span>
+      <div class="hint-chip">
+        <span>Tip:</span> Tasks are cleaned and questions start from the middle answer.
       </div>
 
       <ul class="task-list" id="taskList"></ul>
-      <div class="empty-state" id="noTasksMessage">
-        No tasks yet. Add a task above to get started.
+      <div class="task-empty" id="noTasksMessage">
+        No tasks yet. Add one above to get started.
       </div>
-
-      <div id="questionPanelContainer"></div>
     </div>
+
+    <details class="details-shell">
+      <summary>What the quadrants mean</summary>
+      <p><strong>Do it</strong> - Important and urgent. Real deadlines and real impact if you miss them.</p>
+      <p><strong>Schedule it</strong> - Important but not urgent. Moves you forward but can slip if you are not careful.</p>
+      <p><strong>Delegate it</strong> - Time sensitive but less important for you. Better handled by someone else.</p>
+      <p><strong>Delete it</strong> - Low importance and low urgency. Distractions, nice to have work, or tasks to question.</p>
+    </details>
+
+    <div id="questionPanelContainer"></div>
   </aside>
 
-  <!-- Board side: grid + priorities -->
+  <!-- BOARD -->
   <section class="board-wrapper">
     <div class="board-title-display">Important vs Urgent Board</div>
-
-    <div class="board-meta-bar">
-      <small>
-        Grid: Important (vertical) vs Urgent (horizontal). Do → Schedule → Delegate → Delete.
-      </small>
+    <div class="board-meta-row">
+      <small>Grid: Important (vertical) vs Urgent (horizontal)</small>
       <div class="board-toolbar">
-        <button id="exportPdfButton" title="Export PDF">PDF</button>
+        <button id="exportPdfButton" title="Export summary PDF">PDF</button>
       </div>
     </div>
 
-    <div class="board-main">
-      <!-- Top: grid -->
-      <div>
-        <div class="grid-header-row">
-          <div class="grid-header-cell">Urgent</div>
-          <div class="grid-header-cell">Not urgent</div>
+    <div class="board">
+      <!-- Grid -->
+      <div class="grid-wrapper">
+        <div class="grid-header">
+          <span>URGENT</span>
+          <span>NOT URGENT</span>
         </div>
+        <div class="grid-body">
+          <div class="grid-y-label">IMPORTANT</div>
 
-        <div class="grid-wrapper">
-          <div class="grid-y-label grid-y-label-top">Important</div>
-          <div class="grid-y-label grid-y-label-bottom">Not important</div>
-
-          <div class="grid">
-            <div class="grid-cell do">
-              <div class="grid-cell-header">
-                <span>Do it</span>
-              </div>
-              <ul class="grid-tasks" id="grid-q1"></ul>
-            </div>
-
-            <div class="grid-cell schedule">
-              <div class="grid-cell-header">
-                <span>Schedule it</span>
-              </div>
-              <ul class="grid-tasks" id="grid-q2"></ul>
-            </div>
-
-            <div class="grid-cell delegate">
-              <div class="grid-cell-header">
-                <span>Delegate it</span>
-              </div>
-              <ul class="grid-tasks" id="grid-q3"></ul>
-            </div>
-
-            <div class="grid-cell delete">
-              <div class="grid-cell-header">
-                <span>Delete it</span>
-              </div>
-              <ul class="grid-tasks" id="grid-q4"></ul>
-            </div>
+          <div class="grid-cell do">
+            <div class="grid-cell-header">Do it</div>
+            <ul class="grid-tasks" id="grid-q1"></ul>
           </div>
-        </div>
 
-        <div class="grid-descriptions">
-          <div>
-            <strong>Do it</strong> · Important and urgent, with clear deadlines and real consequences for not acting.
+          <div class="grid-cell schedule">
+            <div class="grid-cell-header">Schedule it</div>
+            <ul class="grid-tasks" id="grid-q2"></ul>
           </div>
-          <div>
-            <strong>Schedule it</strong> · Important but not urgent. Moves you towards your goals but easy to postpone.
+
+          <div class="grid-cell delegate">
+            <div class="grid-cell-header">Delegate it</div>
+            <ul class="grid-tasks" id="grid-q3"></ul>
           </div>
-          <div>
-            <strong>Delegate it</strong> · Less important for you, but time-sensitive. Needs doing, just not necessarily by you.
-          </div>
-          <div>
-            <strong>Delete it</strong> · Less important and not urgent. Distractions, nice-to-haves, or things to question.
+
+          <div class="grid-cell delete">
+            <div class="grid-cell-header">Delete it</div>
+            <ul class="grid-tasks" id="grid-q4"></ul>
           </div>
         </div>
       </div>
 
-      <!-- Bottom: priority list -->
-      <div>
-        <div class="priority-section-title">Step 2 · Priority order</div>
-        <p class="priority-section-subtitle">
-          Ordered by quadrant (Do → Schedule → Delegate → Delete) then by a score that weights impact
-          slightly higher than timing.
-        </p>
+      <!-- Priority panel -->
+      <div class="priority-panel">
+        <div>
+          <div class="priority-header">Step 2 - Priority order</div>
+          <div class="priority-summary" id="prioritySummary">
+            No assessed tasks yet.
+          </div>
+        </div>
 
         <ul class="priority-list" id="priorityList">
-          <li class="empty-state">Assess at least one task to see a working list.</li>
+          <li class="priority-empty">Assess at least one task to see a working list.</li>
         </ul>
       </div>
     </div>
@@ -932,6 +829,7 @@
 </div>
 
 <script>
+  // core elements
   const taskInput = document.getElementById("taskInput");
   const addTaskButton = document.getElementById("addTaskButton");
   const clearAllButton = document.getElementById("clearAllButton");
@@ -948,6 +846,7 @@
   };
 
   const priorityList = document.getElementById("priorityList");
+  const prioritySummary = document.getElementById("prioritySummary");
 
   let tasks = [];
   let assessmentState = null;
@@ -958,28 +857,29 @@
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
+  // questions - text trimmed a little
   const questions = [
     // Importance
     {
       id: "impImpact",
-      title: "Impact if this never happened",
-      question: "If this task never happened at all, what would the impact be?",
+      title: "Impact if ignored",
+      question: "Impact on outcomes if this never happened.",
       dimension: "importance",
       scaleLabels: ["Very low", "Low", "Medium", "High", "Very high"],
       options: [{ value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }, { value: 5 }]
     },
     {
       id: "impStake",
-      title: "Who is affected",
-      question: "How many people or groups are meaningfully affected?",
+      title: "Who it affects",
+      question: "How many people or groups are meaningfully affected.",
       dimension: "importance",
       scaleLabels: ["Just me", "Small group", "One team", "Many teams", "Whole business / key customers"],
       options: [{ value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }, { value: 5 }]
     },
     {
       id: "impGoal",
-      title: "Goal alignment",
-      question: "How directly does this support your current priorities?",
+      title: "Strategic fit",
+      question: "How directly this supports current priorities.",
       dimension: "importance",
       scaleLabels: ["Not at all", "Loosely", "Somewhat", "Strongly", "Directly delivers"],
       options: [{ value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }, { value: 5 }]
@@ -988,15 +888,15 @@
     {
       id: "urgDeadline",
       title: "Real deadline",
-      question: "How soon does this genuinely need to be done?",
+      question: "How soon it genuinely needs to be done.",
       dimension: "urgency",
-      scaleLabels: ["No date", "This month", "Two weeks", "This week", "Today / tomorrow"],
+      scaleLabels: ["No date", "> 1 month", "Two weeks", "This week", "Today / tomorrow"],
       options: [{ value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }, { value: 5 }]
     },
     {
       id: "urgBlock",
-      title: "Is anyone waiting?",
-      question: "How blocked are other people by this?",
+      title: "Others waiting",
+      question: "How blocked other people are by this.",
       dimension: "urgency",
       scaleLabels: ["No one", "Would like it", "Expecting soon", "One team blocked", "Many people blocked"],
       options: [{ value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }, { value: 5 }]
@@ -1004,7 +904,7 @@
     {
       id: "urgDelay",
       title: "Cost of delay",
-      question: "If you push this back by a week, how bad is the impact?",
+      question: "Impact if you push this back by a week.",
       dimension: "urgency",
       scaleLabels: ["None", "Minor", "Noticeable", "Significant", "Serious"],
       options: [{ value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }, { value: 5 }]
@@ -1065,7 +965,6 @@
       taskId,
       answers: defaultAnswers(task.answers)
     };
-
     renderAll();
   }
 
@@ -1079,12 +978,7 @@
     assessmentState.answers[questionId] = Number(value);
   }
 
-  function clampScore(v) {
-    if (v < 1) return 1;
-    if (v > 5) return 5;
-    return v;
-  }
-
+  // new scoring: keep averages as decimals and treat 1-5 as low/mid/high ranges
   function finaliseAssessment() {
     if (!assessmentState) return;
     const state = assessmentState;
@@ -1099,23 +993,47 @@
     const impAvg = impValues.reduce((s, v) => s + v, 0) / impValues.length;
     const urgAvg = urgValues.reduce((s, v) => s + v, 0) / urgValues.length;
 
-    task.importance = clampScore(Math.round(impAvg));
-    task.urgency = clampScore(Math.round(urgAvg));
+    task.importance = impAvg;
+    task.urgency = urgAvg;
     task.answers = { ...a };
 
     assessmentState = null;
     renderAll();
   }
 
+  function levelFromScore(score) {
+    if (score == null) return null;
+    if (score >= 3.6) return "high";
+    if (score <= 2.4) return "low";
+    return "mid";
+  }
+
   function computeQuadrant(task) {
     if (task.importance == null || task.urgency == null) return null;
-    const impHigh = task.importance >= 3;
-    const urgHigh = task.urgency >= 3;
 
-    if (impHigh && urgHigh) return "q1";  // Do
-    if (impHigh && !urgHigh) return "q2"; // Schedule
-    if (!impHigh && urgHigh) return "q3"; // Delegate
-    return "q4";                           // Delete
+    const impLevel = levelFromScore(task.importance);
+    const urgLevel = levelFromScore(task.urgency);
+
+    // clear high-high goes to Do it
+    if (impLevel === "high" && urgLevel === "high") return "q1";
+
+    // high importance, not high urgency -> Schedule
+    if (impLevel === "high" && urgLevel !== "high") return "q2";
+
+    // low importance and low urgency -> Delete
+    if (impLevel === "low" && urgLevel === "low") return "q4";
+
+    // low importance with any urgency that is not low -> Delegate
+    if (impLevel === "low" && urgLevel !== "low") return "q3";
+
+    // mid importance, high urgency -> Delegate (urgent but not clearly important)
+    if (impLevel === "mid" && urgLevel === "high") return "q3";
+
+    // mid importance, low urgency -> Delete
+    if (impLevel === "mid" && urgLevel === "low") return "q4";
+
+    // both mid or mid importance with mid urgency -> Schedule
+    return "q2";
   }
 
   function quadrantMeta(q) {
@@ -1133,8 +1051,11 @@
   }
 
   function computePriorityScore(task) {
+    // weight importance slightly higher than urgency
     return (task.importance || 0) * 2 + (task.urgency || 0);
   }
+
+  /* RENDER TASKS */
 
   function renderTasks() {
     taskList.innerHTML = "";
@@ -1144,8 +1065,7 @@
       return;
     }
 
-    noTasksMessage.style.display = "block";
-    noTasksMessage.textContent = "Select a task to answer the questions.";
+    noTasksMessage.style.display = "none";
 
     tasks.forEach(task => {
       const li = document.createElement("li");
@@ -1161,7 +1081,9 @@
       const metaEl = document.createElement("div");
       metaEl.className = "task-meta";
 
-      if (task.importance == null || task.urgency == null) {
+      const assessed = task.importance != null && task.urgency != null;
+
+      if (!assessed) {
         metaEl.textContent = "Not assessed yet";
       } else {
         const q = computeQuadrant(task);
@@ -1172,13 +1094,11 @@
       main.appendChild(nameEl);
       main.appendChild(metaEl);
 
-      const right = document.createElement("div");
-      right.style.display = "flex";
-      right.style.alignItems = "center";
-      right.style.gap = "6px";
+      const actions = document.createElement("div");
+      actions.className = "task-actions";
 
       const pill = document.createElement("div");
-      if (task.importance == null || task.urgency == null) {
+      if (!assessed) {
         pill.className = "pill pill-unassessed";
         pill.textContent = "Needs assessment";
       } else {
@@ -1188,24 +1108,23 @@
       }
 
       const assessBtn = document.createElement("button");
-      assessBtn.className = "secondary small";
-      assessBtn.textContent =
-        task.importance == null || task.urgency == null ? "Assess" : "Revisit";
+      assessBtn.className = "btn-pill btn-small";
+      assessBtn.textContent = assessed ? "Revisit" : "Assess";
       assessBtn.addEventListener("click", () => startAssessment(task.id));
 
       const deleteBtn = document.createElement("button");
-      deleteBtn.className = "small secondary";
+      deleteBtn.className = "btn-pill btn-small secondary";
       deleteBtn.textContent = "Remove";
-      deleteBtn.style.borderColor = "rgba(248,113,113,0.8)";
-      deleteBtn.style.color = "#b91c1c";
+      deleteBtn.style.borderColor = "rgba(185,28,28,0.7)";
+      deleteBtn.style.color = "#991b1b";
       deleteBtn.addEventListener("click", () => deleteTask(task.id));
 
-      right.appendChild(pill);
-      right.appendChild(assessBtn);
-      right.appendChild(deleteBtn);
+      actions.appendChild(pill);
+      actions.appendChild(assessBtn);
+      actions.appendChild(deleteBtn);
 
       li.appendChild(main);
-      li.appendChild(right);
+      li.appendChild(actions);
 
       taskList.appendChild(li);
     });
@@ -1219,8 +1138,8 @@
         const panel = document.createElement("div");
         panel.className = "question-panel";
         const text = document.createElement("div");
-        text.className = "empty-state";
-        text.textContent = "Select a task to answer the questions.";
+        text.className = "question-step";
+        text.textContent = "Select a task above then tweak the sliders that stand out.";
         panel.appendChild(text);
         questionPanelContainer.appendChild(panel);
       }
@@ -1242,31 +1161,10 @@
 
     const stepEl = document.createElement("div");
     stepEl.className = "question-step";
-    stepEl.textContent = "Six quick questions · middle option is pre-selected";
+    stepEl.textContent = "Six quick sliders - middle is preselected.";
 
     header.appendChild(nameEl);
     header.appendChild(stepEl);
-
-    const body = document.createElement("div");
-    body.className = "question-body";
-
-    // Shared scale headers
-    const scaleHeaderRow = document.createElement("div");
-    scaleHeaderRow.className = "scale-header-row";
-
-    const scaleLeftLabel = document.createElement("div");
-    scaleLeftLabel.textContent = "Question";
-
-    const scaleLabels = document.createElement("div");
-    scaleLabels.className = "scale-header-labels";
-    ["1", "2", "3", "4", "5"].forEach(n => {
-      const span = document.createElement("span");
-      span.textContent = n;
-      scaleLabels.appendChild(span);
-    });
-
-    scaleHeaderRow.appendChild(scaleLeftLabel);
-    scaleHeaderRow.appendChild(scaleLabels);
 
     const rowsContainer = document.createElement("div");
     rowsContainer.className = "question-rows";
@@ -1275,19 +1173,9 @@
       const row = document.createElement("div");
       row.className = "question-row";
 
-      const left = document.createElement("div");
-      left.className = "question-left";
-
       const titleEl = document.createElement("div");
       titleEl.className = "question-title";
       titleEl.textContent = q.title;
-
-      const textEl = document.createElement("div");
-      textEl.className = "question-text";
-      textEl.textContent = q.question;
-
-      left.appendChild(titleEl);
-      left.appendChild(textEl);
 
       const scale = document.createElement("div");
       scale.className = "question-scale";
@@ -1312,32 +1200,28 @@
         scale.appendChild(wrapper);
       });
 
-      row.appendChild(left);
+      row.appendChild(titleEl);
       row.appendChild(scale);
       rowsContainer.appendChild(row);
     });
-
-    body.appendChild(scaleHeaderRow);
-    body.appendChild(rowsContainer);
 
     const footer = document.createElement("div");
     footer.className = "question-footer";
 
     const hint = document.createElement("div");
-    hint.textContent = "Adjust only the answers that stand out. The rest can stay in the middle.";
+    hint.textContent = "Change only the answers that feel clearly high or low.";
 
     const actions = document.createElement("div");
-    actions.className = "question-actions";
 
     const cancelBtn = document.createElement("button");
     cancelBtn.type = "button";
-    cancelBtn.className = "secondary small";
+    cancelBtn.className = "btn-pill btn-small secondary";
     cancelBtn.textContent = "Cancel";
     cancelBtn.addEventListener("click", cancelAssessment);
 
     const saveBtn = document.createElement("button");
     saveBtn.type = "button";
-    saveBtn.className = "small";
+    saveBtn.className = "btn-pill btn-small";
     saveBtn.textContent = "Save answers";
     saveBtn.addEventListener("click", finaliseAssessment);
 
@@ -1348,33 +1232,22 @@
     footer.appendChild(actions);
 
     panel.appendChild(header);
-    panel.appendChild(body);
+    panel.appendChild(rowsContainer);
     panel.appendChild(footer);
 
     questionPanelContainer.appendChild(panel);
   }
 
-  function randomRotation() {
-    // small random tilt between -3 and 3 degrees
-    const deg = (Math.random() * 6 - 3).toFixed(1);
-    return "rotate(" + deg + "deg)";
-  }
-
   function renderGrid() {
-    Object.values(gridElements).forEach(el => {
-      el.innerHTML = "";
-    });
+    Object.values(gridElements).forEach(el => { el.innerHTML = ""; });
 
     const assessed = tasks.filter(t => t.importance != null && t.urgency != null);
-    if (!assessed.length) {
-      return;
-    }
+    if (!assessed.length) return;
 
     const grouped = { q1: [], q2: [], q3: [], q4: [] };
 
     assessed.forEach(task => {
       const q = computeQuadrant(task);
-      if (!q) return;
       grouped[q].push(task);
     });
 
@@ -1382,9 +1255,7 @@
       const ul = gridElements[key];
       const arr = grouped[key];
 
-      if (!arr.length) {
-        return;
-      }
+      if (!arr.length) return;
 
       arr
         .slice()
@@ -1392,7 +1263,6 @@
         .forEach(task => {
           const li = document.createElement("li");
           li.textContent = task.name;
-          li.style.transform = randomRotation();
           ul.appendChild(li);
         });
     });
@@ -1404,8 +1274,9 @@
     const assessed = tasks.filter(t => t.importance != null && t.urgency != null);
 
     if (!assessed.length) {
+      prioritySummary.textContent = "No assessed tasks yet.";
       const li = document.createElement("li");
-      li.className = "empty-state";
+      li.className = "priority-empty";
       li.textContent = "Assess at least one task to see a working list.";
       priorityList.appendChild(li);
       return;
@@ -1425,6 +1296,27 @@
         if (qa !== qb) return qa - qb;
         return b.score - a.score;
       });
+
+    // quadrant summary
+    const counts = { q1: 0, q2: 0, q3: 0, q4: 0 };
+    sorted.forEach(t => { counts[t.quadrant] = (counts[t.quadrant] || 0) + 1; });
+
+    prioritySummary.innerHTML = "";
+    const summaryBits = [
+      { key: "q1", label: "Do", class: "do" },
+      { key: "q2", label: "Schedule", class: "schedule" },
+      { key: "q3", label: "Delegate", class: "delegate" },
+      { key: "q4", label: "Delete", class: "delete" }
+    ];
+    summaryBits.forEach(bit => {
+      const span = document.createElement("span");
+      const dot = document.createElement("span");
+      dot.className = "priority-dot " + bit.class;
+      span.appendChild(dot);
+      const text = document.createTextNode(" " + bit.label + ": " + (counts[bit.key] || 0));
+      span.appendChild(text);
+      prioritySummary.appendChild(span);
+    });
 
     sorted.forEach((task, index) => {
       const li = document.createElement("li");
@@ -1451,7 +1343,9 @@
 
       const pill = document.createElement("div");
       pill.className = "priority-pill";
-      pill.textContent = `Impact ${task.importance} · Timing ${task.urgency}`;
+      const imp = task.importance != null ? task.importance.toFixed(1) : "-";
+      const urg = task.urgency != null ? task.urgency.toFixed(1) : "-";
+      pill.textContent = "Impact " + imp + " · Timing " + urg;
 
       li.appendChild(main);
       li.appendChild(pill);
@@ -1462,8 +1356,8 @@
     const unassessed = tasks.filter(t => t.importance == null || t.urgency == null);
     if (unassessed.length) {
       const li = document.createElement("li");
-      li.className = "empty-state";
-      li.textContent = `${unassessed.length} task${unassessed.length > 1 ? "s" : ""} not yet assessed.`;
+      li.className = "priority-empty";
+      li.textContent = unassessed.length + " task" + (unassessed.length > 1 ? "s" : "") + " not yet assessed.";
       priorityList.appendChild(li);
     }
   }
@@ -1475,7 +1369,7 @@
     renderPriorities();
   }
 
-  // PDF export
+  /* PDF EXPORT */
 
   function formatDateForFilename(date) {
     const pad = n => String(n).padStart(2, "0");
@@ -1537,7 +1431,7 @@
         y += 14;
       } else {
         list.forEach(t => {
-          const line = `• ${t.name}`;
+          const line = "• " + t.name;
           const split = doc.splitTextToSize(line, 500);
           doc.text(split, margin + 14, y);
           y += 14 + (split.length - 1) * 12;
@@ -1604,7 +1498,7 @@
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
       unassessed.forEach(t => {
-        const line = `• ${t.name}`;
+        const line = "• " + t.name;
         const split = doc.splitTextToSize(line, 500);
         doc.text(split, margin + 14, y);
         y += 14 + (split.length - 1) * 12;
@@ -1615,7 +1509,7 @@
       });
     }
 
-    const filename = `important-vs-urgent-${formatDateForFilename(now)}.pdf`;
+    const filename = "important-vs-urgent-" + formatDateForFilename(now) + ".pdf";
     doc.save(filename);
   }
 
