@@ -5,129 +5,36 @@
   <title>Important vs Urgent – IMTHEBUS Toolbox</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <!-- Site-wide base styles -->
+  <link rel="stylesheet" href="assets/imthebus-base.css" />
 
   <!-- jsPDF for PDF export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 
+  <!-- Core helpers: partials, collapsibles, counter, draggable notes -->
+  <script src="assets/imthebus-core.js" defer></script>
+
+  <!-- Page specific styling -->
   <style>
     :root {
-      --ink: #111111;
-      --border-strong: #000000;
-
-      --q1-note: #c7f9cc;   /* Do */
-      --q2-note: #bde0fe;   /* Schedule */
-      --q3-note: #ffeaa7;   /* Delegate */
-      --q4-note: #ffb3c1;   /* Delete */
-
       --muted: #4b5563;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        url("assets/whiteboard-noise.png") repeat,
-        url("assets/whiteboard-texture.jpg") repeat,
-        #f4f4f4;
-      background-size: 600px, 1200px;
-      color: var(--ink);
-    }
-
-    /* NAV */
-
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 30;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-      padding: 10px 20px;
-      background:
-        url("assets/whiteboard-noise.png") repeat,
-        url("assets/whiteboard.jpg") repeat,
-        #ffffff;
-      background-size: 600px, 1200px;
-      border-bottom: 3px solid var(--border-strong);
-      font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 0.95rem;
-    }
-
-    .nav-left {
-      display: flex;
-      gap: 18px;
-      align-items: center;
-    }
-
-    .nav-left a {
-      text-decoration: none;
-      color: var(--ink);
-      padding: 2px 4px;
-    }
-
-    .nav-left a:hover {
-      background: #000000;
-      color: #ffffff;
-    }
-
-    .nav-right {
-      font-size: 1rem;
-      font-weight: 700;
-    }
-
-    /* LAYOUT */
-
-    .page {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 18px 16px 40px;
-      display: grid;
-      grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-      gap: 20px;
-      align-items: flex-start;
-    }
-
-    @media (max-width: 900px) {
-      .page {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    /* SIDEBAR (STEP 1) */
-
-    .sidebar {
-      position: sticky;
-      top: 64px;
-      max-height: calc(100vh - 80px);
-      overflow-y: auto;
-      border-radius: 10px;
-      border: 2px solid #000000;
-      padding: 14px 14px 16px;
-      box-shadow: 0 8px 14px rgba(0, 0, 0, 0.22);
-      background:
-        url("assets/whiteboard-noise.png") repeat,
-        url("assets/whiteboard-texture.jpg") repeat,
-        rgba(255, 255, 255, 0.96);
-      background-size: 600px, 1200px;
+      --q1-note: var(--q-do);
+      --q2-note: var(--q-schedule);
+      --q3-note: var(--q-delegate);
+      --q4-note: var(--q-delete);
     }
 
     .sidebar-title {
-      font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 1.5rem;
-      margin-bottom: 2px;
+      font-family: "Archivo Black", system-ui, sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
     }
 
     .sidebar-subtitle {
       font-size: 0.85rem;
-      color: var(--muted);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .step-heading {
@@ -145,31 +52,6 @@
 
     .task-input-row input[type="text"] {
       flex: 1;
-      border-radius: 40px;
-      border: 1px solid #000000;
-      padding: 6px 10px;
-      font-size: 0.9rem;
-    }
-
-    .btn {
-      border-radius: 40px;
-      border: 1px solid #000000;
-      background: #ffffff;
-      padding: 6px 12px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .btn:hover {
-      background: #000000;
-      color: #ffffff;
-    }
-
-    .btn-pill-small {
-      border-radius: 999px;
-      padding: 3px 8px;
-      font-size: 0.75rem;
     }
 
     .tip-text {
@@ -234,18 +116,13 @@
     .pill-q2 { background: var(--q2-note); }
     .pill-q3 { background: var(--q3-note); }
     .pill-q4 { background: var(--q4-note); }
-
-    .pill-unassessed {
-      background: #f5f5f5;
-    }
+    .pill-unassessed { background: #f5f5f5; }
 
     .empty-state {
       font-size: 0.8rem;
       color: var(--muted);
       margin: 4px 0 6px;
     }
-
-    /* Quadrant explainer */
 
     .quadrant-explainer-toggle {
       margin-top: 4px;
@@ -271,14 +148,13 @@
       margin: 4px 0;
     }
 
-    /* QUESTION PANEL */
-
     .question-panel {
       margin-top: 10px;
       border-radius: 8px;
       border: 1px solid #000000;
       padding: 8px 8px 10px;
       background: rgba(255, 255, 255, 0.9);
+      font-size: 0.78rem;
     }
 
     .question-header {
@@ -286,7 +162,6 @@
       justify-content: space-between;
       gap: 6px;
       align-items: center;
-      font-size: 0.78rem;
       margin-bottom: 4px;
     }
 
@@ -307,7 +182,6 @@
       border-top: 1px dashed rgba(0, 0, 0, 0.2);
       padding-top: 4px;
       margin-top: 4px;
-      font-size: 0.78rem;
     }
 
     .question-row:first-of-type {
@@ -350,23 +224,6 @@
       flex-wrap: wrap;
     }
 
-    /* BOARD / STEP 2 */
-
-    .board-wrapper {
-      border-radius: 12px;
-      border: 2px solid #000000;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
-      background:
-        url("assets/whiteboard-noise.png") repeat,
-        url("assets/whiteboard-texture.jpg") repeat,
-        rgba(255, 255, 255, 0.96);
-      background-size: 600px, 1200px;
-      padding: 10px 14px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
     .board-header-row {
       display: flex;
       justify-content: space-between;
@@ -375,8 +232,10 @@
     }
 
     .board-title {
-      font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 1.7rem;
+      font-family: "Archivo Black", system-ui, sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
     .board-subtitle {
@@ -384,127 +243,20 @@
       color: var(--muted);
     }
 
-    .board-toolbar {
-      display: flex;
-      gap: 6px;
-    }
-
-    .board-toolbar .btn {
-      padding: 4px 10px;
-      font-size: 0.78rem;
-    }
-
     .board-meta {
       font-size: 0.78rem;
       color: var(--muted);
+      margin-top: 4px;
     }
 
-    .board {
-      position: relative;
-      border-radius: 10px;
-      border: 1px solid #000000;
-      padding: 18px 16px 40px;
-      height: 420px;
-      overflow: hidden;
-      background:
-        url("assets/whiteboard-noise.png") repeat,
-        url("assets/whiteboard.jpg") repeat,
-        #ffffff;
-      background-size: 600px, 1200px;
+    .board-toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
     }
-
-    .quadrant-grid {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-
-    .quadrant-lines::before,
-    .quadrant-lines::after {
-      content: "";
-      position: absolute;
-      background: rgba(0, 0, 0, 0.3);
-    }
-
-    .quadrant-lines::before {
-      width: 1px;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-0.5px);
-    }
-
-    .quadrant-lines::after {
-      height: 1px;
-      left: 0;
-      right: 0;
-      top: 50%;
-      transform: translateY(-0.5px);
-    }
-
-    .axis-label-x {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.8rem;
-      font-family: "Permanent Marker", system-ui, sans-serif;
-    }
-
-    .axis-label-x span {
-      margin: 0 60px;
-    }
-
-    .axis-label-y {
-      position: absolute;
-      left: -14px;
-      top: 50%;
-      transform: translate(-50%, -50%) rotate(-90deg);
-      font-size: 0.8rem;
-      font-family: "Permanent Marker", system-ui, sans-serif;
-    }
-
-    .quadrant-headings {
-      position: absolute;
-      inset: 8px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 1rem;
-      pointer-events: none;
-    }
-
-    .quadrant-headings > div {
-      padding: 4px 6px;
-    }
-
-    .board-inner {
-      position: absolute;
-      inset: 0;
-      pointer-events: none; /* notes re-enable pointer */
-    }
-
-    /* TASK NOTES */
 
     .task-note {
-      position: absolute;
-      min-width: 130px;
-      max-width: 220px;
-      min-height: 46px;
-      padding: 6px 8px;
-      border-radius: 6px;
-      box-shadow:
-        0 10px 12px rgba(0, 0, 0, 0.28),
-        0 1px 0 rgba(255, 255, 255, 0.9) inset;
-      font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 0.9rem;
-      user-select: none;
-      cursor: grab;
-      transform-origin: center top;
-      background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.65), transparent 30%);
-      pointer-events: auto;
-      transition: box-shadow 0.08s ease-out, transform 0.08s ease-out;
+      /* extends shared .note in CSS */
     }
 
     .task-note[data-quadrant="q1"] { background-color: var(--q1-note); }
@@ -512,45 +264,8 @@
     .task-note[data-quadrant="q3"] { background-color: var(--q3-note); }
     .task-note[data-quadrant="q4"] { background-color: var(--q4-note); }
 
-    .task-note.dragging {
-      cursor: grabbing;
-      box-shadow:
-        0 16px 20px rgba(0, 0, 0, 0.45),
-        0 1px 0 rgba(255, 255, 255, 0.9) inset;
-    }
-
-    .task-note:hover:not(.dragging) {
-      transform: translateY(-1px) scale(1.01) rotate(var(--note-rot, 0deg));
-      box-shadow:
-        0 12px 16px rgba(0, 0, 0, 0.4),
-        0 1px 0 rgba(255, 255, 255, 0.9) inset;
-    }
-
-    .task-note.new {
-      animation: noteDrop 0.35s ease-out;
-    }
-
-    @keyframes noteDrop {
-      0% {
-        opacity: 0;
-        transform: translateY(-12px) scale(0.92) rotate(-4deg);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1) rotate(0deg);
-      }
-    }
-
-    .task-note-title {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* PRIORITY PANEL */
-
     .priority-panel {
-      margin-top: 4px;
+      margin-top: 8px;
       border-radius: 8px;
       border: 1px solid #000000;
       background: rgba(255, 255, 255, 0.96);
@@ -566,13 +281,16 @@
       justify-content: space-between;
       align-items: baseline;
       gap: 8px;
-      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-family: "Archivo Black", system-ui, sans-serif;
+      text-transform: uppercase;
+      font-size: 0.9rem;
     }
 
     .priority-panel-header small {
       font-family: "Inter", system-ui, sans-serif;
       font-size: 0.7rem;
       color: var(--muted);
+      text-transform: none;
     }
 
     .priority-list {
@@ -634,965 +352,887 @@
       white-space: nowrap;
       background: #f9fafb;
     }
-
-    /* FOOTER */
-
-    .site-footer {
-      max-width: 1200px;
-      margin: 0 auto 18px;
-      padding: 8px 16px 0;
-      border-top: 2px solid #000000;
-      font-size: 0.75rem;
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    @media (max-width: 640px) {
-      .site-footer {
-        flex-direction: column;
-      }
-    }
   </style>
 </head>
-<body>
-<nav>
-  <div class="nav-left">
-    <a href="important-vs-urgent.html">Important vs Urgent</a>
-    <a href="swot.html">SWOT</a>
-    <a href="index.html#tools">Tools</a>
-    <a href="index.html#about">About</a>
-  </div>
-  <div class="nav-right">IMTHEBUS tools</div>
-</nav>
 
-<div class="page">
-  <!-- STEP 1 SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-title">Important vs Urgent</div>
-    <div class="sidebar-subtitle">
-      Capture tasks on the left, answer six quick sliders, then work from the priority list.
-    </div>
+<body data-counter-key="important_vs_urgent">
+  <!-- Shared header/nav -->
+  <header data-include="partials/header.html"></header>
 
-    <div class="step-heading">Step 1 · Tasks</div>
-
-    <div class="task-input-row">
-      <input
-        type="text"
-        id="taskInput"
-        placeholder="Example: Draft Q1 board report"
-        autocomplete="off"
-      />
-      <button class="btn" id="addTaskButton">Add</button>
-    </div>
-
-    <button class="btn btn-pill-small" id="clearAllButton">Clear</button>
-
-    <div class="tip-text">
-      Tasks are tidied automatically. Questions start from the middle answer.
-    </div>
-
-    <ul class="task-list" id="taskList"></ul>
-    <div class="empty-state" id="noTasksMessage">
-      No tasks yet. Add one above to get started.
-    </div>
-
-    <div class="quadrant-explainer-toggle" id="quadrantExplainerToggle">
-      + What the quadrants mean
-    </div>
-    <div class="quadrant-explainer-body" id="quadrantExplainerBody">
-      <p><strong>Do it</strong> · Important and urgent, with clear deadlines and real consequences for not acting.</p>
-      <p><strong>Schedule it</strong> · Important but not urgent. Moves you towards your goals but is easy to postpone.</p>
-      <p><strong>Delegate it</strong> · Less important for you, but time-sensitive. Needs doing, just not necessarily by you.</p>
-      <p><strong>Delete it</strong> · Less important and not urgent. Distractions, nice-to-haves, or things to question.</p>
-    </div>
-
-    <div id="questionPanelContainer" style="margin-top:10px;"></div>
-  </aside>
-
-  <!-- STEP 2 BOARD -->
-  <section class="board-wrapper">
-    <div class="board-header-row">
-      <div>
-        <div class="board-title">Important vs Urgent Board</div>
-        <div class="board-subtitle">
-          Grid: Important (vertical) vs Urgent (horizontal). Do → Schedule → Delegate → Delete.
-        </div>
+  <main class="page">
+    <!-- Sidebar -->
+    <aside class="sidebar-card">
+      <div class="sidebar-title">Important vs Urgent</div>
+      <div class="sidebar-subtitle">
+        Capture tasks, answer six sliders, then work from the priority list.
       </div>
-      <div class="board-toolbar">
-        <button class="btn" id="exportPdfButton">PDF</button>
+
+      <div class="step-heading">Step 1 · Tasks</div>
+
+      <div class="task-input-row">
+        <input
+          type="text"
+          id="taskInput"
+          class="input-text"
+          placeholder="Example: Draft Q1 board report"
+          autocomplete="off"
+        />
+        <button class="btn btn-primary" id="addTaskButton">Add</button>
       </div>
-    </div>
 
-    <div class="board-meta">
-      Drag notes to fine-tune where they sit. Moving a note updates its impact and timing scores.
-    </div>
+      <button class="btn btn-pill-small" id="clearAllButton">Clear</button>
 
-    <div class="board" id="board">
-      <div class="quadrant-grid" id="quadrantGrid">
-        <div class="quadrant-lines"></div>
+      <div class="tip-text">
+        Tasks are tidied automatically. Questions start from the middle answer.
+      </div>
 
-        <div class="axis-label-x">
-          <span>Urgent</span> / <span>Not urgent</span>
-        </div>
-        <div class="axis-label-y">
-          Important ↑ / ↓ Not important
+      <ul class="task-list" id="taskList"></ul>
+      <div class="empty-state" id="noTasksMessage">
+        No tasks yet. Add one above to get started.
+      </div>
+
+      <div class="quadrant-explainer-toggle" id="quadrantExplainerToggle">
+        + What the quadrants mean
+      </div>
+      <div class="quadrant-explainer-body" id="quadrantExplainerBody">
+        <p><strong>Do it</strong> · Important and urgent with clear deadlines and real consequences.</p>
+        <p><strong>Schedule it</strong> · Important but not urgent. Moves you toward your goals but is easy to postpone.</p>
+        <p><strong>Delegate it</strong> · Less important for you but time sensitive. Needs doing, just not necessarily by you.</p>
+        <p><strong>Delete it</strong> · Less important and not urgent. Distractions, nice to haves, or things to question.</p>
+      </div>
+
+      <div id="questionPanelContainer" style="margin-top:10px;"></div>
+    </aside>
+
+    <!-- Board and priority -->
+    <section class="board-wrapper">
+      <div class="board-inner-shell">
+        <div class="board-header-row">
+          <div>
+            <div class="board-title">Important vs Urgent board</div>
+            <div class="board-subtitle">
+              Grid: Important (vertical) vs Urgent (horizontal). Do → Schedule → Delegate → Delete.
+            </div>
+          </div>
+          <div class="board-toolbar">
+            <button class="btn" id="exportPdfButton">PDF</button>
+          </div>
         </div>
 
-        <div class="quadrant-headings">
-          <div>Do it</div>
-          <div>Schedule it</div>
-          <div>Delegate it</div>
-          <div>Delete it</div>
+        <div class="board-meta">
+          Drag notes to fine tune where they sit. Moving a note updates impact and timing.
         </div>
 
-        <div class="board-inner" id="boardInner"></div>
+        <div class="quadrant-board" id="board">
+          <div class="quadrant-grid" id="quadrantGrid">
+            <div class="quadrant-lines"></div>
+
+            <div class="axis-label-x">
+              <span>Urgent</span> / <span>Not urgent</span>
+            </div>
+            <div class="axis-label-y">
+              Important ↑ / ↓ Not important
+            </div>
+
+            <div class="quadrant-headings">
+              <div>Do it</div>
+              <div>Schedule it</div>
+              <div>Delegate it</div>
+              <div>Delete it</div>
+            </div>
+
+            <div class="board-inner" id="boardInner"></div>
+          </div>
+        </div>
+
+        <div class="priority-panel">
+          <div class="priority-panel-header">
+            <div>Step 2 · Priority order</div>
+            <small>Ordered by quadrant (Do → Schedule → Delegate → Delete), then by impact and timing.</small>
+          </div>
+          <ul class="priority-list" id="priorityList">
+            <li class="empty-state">Assess at least one task to see a working list.</li>
+          </ul>
+        </div>
       </div>
-    </div>
+    </section>
+  </main>
 
-    <div class="priority-panel">
-      <div class="priority-panel-header">
-        <div>Step 2 – Priority order</div>
-        <small>Ordered by quadrant (Do → Schedule → Delegate → Delete), then by impact and timing.</small>
-      </div>
-      <ul class="priority-list" id="priorityList">
-        <li class="empty-state">Assess at least one task to see a working list.</li>
-      </ul>
-    </div>
-  </section>
-</div>
+  <!-- Shared footer -->
+  <footer data-include="partials/footer.html"></footer>
 
-<footer class="site-footer">
-  <span>IMTHEBUS Management Toolkit – Important vs Urgent.</span>
-  <span>Local to your browser. Nothing is sent to a server.</span>
-</footer>
+  <!-- Page logic -->
+  <script>
+    (function () {
+      const taskInput = document.getElementById("taskInput");
+      const addTaskButton = document.getElementById("addTaskButton");
+      const clearAllButton = document.getElementById("clearAllButton");
+      const taskList = document.getElementById("taskList");
+      const noTasksMessage = document.getElementById("noTasksMessage");
+      const questionPanelContainer = document.getElementById("questionPanelContainer");
+      const quadrantExplainerToggle = document.getElementById("quadrantExplainerToggle");
+      const quadrantExplainerBody = document.getElementById("quadrantExplainerBody");
 
-<script>
-(function () {
-  // DOM references
-  const taskInput = document.getElementById("taskInput");
-  const addTaskButton = document.getElementById("addTaskButton");
-  const clearAllButton = document.getElementById("clearAllButton");
-  const taskList = document.getElementById("taskList");
-  const noTasksMessage = document.getElementById("noTasksMessage");
-  const questionPanelContainer = document.getElementById("questionPanelContainer");
-  const quadrantExplainerToggle = document.getElementById("quadrantExplainerToggle");
-  const quadrantExplainerBody = document.getElementById("quadrantExplainerBody");
+      const exportPdfButton = document.getElementById("exportPdfButton");
+      const quadrantGrid = document.getElementById("quadrantGrid");
+      const boardInner = document.getElementById("boardInner");
+      const priorityList = document.getElementById("priorityList");
 
-  const exportPdfButton = document.getElementById("exportPdfButton");
-  const quadrantGrid = document.getElementById("quadrantGrid");
-  const boardInner = document.getElementById("boardInner");
-  const priorityList = document.getElementById("priorityList");
+      let tasks = [];
+      let assessmentState = null;
+      let dragInitialised = false;
 
-  let tasks = [];
-  let assessmentState = null;
-  let topZ = 10;
+      const questions = [
+        {
+          id: "impImpact",
+          title: "Impact if ignored",
+          question: "If this task never happened at all, what would the impact be?",
+          dimension: "importance",
+          labels: ["Very low", "Low", "Medium", "High", "Very high"]
+        },
+        {
+          id: "impStake",
+          title: "Who it affects",
+          question: "How many people or groups are meaningfully affected?",
+          dimension: "importance",
+          labels: ["Just me", "Small group", "One team", "Many teams", "Whole business or key customers"]
+        },
+        {
+          id: "impGoal",
+          title: "Strategic fit",
+          question: "How directly does this support your current priorities?",
+          dimension: "importance",
+          labels: ["Not at all", "Loosely", "Somewhat", "Strongly", "Directly delivers"]
+        },
+        {
+          id: "urgDeadline",
+          title: "Real deadline",
+          question: "How soon does this genuinely need to be done?",
+          dimension: "urgency",
+          labels: ["No date", "More than a month", "Two weeks", "This week", "Today or tomorrow"]
+        },
+        {
+          id: "urgBlock",
+          title: "Others waiting",
+          question: "How blocked are other people by this?",
+          dimension: "urgency",
+          labels: ["No one", "Would like it", "Expecting soon", "One team blocked", "Many people blocked"]
+        },
+        {
+          id: "urgDelay",
+          title: "Cost of delay",
+          question: "If you push this back by a week, how bad is the impact?",
+          dimension: "urgency",
+          labels: ["None", "Minor", "Noticeable", "Significant", "Serious"]
+        }
+      ];
 
-  // Questions definition
-  const questions = [
-    {
-      id: "impImpact",
-      title: "Impact if ignored",
-      question: "If this task never happened at all, what would the impact be?",
-      dimension: "importance",
-      labels: ["Very low", "Low", "Medium", "High", "Very high"]
-    },
-    {
-      id: "impStake",
-      title: "Who it affects",
-      question: "How many people or groups are meaningfully affected?",
-      dimension: "importance",
-      labels: ["Just me", "Small group", "One team", "Many teams", "Whole business / key customers"]
-    },
-    {
-      id: "impGoal",
-      title: "Strategic fit",
-      question: "How directly does this support your current priorities?",
-      dimension: "importance",
-      labels: ["Not at all", "Loosely", "Somewhat", "Strongly", "Directly delivers"]
-    },
-    {
-      id: "urgDeadline",
-      title: "Real deadline",
-      question: "How soon does this genuinely need to be done?",
-      dimension: "urgency",
-      labels: ["No date", "> 1 month", "Two weeks", "This week", "Today / tomorrow"]
-    },
-    {
-      id: "urgBlock",
-      title: "Others waiting",
-      question: "How blocked are other people by this?",
-      dimension: "urgency",
-      labels: ["No one", "Would like it", "Expecting soon", "One team blocked", "Many people blocked"]
-    },
-    {
-      id: "urgDelay",
-      title: "Cost of delay",
-      question: "If you push this back by a week, how bad is the impact?",
-      dimension: "urgency",
-      labels: ["None", "Minor", "Noticeable", "Significant", "Serious"]
-    }
-  ];
-
-  function cleanTaskName(raw) {
-    const s = raw.trim().replace(/\s+/g, " ");
-    if (!s) return "";
-    return s.charAt(0).toUpperCase() + s.slice(1);
-  }
-
-  function defaultAnswers(existing) {
-    const answers = {};
-    questions.forEach(q => {
-      if (existing && existing[q.id] != null) {
-        answers[q.id] = existing[q.id];
-      } else {
-        answers[q.id] = 3; // middle
-      }
-    });
-    return answers;
-  }
-
-  function addTaskFromInput() {
-    const cleaned = cleanTaskName(taskInput.value);
-    if (!cleaned) return;
-
-    const task = {
-      id: Date.now() + Math.random().toString(16).slice(2),
-      name: cleaned,
-      importance: null,
-      urgency: null,
-      answers: null,
-      x: null,
-      y: null,
-      quadrant: null,
-      z: null,
-      rotation: null
-    };
-
-    tasks.push(task);
-    taskInput.value = "";
-    assessmentState = null;
-    renderAll();
-    taskInput.focus();
-  }
-
-  function clearAllTasks() {
-    if (!tasks.length) return;
-    if (!confirm("Clear all tasks?")) return;
-    tasks = [];
-    assessmentState = null;
-    renderAll();
-  }
-
-  function deleteTask(id) {
-    tasks = tasks.filter(t => t.id !== id);
-    if (assessmentState && assessmentState.taskId === id) {
-      assessmentState = null;
-    }
-    renderAll();
-  }
-
-  function startAssessment(taskId) {
-    const task = tasks.find(t => t.id === taskId);
-    if (!task) return;
-    assessmentState = {
-      taskId,
-      answers: defaultAnswers(task.answers)
-    };
-    renderAll();
-  }
-
-  function cancelAssessment() {
-    assessmentState = null;
-    renderAll();
-  }
-
-  function handleRadioChange(questionId, value) {
-    if (!assessmentState) return;
-    assessmentState.answers[questionId] = Number(value);
-  }
-
-  function clamp(val, min, max) {
-    return Math.min(max, Math.max(min, val));
-  }
-
-  function computeScoresFromAnswers(a) {
-    const impIds = ["impImpact", "impStake", "impGoal"];
-    const urgIds = ["urgDeadline", "urgBlock", "urgDelay"];
-
-    const impAvg =
-      impIds.reduce((sum, id) => sum + (a[id] || 3), 0) / impIds.length;
-    const urgAvg =
-      urgIds.reduce((sum, id) => sum + (a[id] || 3), 0) / urgIds.length;
-
-    // Keep 1 decimal, clamp 1–5
-    const importance = clamp(Number(impAvg.toFixed(1)), 1, 5);
-    const urgency = clamp(Number(urgAvg.toFixed(1)), 1, 5);
-    return { importance, urgency };
-  }
-
-  function quadrantFromScores(importance, urgency) {
-    const impHigh = importance >= 3;
-    const urgHigh = urgency >= 3;
-    if (impHigh && urgHigh) return "q1"; // Do
-    if (impHigh && !urgHigh) return "q2"; // Schedule
-    if (!impHigh && urgHigh) return "q3"; // Delegate
-    return "q4"; // Delete
-  }
-
-  function quadrantMeta(q) {
-    switch (q) {
-      case "q1":
-        return { label: "Do it", class: "pill-q1" };
-      case "q2":
-        return { label: "Schedule it", class: "pill-q2" };
-      case "q3":
-        return { label: "Delegate it", class: "pill-q3" };
-      default:
-        return { label: "Delete it", class: "pill-q4" };
-    }
-  }
-
-  function computePriorityScore(task) {
-    if (task.importance == null || task.urgency == null) return 0;
-    return task.importance * 2 + task.urgency;
-  }
-
-  function positionFromScores(importance, urgency) {
-    // Map urgency (1–5) to x 0–1
-    const x = (urgency - 1) / 4; // 1 =>0, 5=>1
-    // Map importance (1–5) to y 0–1 (top high)
-    const y = 1 - (importance - 1) / 4; // importance 5 =>0, 1=>1
-    return { x: clamp(x, 0, 1), y: clamp(y, 0, 1) };
-  }
-
-  function scoresFromPosition(x, y) {
-    const urgency = clamp(1 + 4 * x, 1, 5);
-    const importance = clamp(1 + 4 * (1 - y), 1, 5);
-    return {
-      importance: Number(importance.toFixed(1)),
-      urgency: Number(urgency.toFixed(1))
-    };
-  }
-
-  function finaliseAssessment() {
-    if (!assessmentState) return;
-    const task = tasks.find(t => t.id === assessmentState.taskId);
-    if (!task) return;
-
-    const a = assessmentState.answers;
-    const { importance, urgency } = computeScoresFromAnswers(a);
-    task.importance = importance;
-    task.urgency = urgency;
-    task.answers = { ...a };
-    task.quadrant = quadrantFromScores(importance, urgency);
-
-    // Initial board position based on scores if not already set
-    if (task.x == null || task.y == null) {
-      const pos = positionFromScores(importance, urgency);
-      task.x = pos.x;
-      task.y = pos.y;
-    }
-
-    assessmentState = null;
-    renderAll();
-  }
-
-  /* RENDER TASK LIST */
-
-  function renderTasks() {
-    taskList.innerHTML = "";
-
-    if (!tasks.length) {
-      noTasksMessage.style.display = "block";
-      return;
-    }
-    noTasksMessage.style.display = "none";
-
-    tasks.forEach(task => {
-      const li = document.createElement("li");
-      li.className = "task-item";
-
-      const main = document.createElement("div");
-      main.className = "task-main";
-
-      const nameEl = document.createElement("div");
-      nameEl.className = "task-name";
-      nameEl.textContent = task.name;
-
-      const metaEl = document.createElement("div");
-      metaEl.className = "task-meta";
-
-      if (task.importance == null || task.urgency == null) {
-        metaEl.textContent = "Not assessed yet";
-      } else {
-        const qMeta = quadrantMeta(task.quadrant);
-        metaEl.textContent = qMeta.label;
+      function cleanTaskName(raw) {
+        const s = raw.trim().replace(/\s+/g, " ");
+        if (!s) return "";
+        return s.charAt(0).toUpperCase() + s.slice(1);
       }
 
-      main.appendChild(nameEl);
-      main.appendChild(metaEl);
-
-      const actions = document.createElement("div");
-      actions.className = "task-actions";
-
-      const pill = document.createElement("div");
-      if (task.importance == null || task.urgency == null) {
-        pill.className = "pill pill-unassessed";
-        pill.textContent = "Needs assessment";
-      } else {
-        const qMeta = quadrantMeta(task.quadrant);
-        pill.className = "pill " + qMeta.class;
-        pill.textContent = qMeta.label;
+      function defaultAnswers(existing) {
+        const answers = {};
+        questions.forEach(function (q) {
+          if (existing && existing[q.id] != null) {
+            answers[q.id] = existing[q.id];
+          } else {
+            answers[q.id] = 3; // middle
+          }
+        });
+        return answers;
       }
 
-      const assessBtn = document.createElement("button");
-      assessBtn.className = "btn btn-pill-small";
-      assessBtn.textContent =
-        task.importance == null || task.urgency == null ? "Assess" : "Revisit";
-      assessBtn.addEventListener("click", () => startAssessment(task.id));
+      function clamp(val, min, max) {
+        return Math.min(max, Math.max(min, val));
+      }
 
-      const deleteBtn = document.createElement("button");
-      deleteBtn.className = "btn btn-pill-small";
-      deleteBtn.textContent = "Remove";
-      deleteBtn.style.borderColor = "#b91c1c";
-      deleteBtn.style.color = "#b91c1c";
-      deleteBtn.addEventListener("click", () => deleteTask(task.id));
+      function addTaskFromInput() {
+        const cleaned = cleanTaskName(taskInput.value);
+        if (!cleaned) return;
+        const task = {
+          id: String(Date.now()) + Math.random().toString(16).slice(2),
+          name: cleaned,
+          importance: null,
+          urgency: null,
+          answers: null,
+          x: null,
+          y: null,
+          quadrant: null
+        };
+        tasks.push(task);
+        taskInput.value = "";
+        assessmentState = null;
+        renderAll();
+        taskInput.focus();
+      }
 
-      actions.appendChild(pill);
-      actions.appendChild(assessBtn);
-      actions.appendChild(deleteBtn);
+      function clearAllTasks() {
+        if (!tasks.length) return;
+        if (!confirm("Clear all tasks?")) return;
+        tasks = [];
+        assessmentState = null;
+        renderAll();
+      }
 
-      li.appendChild(main);
-      li.appendChild(actions);
+      function deleteTask(id) {
+        tasks = tasks.filter(function (t) { return t.id !== id; });
+        if (assessmentState && assessmentState.taskId === id) {
+          assessmentState = null;
+        }
+        renderAll();
+      }
 
-      taskList.appendChild(li);
-    });
-  }
+      function startAssessment(taskId) {
+        const task = tasks.find(function (t) { return t.id === taskId; });
+        if (!task) return;
+        assessmentState = {
+          taskId: taskId,
+          answers: defaultAnswers(task.answers)
+        };
+        renderAll();
+      }
 
-  /* QUESTION PANEL */
+      function cancelAssessment() {
+        assessmentState = null;
+        renderAll();
+      }
 
-  function renderQuestionPanel() {
-    questionPanelContainer.innerHTML = "";
+      function handleRadioChange(questionId, value) {
+        if (!assessmentState) return;
+        assessmentState.answers[questionId] = Number(value);
+      }
 
-    if (!assessmentState) {
-      if (tasks.length) {
+      function computeScoresFromAnswers(a) {
+        const impIds = ["impImpact", "impStake", "impGoal"];
+        const urgIds = ["urgDeadline", "urgBlock", "urgDelay"];
+
+        const impAvg =
+          impIds.reduce(function (sum, id) { return sum + (a[id] || 3); }, 0) /
+          impIds.length;
+        const urgAvg =
+          urgIds.reduce(function (sum, id) { return sum + (a[id] || 3); }, 0) /
+          urgIds.length;
+
+        const importance = clamp(Number(impAvg.toFixed(1)), 1, 5);
+        const urgency = clamp(Number(urgAvg.toFixed(1)), 1, 5);
+        return { importance: importance, urgency: urgency };
+      }
+
+      function quadrantFromScores(importance, urgency) {
+        const impHigh = importance >= 3;
+        const urgHigh = urgency >= 3;
+        if (impHigh && urgHigh) return "q1"; // Do
+        if (impHigh && !urgHigh) return "q2"; // Schedule
+        if (!impHigh && urgHigh) return "q3"; // Delegate
+        return "q4"; // Delete
+      }
+
+      function quadrantMeta(q) {
+        switch (q) {
+          case "q1": return { label: "Do it", className: "pill-q1" };
+          case "q2": return { label: "Schedule it", className: "pill-q2" };
+          case "q3": return { label: "Delegate it", className: "pill-q3" };
+          default: return { label: "Delete it", className: "pill-q4" };
+        }
+      }
+
+      function computePriorityScore(task) {
+        if (task.importance == null || task.urgency == null) return 0;
+        return task.importance * 2 + task.urgency;
+      }
+
+      function positionFromScores(importance, urgency) {
+        const x = (urgency - 1) / 4;
+        const y = 1 - (importance - 1) / 4;
+        return {
+          x: clamp(x, 0, 1),
+          y: clamp(y, 0, 1)
+        };
+      }
+
+      function scoresFromPosition(x, y) {
+        const urgency = clamp(1 + 4 * x, 1, 5);
+        const importance = clamp(1 + 4 * (1 - y), 1, 5);
+        return {
+          importance: Number(importance.toFixed(1)),
+          urgency: Number(urgency.toFixed(1))
+        };
+      }
+
+      function finaliseAssessment() {
+        if (!assessmentState) return;
+        const task = tasks.find(function (t) { return t.id === assessmentState.taskId; });
+        if (!task) return;
+
+        const a = assessmentState.answers;
+        const scores = computeScoresFromAnswers(a);
+        task.importance = scores.importance;
+        task.urgency = scores.urgency;
+        task.answers = Object.assign({}, a);
+        task.quadrant = quadrantFromScores(task.importance, task.urgency);
+
+        if (task.x == null || task.y == null) {
+          const pos = positionFromScores(task.importance, task.urgency);
+          task.x = pos.x;
+          task.y = pos.y;
+        }
+
+        assessmentState = null;
+        renderAll();
+      }
+
+      function renderTasks() {
+        taskList.innerHTML = "";
+        if (!tasks.length) {
+          noTasksMessage.style.display = "block";
+          return;
+        }
+        noTasksMessage.style.display = "none";
+
+        tasks.forEach(function (task) {
+          const li = document.createElement("li");
+          li.className = "task-item";
+
+          const main = document.createElement("div");
+          main.className = "task-main";
+
+          const nameEl = document.createElement("div");
+          nameEl.className = "task-name";
+          nameEl.textContent = task.name;
+
+          const metaEl = document.createElement("div");
+          metaEl.className = "task-meta";
+          if (task.importance == null || task.urgency == null) {
+            metaEl.textContent = "Not assessed yet";
+          } else {
+            metaEl.textContent = quadrantMeta(task.quadrant).label;
+          }
+
+          main.appendChild(nameEl);
+          main.appendChild(metaEl);
+
+          const actions = document.createElement("div");
+          actions.className = "task-actions";
+
+          const pill = document.createElement("div");
+          if (task.importance == null || task.urgency == null) {
+            pill.className = "pill pill-unassessed";
+            pill.textContent = "Needs assessment";
+          } else {
+            const qMeta = quadrantMeta(task.quadrant);
+            pill.className = "pill " + qMeta.className;
+            pill.textContent = qMeta.label;
+          }
+
+          const assessBtn = document.createElement("button");
+          assessBtn.className = "btn btn-pill-small";
+          assessBtn.textContent =
+            task.importance == null || task.urgency == null ? "Assess" : "Revisit";
+          assessBtn.addEventListener("click", function () {
+            startAssessment(task.id);
+          });
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "btn btn-pill-small";
+          deleteBtn.textContent = "Remove";
+          deleteBtn.style.borderColor = "#b91c1c";
+          deleteBtn.style.color = "#b91c1c";
+          deleteBtn.addEventListener("click", function () {
+            deleteTask(task.id);
+          });
+
+          actions.appendChild(pill);
+          actions.appendChild(assessBtn);
+          actions.appendChild(deleteBtn);
+
+          li.appendChild(main);
+          li.appendChild(actions);
+          taskList.appendChild(li);
+        });
+      }
+
+      function renderQuestionPanel() {
+        questionPanelContainer.innerHTML = "";
+
+        if (!assessmentState) {
+          if (tasks.length) {
+            const panel = document.createElement("div");
+            panel.className = "question-panel";
+            const text = document.createElement("div");
+            text.className = "empty-state";
+            text.textContent = "Select Assess on a task to answer the questions.";
+            panel.appendChild(text);
+            questionPanelContainer.appendChild(panel);
+          }
+          return;
+        }
+
+        const task = tasks.find(function (t) { return t.id === assessmentState.taskId; });
+        const answers = assessmentState.answers;
+
         const panel = document.createElement("div");
         panel.className = "question-panel";
-        const text = document.createElement("div");
-        text.className = "empty-state";
-        text.textContent = "Select “Assess” on a task to answer the questions.";
-        panel.appendChild(text);
+
+        const header = document.createElement("div");
+        header.className = "question-header";
+
+        const nameEl = document.createElement("div");
+        nameEl.className = "question-task-name";
+        nameEl.textContent = task ? task.name : "";
+
+        const infoEl = document.createElement("div");
+        infoEl.textContent = "Six quick sliders. Middle is preselected.";
+
+        header.appendChild(nameEl);
+        header.appendChild(infoEl);
+        panel.appendChild(header);
+
+        const body = document.createElement("div");
+        body.className = "question-body";
+
+        questions.forEach(function (q) {
+          const row = document.createElement("div");
+          row.className = "question-row";
+
+          const title = document.createElement("div");
+          title.className = "question-title";
+          title.textContent = q.title;
+
+          const text = document.createElement("div");
+          text.textContent = q.question;
+
+          const scale = document.createElement("div");
+          scale.className = "question-scale";
+
+          q.labels.forEach(function (label, idx) {
+            const val = idx + 1;
+            const opt = document.createElement("label");
+            opt.className = "scale-option";
+
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = "q-" + q.id;
+            input.value = String(val);
+            input.checked = answers[q.id] === val;
+            input.addEventListener("change", function () {
+              handleRadioChange(q.id, val);
+            });
+
+            const span = document.createElement("span");
+            span.textContent = label;
+
+            opt.appendChild(input);
+            opt.appendChild(span);
+            scale.appendChild(opt);
+          });
+
+          row.appendChild(title);
+          row.appendChild(text);
+          row.appendChild(scale);
+          body.appendChild(row);
+        });
+
+        panel.appendChild(body);
+
+        const footer = document.createElement("div");
+        footer.className = "question-footer";
+
+        const hint = document.createElement("div");
+        hint.textContent = "Change only answers that feel clearly high or low.";
+
+        const actions = document.createElement("div");
+        const cancelBtn = document.createElement("button");
+        cancelBtn.className = "btn btn-pill-small";
+        cancelBtn.textContent = "Cancel";
+        cancelBtn.addEventListener("click", cancelAssessment);
+
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "btn btn-pill-small";
+        saveBtn.textContent = "Save answers";
+        saveBtn.addEventListener("click", finaliseAssessment);
+
+        actions.appendChild(cancelBtn);
+        actions.appendChild(saveBtn);
+
+        footer.appendChild(hint);
+        footer.appendChild(actions);
+        panel.appendChild(footer);
+
         questionPanelContainer.appendChild(panel);
       }
-      return;
-    }
 
-    const task = tasks.find(t => t.id === assessmentState.taskId);
-    const answers = assessmentState.answers;
-
-    const panel = document.createElement("div");
-    panel.className = "question-panel";
-
-    const header = document.createElement("div");
-    header.className = "question-header";
-
-    const nameEl = document.createElement("div");
-    nameEl.className = "question-task-name";
-    nameEl.textContent = task ? task.name : "";
-
-    const infoEl = document.createElement("div");
-    infoEl.textContent = "Six quick sliders – middle is preselected.";
-
-    header.appendChild(nameEl);
-    header.appendChild(infoEl);
-    panel.appendChild(header);
-
-    const body = document.createElement("div");
-    body.className = "question-body";
-
-    questions.forEach(q => {
-      const row = document.createElement("div");
-      row.className = "question-row";
-
-      const title = document.createElement("div");
-      title.className = "question-title";
-      title.textContent = q.title;
-
-      const text = document.createElement("div");
-      text.textContent = q.question;
-
-      const scale = document.createElement("div");
-      scale.className = "question-scale";
-
-      q.labels.forEach((label, idx) => {
-        const val = idx + 1;
-        const opt = document.createElement("label");
-        opt.className = "scale-option";
-
-        const input = document.createElement("input");
-        input.type = "radio";
-        input.name = "q-" + q.id;
-        input.value = String(val);
-        input.checked = answers[q.id] === val;
-        input.addEventListener("change", () =>
-          handleRadioChange(q.id, val)
-        );
-
-        const span = document.createElement("span");
-        span.textContent = label;
-
-        opt.appendChild(input);
-        opt.appendChild(span);
-        scale.appendChild(opt);
-      });
-
-      row.appendChild(title);
-      row.appendChild(text);
-      row.appendChild(scale);
-      body.appendChild(row);
-    });
-
-    panel.appendChild(body);
-
-    const footer = document.createElement("div");
-    footer.className = "question-footer";
-
-    const hint = document.createElement("div");
-    hint.textContent = "Change only answers that feel clearly high or low.";
-
-    const actions = document.createElement("div");
-    const cancelBtn = document.createElement("button");
-    cancelBtn.className = "btn btn-pill-small";
-    cancelBtn.textContent = "Cancel";
-    cancelBtn.addEventListener("click", cancelAssessment);
-
-    const saveBtn = document.createElement("button");
-    saveBtn.className = "btn btn-pill-small";
-    saveBtn.textContent = "Save answers";
-    saveBtn.addEventListener("click", finaliseAssessment);
-
-    actions.appendChild(cancelBtn);
-    actions.appendChild(saveBtn);
-
-    footer.appendChild(hint);
-    footer.appendChild(actions);
-
-    panel.appendChild(footer);
-
-    questionPanelContainer.appendChild(panel);
-  }
-
-  /* BOARD / NOTES */
-
-  function ensureNoteRotation(task) {
-    if (task.rotation == null) {
-      task.rotation = (Math.random() * 8 - 4).toFixed(2);
-    }
-  }
-
-  function ensureNoteZ(task) {
-    if (task.z == null) {
-      topZ += 1;
-      task.z = topZ;
-    } else {
-      topZ = Math.max(topZ, task.z);
-    }
-  }
-
-  function makeNoteDraggable(el, task) {
-    let dragging = false;
-    let startX, startY, originLeft, originTop;
-
-    function onMouseDown(e) {
-      if (e.button !== 0) return;
-      dragging = true;
-      topZ += 1;
-      task.z = topZ;
-      el.style.zIndex = topZ;
-      el.classList.add("dragging");
-
-      const rect = el.getBoundingClientRect();
-      startX = e.clientX;
-      startY = e.clientY;
-      originLeft = rect.left;
-      originTop = rect.top;
-
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
-    }
-
-    function onMouseMove(e) {
-      if (!dragging) return;
-
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-
-      const innerRect = boardInner.getBoundingClientRect();
-      const noteWidth = el.offsetWidth;
-      const noteHeight = el.offsetHeight;
-
-      let newLeftRel = originLeft + dx - innerRect.left;
-      let newTopRel = originTop + dy - innerRect.top;
-
-      newLeftRel = clamp(newLeftRel, 0, innerRect.width - noteWidth);
-      newTopRel = clamp(newTopRel, 0, innerRect.height - noteHeight);
-
-      el.style.left = newLeftRel + "px";
-      el.style.top = newTopRel + "px";
-    }
-
-    function onMouseUp() {
-      if (!dragging) return;
-      dragging = false;
-      el.classList.remove("dragging");
-      document.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseup", onMouseUp);
-
-      const innerRect = boardInner.getBoundingClientRect();
-      const noteRect = el.getBoundingClientRect();
-      const noteWidth = el.offsetWidth;
-      const noteHeight = el.offsetHeight;
-
-      const centerX = noteRect.left - innerRect.left + noteWidth / 2;
-      const centerY = noteRect.top - innerRect.top + noteHeight / 2;
-
-      const xNorm = clamp(centerX / innerRect.width, 0, 1);
-      const yNorm = clamp(centerY / innerRect.height, 0, 1);
-
-      task.x = xNorm;
-      task.y = yNorm;
-
-      const scores = scoresFromPosition(xNorm, yNorm);
-      task.importance = scores.importance;
-      task.urgency = scores.urgency;
-      task.quadrant = quadrantFromScores(task.importance, task.urgency);
-
-      // Update colour
-      el.dataset.quadrant = task.quadrant;
-
-      // Refresh list / priority to show new numbers
-      renderTasks();
-      renderPriorities();
-    }
-
-    el.addEventListener("mousedown", onMouseDown);
-  }
-
-  function renderBoard() {
-    boardInner.innerHTML = "";
-
-    const assessed = tasks.filter(t => t.importance != null && t.urgency != null);
-    if (!assessed.length) return;
-
-    const innerRect = quadrantGrid.getBoundingClientRect();
-
-    assessed.forEach(task => {
-      ensureNoteRotation(task);
-      ensureNoteZ(task);
-
-      // Default x/y from scores if missing
-      if (task.x == null || task.y == null) {
-        const pos = positionFromScores(task.importance, task.urgency);
-        task.x = pos.x;
-        task.y = pos.y;
+      function ensureNoteDefaults(task) {
+        if (task.rotation == null) {
+          task.rotation = (Math.random() * 8 - 4).toFixed(2);
+        }
       }
 
-      const note = document.createElement("div");
-      note.className = "task-note new";
-      note.dataset.id = task.id;
-      note.dataset.quadrant = task.quadrant || quadrantFromScores(task.importance, task.urgency);
-      note.style.setProperty("--note-rot", task.rotation + "deg");
-      note.style.zIndex = task.z || 1;
+      function renderBoard() {
+        boardInner.innerHTML = "";
 
-      const title = document.createElement("div");
-      title.className = "task-note-title";
-      title.textContent = task.name;
-      note.appendChild(title);
+        const assessed = tasks.filter(function (t) {
+          return t.importance != null && t.urgency != null;
+        });
+        if (!assessed.length) return;
 
-      boardInner.appendChild(note);
+        const innerRect = quadrantGrid.getBoundingClientRect();
 
-      // After in DOM, position
-      const noteWidth = note.offsetWidth || 150;
-      const noteHeight = note.offsetHeight || 60;
+        assessed.forEach(function (task) {
+          ensureNoteDefaults(task);
 
-      const left =
-        clamp(task.x, 0, 1) * innerRect.width - noteWidth / 2;
-      const top =
-        clamp(task.y, 0, 1) * innerRect.height - noteHeight / 2;
+          if (task.x == null || task.y == null) {
+            const pos = positionFromScores(task.importance, task.urgency);
+            task.x = pos.x;
+            task.y = pos.y;
+          }
 
-      note.style.left = clamp(left, 0, innerRect.width - noteWidth) + "px";
-      note.style.top = clamp(top, 0, innerRect.height - noteHeight) + "px";
+          const note = document.createElement("div");
+          note.className = "note task-note";
+          note.dataset.id = task.id;
+          const q = task.quadrant || quadrantFromScores(task.importance, task.urgency);
+          note.dataset.quadrant = q;
+          note.style.setProperty("--note-rot", task.rotation + "deg");
 
-      // Remove "new" animation class after a moment
-      setTimeout(() => note.classList.remove("new"), 400);
+          const title = document.createElement("div");
+          title.className = "note-title";
+          title.textContent = task.name;
+          note.appendChild(title);
 
-      makeNoteDraggable(note, task);
-    });
-  }
+          boardInner.appendChild(note);
 
-  /* PRIORITY LIST */
+          const noteWidth = note.offsetWidth || 150;
+          const noteHeight = note.offsetHeight || 60;
 
-  function renderPriorities() {
-    priorityList.innerHTML = "";
+          const left = clamp(task.x, 0, 1) * innerRect.width - noteWidth / 2;
+          const top = clamp(task.y, 0, 1) * innerRect.height - noteHeight / 2;
 
-    const assessed = tasks.filter(t => t.importance != null && t.urgency != null);
-
-    if (!assessed.length) {
-      const li = document.createElement("li");
-      li.className = "empty-state";
-      li.textContent = "Assess at least one task to see a working list.";
-      priorityList.appendChild(li);
-      return;
-    }
-
-    const qOrder = { q1: 1, q2: 2, q3: 3, q4: 4 };
-
-    const sorted = assessed
-      .slice()
-      .map(t => {
-        const q = t.quadrant || quadrantFromScores(t.importance, t.urgency);
-        return { ...t, quadrant: q, score: computePriorityScore(t) };
-      })
-      .sort((a, b) => {
-        const qa = qOrder[a.quadrant];
-        const qb = qOrder[b.quadrant];
-        if (qa !== qb) return qa - qb;
-        return b.score - a.score;
-      });
-
-    sorted.forEach((task, index) => {
-      const li = document.createElement("li");
-      li.className = "priority-item";
-
-      const main = document.createElement("div");
-      main.className = "priority-main";
-
-      const rank = document.createElement("div");
-      rank.className = "priority-rank";
-      rank.textContent = index + 1;
-
-      const nameEl = document.createElement("div");
-      nameEl.className = "priority-name";
-      nameEl.textContent = task.name;
-
-      const metaEl = document.createElement("div");
-      metaEl.className = "priority-meta";
-      metaEl.textContent = quadrantMeta(task.quadrant).label;
-
-      main.appendChild(rank);
-      main.appendChild(nameEl);
-      main.appendChild(metaEl);
-
-      const pill = document.createElement("div");
-      pill.className = "priority-pill";
-      pill.textContent =
-        "Impact " +
-        task.importance.toFixed(1) +
-        " · Timing " +
-        task.urgency.toFixed(1);
-
-      li.appendChild(main);
-      li.appendChild(pill);
-
-      priorityList.appendChild(li);
-    });
-
-    const unassessed = tasks.filter(t => t.importance == null || t.urgency == null);
-    if (unassessed.length) {
-      const li = document.createElement("li");
-      li.className = "empty-state";
-      li.textContent =
-        unassessed.length +
-        " task" +
-        (unassessed.length > 1 ? "s" : "") +
-        " not yet assessed.";
-      priorityList.appendChild(li);
-    }
-  }
-
-  function renderAll() {
-    renderTasks();
-    renderQuestionPanel();
-    renderBoard();
-    renderPriorities();
-  }
-
-  /* PDF EXPORT */
-
-  function formatDateForFilename(date) {
-    const pad = n => String(n).padStart(2, "0");
-    const yyyy = date.getFullYear();
-    const mm = pad(date.getMonth() + 1);
-    const dd = pad(date.getDate());
-    const hh = pad(date.getHours());
-    const mi = pad(date.getMinutes());
-    return `${yyyy}-${mm}-${dd}_${hh}-${mi}`;
-  }
-
-  function exportAsPdf() {
-    if (!window.jspdf || !window.jspdf.jsPDF) {
-      alert("PDF export is not available in this browser.");
-      return;
-    }
-    const assessed = tasks.filter(t => t.importance != null && t.urgency != null);
-    const unassessed = tasks.filter(t => t.importance == null || t.urgency == null);
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
-
-    const margin = 40;
-    let y = margin;
-    const now = new Date();
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.text("Important vs Urgent Planner", margin, y);
-    y += 18;
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.text(now.toLocaleString(), margin, y);
-    y += 18;
-
-    const sections = [
-      { key: "q1", heading: "Do it (important and urgent)" },
-      { key: "q2", heading: "Schedule it (important, not urgent)" },
-      { key: "q3", heading: "Delegate it (less important, urgent)" },
-      { key: "q4", heading: "Delete it (less important, not urgent)" }
-    ];
-
-    doc.setFontSize(12);
-    sections.forEach(sec => {
-      const list = assessed.filter(
-        t => (t.quadrant || quadrantFromScores(t.importance, t.urgency)) === sec.key
-      );
-      doc.setFont("helvetica", "bold");
-      doc.text(sec.heading, margin, y);
-      y += 14;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-
-      if (!list.length) {
-        doc.text("No tasks in this quadrant.", margin + 14, y);
-        y += 14;
-      } else {
-        list.forEach(t => {
-          const line =
-            "• " +
-            t.name +
-            `  (Impact ${t.importance.toFixed(1)}, Timing ${t.urgency.toFixed(1)})`;
-          const split = doc.splitTextToSize(line, 500);
-          doc.text(split, margin + 14, y);
-          y += 14 + (split.length - 1) * 12;
+          note.style.left =
+            clamp(left, 0, innerRect.width - noteWidth) + "px";
+          note.style.top =
+            clamp(top, 0, innerRect.height - noteHeight) + "px";
         });
       }
-      y += 6;
-      if (y > 760) {
-        doc.addPage();
-        y = margin;
-      }
-      doc.setFontSize(12);
-    });
 
-    if (assessed.length) {
-      if (y > 720) {
-        doc.addPage();
-        y = margin;
-      }
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      doc.text("Priority order", margin, y);
-      y += 14;
+      function renderPriorities() {
+        priorityList.innerHTML = "";
 
-      const qOrder = { q1: 1, q2: 2, q3: 3, q4: 4 };
-      const sorted = assessed
-        .slice()
-        .map(t => {
-          const q = t.quadrant || quadrantFromScores(t.importance, t.urgency);
-          return { ...t, quadrant: q, score: computePriorityScore(t) };
-        })
-        .sort((a, b) => {
-          const qa = qOrder[a.quadrant];
-          const qb = qOrder[b.quadrant];
-          if (qa !== qb) return qa - qb;
-          return b.score - a.score;
+        const assessed = tasks.filter(function (t) {
+          return t.importance != null && t.urgency != null;
         });
 
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-
-      sorted.forEach((t, idx) => {
-        const qMeta = quadrantMeta(t.quadrant);
-        const base =
-          `${idx + 1}. ${t.name}  (${qMeta.label}, ` +
-          `Impact ${t.importance.toFixed(1)}, Timing ${t.urgency.toFixed(1)})`;
-        const split = doc.splitTextToSize(base, 500);
-        doc.text(split, margin, y);
-        y += 14 + (split.length - 1) * 12;
-        if (y > 760) {
-          doc.addPage();
-          y = margin;
+        if (!assessed.length) {
+          const li = document.createElement("li");
+          li.className = "empty-state";
+          li.textContent = "Assess at least one task to see a working list.";
+          priorityList.appendChild(li);
+          return;
         }
-      });
-      y += 8;
-    }
 
-    if (unassessed.length) {
-      if (y > 740) {
-        doc.addPage();
-        y = margin;
+        const qOrder = { q1: 1, q2: 2, q3: 3, q4: 4 };
+
+        const sorted = assessed
+          .slice()
+          .map(function (t) {
+            const q = t.quadrant || quadrantFromScores(t.importance, t.urgency);
+            return {
+              data: t,
+              quadrant: q,
+              score: computePriorityScore(t)
+            };
+          })
+          .sort(function (a, b) {
+            const qa = qOrder[a.quadrant];
+            const qb = qOrder[b.quadrant];
+            if (qa !== qb) return qa - qb;
+            return b.score - a.score;
+          });
+
+        sorted.forEach(function (entry, index) {
+          const task = entry.data;
+          const li = document.createElement("li");
+          li.className = "priority-item";
+
+          const main = document.createElement("div");
+          main.className = "priority-main";
+
+          const rank = document.createElement("div");
+          rank.className = "priority-rank";
+          rank.textContent = index + 1;
+
+          const nameEl = document.createElement("div");
+          nameEl.className = "priority-name";
+          nameEl.textContent = task.name;
+
+          const metaEl = document.createElement("div");
+          metaEl.className = "priority-meta";
+          metaEl.textContent = quadrantMeta(task.quadrant).label;
+
+          main.appendChild(rank);
+          main.appendChild(nameEl);
+          main.appendChild(metaEl);
+
+          const pill = document.createElement("div");
+          pill.className = "priority-pill";
+          pill.textContent =
+            "Impact " +
+            task.importance.toFixed(1) +
+            " · Timing " +
+            task.urgency.toFixed(1);
+
+          li.appendChild(main);
+          li.appendChild(pill);
+          priorityList.appendChild(li);
+        });
+
+        const unassessed = tasks.filter(function (t) {
+          return t.importance == null || t.urgency == null;
+        });
+        if (unassessed.length) {
+          const li = document.createElement("li");
+          li.className = "empty-state";
+          li.textContent =
+            unassessed.length +
+            " task" +
+            (unassessed.length > 1 ? "s" : "") +
+            " not yet assessed.";
+          priorityList.appendChild(li);
+        }
       }
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      doc.text("Not yet assessed", margin, y);
-      y += 14;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      unassessed.forEach(t => {
-        const line = "• " + t.name;
-        const split = doc.splitTextToSize(line, 500);
-        doc.text(split, margin + 14, y);
-        y += 14 + (split.length - 1) * 12;
-        if (y > 760) {
-          doc.addPage();
-          y = margin;
+
+      function setupDragging() {
+        if (dragInitialised) return;
+        if (!window.imthebusCore || !window.imthebusCore.initDraggableNotes) return;
+        window.imthebusCore.initDraggableNotes({
+          boardEl: boardInner,
+          noteSelector: ".task-note",
+          onDrop: function (noteEl, xNorm, yNorm) {
+            const id = noteEl.dataset.id;
+            const task = tasks.find(function (t) { return t.id === id; });
+            if (!task) return;
+            task.x = xNorm;
+            task.y = yNorm;
+            const scores = scoresFromPosition(xNorm, yNorm);
+            task.importance = scores.importance;
+            task.urgency = scores.urgency;
+            task.quadrant = quadrantFromScores(task.importance, task.urgency);
+            renderTasks();
+            renderPriorities();
+          }
+        });
+        dragInitialised = true;
+      }
+
+      function renderAll() {
+        renderTasks();
+        renderQuestionPanel();
+        renderBoard();
+        renderPriorities();
+        setupDragging();
+      }
+
+      function formatDateForFilename(date) {
+        function pad(n) { return String(n).padStart(2, "0"); }
+        const yyyy = date.getFullYear();
+        const mm = pad(date.getMonth() + 1);
+        const dd = pad(date.getDate());
+        const hh = pad(date.getHours());
+        const mi = pad(date.getMinutes());
+        return yyyy + "-" + mm + "-" + dd + "_" + hh + "-" + mi;
+      }
+
+      function exportAsPdf() {
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+          alert("PDF export is not available in this browser.");
+          return;
+        }
+        const assessed = tasks.filter(function (t) {
+          return t.importance != null && t.urgency != null;
+        });
+        const unassessed = tasks.filter(function (t) {
+          return t.importance == null || t.urgency == null;
+        });
+
+        const jsPDF = window.jspdf.jsPDF;
+        const doc = new jsPDF({
+          orientation: "portrait",
+          unit: "pt",
+          format: "a4"
+        });
+
+        const margin = 40;
+        let y = margin;
+        const now = new Date();
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(16);
+        doc.text("Important vs Urgent planner", margin, y);
+        y += 18;
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.text(now.toLocaleString(), margin, y);
+        y += 18;
+
+        const sections = [
+          { key: "q1", heading: "Do it (important and urgent)" },
+          { key: "q2", heading: "Schedule it (important, not urgent)" },
+          { key: "q3", heading: "Delegate it (less important, urgent)" },
+          { key: "q4", heading: "Delete it (less important, not urgent)" }
+        ];
+
+        doc.setFontSize(12);
+        sections.forEach(function (sec) {
+          const list = assessed.filter(function (t) {
+            const q = t.quadrant || quadrantFromScores(t.importance, t.urgency);
+            return q === sec.key;
+          });
+
+          doc.setFont("helvetica", "bold");
+          doc.text(sec.heading, margin, y);
+          y += 14;
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10);
+
+          if (!list.length) {
+            doc.text("No tasks in this quadrant.", margin + 14, y);
+            y += 14;
+          } else {
+            list.forEach(function (t) {
+              const line =
+                "• " +
+                t.name +
+                " (Impact " +
+                t.importance.toFixed(1) +
+                ", Timing " +
+                t.urgency.toFixed(1) +
+                ")";
+              const split = doc.splitTextToSize(line, 500);
+              doc.text(split, margin + 14, y);
+              y += 14 + (split.length - 1) * 12;
+            });
+          }
+
+          y += 6;
+          if (y > 760) {
+            doc.addPage();
+            y = margin;
+          }
+          doc.setFontSize(12);
+        });
+
+        if (assessed.length) {
+          if (y > 720) {
+            doc.addPage();
+            y = margin;
+          }
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(12);
+          doc.text("Priority order", margin, y);
+          y += 14;
+
+          const qOrder = { q1: 1, q2: 2, q3: 3, q4: 4 };
+          const sorted = assessed
+            .slice()
+            .map(function (t) {
+              const q = t.quadrant || quadrantFromScores(t.importance, t.urgency);
+              return {
+                data: t,
+                quadrant: q,
+                score: computePriorityScore(t)
+              };
+            })
+            .sort(function (a, b) {
+              const qa = qOrder[a.quadrant];
+              const qb = qOrder[b.quadrant];
+              if (qa !== qb) return qa - qb;
+              return b.score - a.score;
+            });
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10);
+
+          sorted.forEach(function (entry, idx) {
+            const t = entry.data;
+            const qMeta = quadrantMeta(entry.quadrant);
+            const base =
+              String(idx + 1) +
+              ". " +
+              t.name +
+              " (" +
+              qMeta.label +
+              ", Impact " +
+              t.importance.toFixed(1) +
+              ", Timing " +
+              t.urgency.toFixed(1) +
+              ")";
+            const split = doc.splitTextToSize(base, 500);
+            doc.text(split, margin, y);
+            y += 14 + (split.length - 1) * 12;
+            if (y > 760) {
+              doc.addPage();
+              y = margin;
+            }
+          });
+          y += 8;
+        }
+
+        if (unassessed.length) {
+          if (y > 740) {
+            doc.addPage();
+            y = margin;
+          }
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(12);
+          doc.text("Not yet assessed", margin, y);
+          y += 14;
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10);
+          unassessed.forEach(function (t) {
+            const line = "• " + t.name;
+            const split = doc.splitTextToSize(line, 500);
+            doc.text(split, margin + 14, y);
+            y += 14 + (split.length - 1) * 12;
+            if (y > 760) {
+              doc.addPage();
+              y = margin;
+            }
+          });
+        }
+
+        const filename =
+          "important-vs-urgent-" + formatDateForFilename(now) + ".pdf";
+        doc.save(filename);
+      }
+
+      addTaskButton.addEventListener("click", addTaskFromInput);
+      clearAllButton.addEventListener("click", clearAllTasks);
+      taskInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          addTaskFromInput();
         }
       });
-    }
 
-    const filename = "important-vs-urgent-" + formatDateForFilename(now) + ".pdf";
-    doc.save(filename);
-  }
+      exportPdfButton.addEventListener("click", exportAsPdf);
 
-  /* EVENT WIRING */
+      quadrantExplainerToggle.addEventListener("click", function () {
+        const open = !quadrantExplainerBody.classList.contains("open");
+        quadrantExplainerBody.classList.toggle("open", open);
+        quadrantExplainerToggle.textContent = open
+          ? "- What the quadrants mean"
+          : "+ What the quadrants mean";
+      });
 
-  addTaskButton.addEventListener("click", addTaskFromInput);
-  clearAllButton.addEventListener("click", clearAllTasks);
-  taskInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addTaskFromInput();
-    }
-  });
+      window.addEventListener("resize", function () {
+        renderBoard();
+      });
 
-  exportPdfButton.addEventListener("click", exportAsPdf);
-
-  quadrantExplainerToggle.addEventListener("click", () => {
-    const open = quadrantExplainerBody.classList.toggle("open");
-    quadrantExplainerToggle.textContent = open
-      ? "– What the quadrants mean"
-      : "+ What the quadrants mean";
-  });
-
-  window.addEventListener("resize", () => {
-    // Reposition notes when the board size changes
-    renderBoard();
-  });
-
-  renderAll();
-})();
-</script>
+      renderAll();
+    })();
+  </script>
 </body>
 </html>
