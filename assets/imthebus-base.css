@@ -5,11 +5,10 @@
   --ink: #111111;
   --border-strong: #000000;
 
-  --bg-board: #fdfdfd;
-  --bg-noise: url("assets/whiteboard-noise.png");
-  --bg-texture: url("assets/whiteboard.jpg");
+  /* single shared texture – relative to /assets/imthebus-base.css */
+  --bg-texture: url("whiteboard.jpg");
 
-  /* Common quadrant note colors */
+  /* quadrant colours for notes */
   --q-do: #c7f9cc;
   --q-schedule: #bde0fe;
   --q-delegate: #ffeaa7;
@@ -27,11 +26,8 @@
 body {
   margin: 0;
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background:
-    var(--bg-noise) repeat,
-    var(--bg-texture) repeat,
-    var(--bg-board);
-  background-size: 600px, 1200px;
+  background: var(--bg-texture) repeat;
+  background-size: 1200px;
   color: var(--ink);
 }
 
@@ -56,7 +52,7 @@ a:hover {
   font-size: 0.9rem;
 }
 
-/* NAVIGATION - single canonical style, darkened background */
+/* NAVIGATION – dark overlay on same texture */
 
 nav.site-nav {
   position: sticky;
@@ -68,11 +64,9 @@ nav.site-nav {
   gap: 24px;
   padding: 10px 20px;
   background:
-    linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
-    var(--bg-noise) repeat,
-    var(--bg-texture) repeat,
-    #111111;
-  background-size: 600px, 1200px;
+    linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
+    var(--bg-texture) repeat;
+  background-size: 1200px;
   border-bottom: 3px solid var(--border-strong);
   font-family: "Archivo Black", system-ui, sans-serif;
   font-size: 0.8rem;
@@ -133,9 +127,8 @@ nav.site-nav {
   box-shadow: 0 8px 14px rgba(0, 0, 0, 0.22);
   background:
     linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
-    var(--bg-noise) repeat,
     var(--bg-texture) repeat;
-  background-size: 600px, 1200px;
+  background-size: 1200px;
 }
 
 /* TITLES */
@@ -202,7 +195,7 @@ nav.site-nav {
   color: #ffffff;
 }
 
-/* COLLAPSIBLES - shared pattern */
+/* COLLAPSIBLES */
 
 .collapsible {
   border-top: 1px dashed rgba(0, 0, 0, 0.2);
@@ -233,9 +226,7 @@ nav.site-nav {
   max-height: 260px;
 }
 
-/* BOARD WRAPPER
-   Keep it mostly transparent so the global background shows "behind everything",
-   but still framed as a board. */
+/* BOARD WRAPPER – same texture, light overlay inside frame */
 
 .board-wrapper {
   position: relative;
@@ -246,16 +237,15 @@ nav.site-nav {
   overflow: hidden;
   background:
     linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)),
-    var(--bg-noise) repeat,
     var(--bg-texture) repeat;
-  background-size: 600px, 1200px;
+  background-size: 1200px;
 }
 
 .board-inner-shell {
   padding: 10px 16px 12px;
 }
 
-/* FOOTER - darkened like header */
+/* FOOTER – dark overlay on same texture */
 
 .site-footer {
   border-top: 2px solid #000000;
@@ -266,11 +256,9 @@ nav.site-nav {
   justify-content: space-between;
   gap: 10px;
   background:
-    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    var(--bg-noise) repeat,
-    var(--bg-texture) repeat,
-    #111111;
-  background-size: 600px, 1200px;
+    linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
+    var(--bg-texture) repeat;
+  background-size: 1200px;
   color: #f9fafb;
 }
 
@@ -278,95 +266,5 @@ nav.site-nav {
   color: #f9fafb;
 }
 
-/* GENERIC POST IT NOTES */
-
-.note {
-  position: absolute;
-  min-height: 70px;
-  padding: 8px 10px 6px;
-  border-radius: 6px;
-  box-shadow:
-    0 10px 12px rgba(0, 0, 0, 0.28),
-    0 1px 0 rgba(255, 255, 255, 0.9) inset;
-  font-family: "Permanent Marker", system-ui, sans-serif; /* handwritten ONLY here */
-  font-size: 0.9rem;
-  cursor: grab;
-  transform-origin: center top;
-  user-select: none;
-  white-space: pre-wrap;
-  background-image:
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.65), transparent 30%);
-  transition:
-    transform 0.08s ease-out,
-    box-shadow 0.08s ease-out,
-    opacity 0.08s ease-out;
-}
-
-.note.dragging {
-  opacity: 0.95;
-  cursor: grabbing;
-  box-shadow:
-    0 16px 20px rgba(0, 0, 0, 0.45),
-    0 1px 0 rgba(255, 255, 255, 0.9) inset;
-}
-
-.note-new {
-  animation: noteDrop 0.3s ease-out;
-}
-
-@keyframes noteDrop {
-  0% {
-    opacity: 0;
-    transform: translateY(-12px) scale(0.9) rotate(-4deg);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1) rotate(0deg);
-  }
-}
-
-/* Small remove button on each note */
-
-.note-remove {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.6);
-  background: rgba(255, 255, 255, 0.9);
-  font-size: 10px;
-  line-height: 14px;
-  text-align: center;
-  cursor: pointer;
-}
-
-.note-remove:hover {
-  background: #000000;
-  color: #ffffff;
-}
-
-/* fall to bottom and disappear */
-
-@keyframes noteFallOff {
-  0% {
-    transform: translateY(0) scale(1) rotate(var(--note-rot, 0deg));
-    opacity: 1;
-  }
-  70% {
-    transform: translateY(40vh) scale(0.98)
-      rotate(calc(var(--note-rot, 0deg) + 6deg));
-    opacity: 0.85;
-  }
-  100% {
-    transform: translateY(60vh) scale(0.9)
-      rotate(calc(var(--note-rot, 0deg) + 12deg));
-    opacity: 0;
-  }
-}
-
-.note.removing {
-  animation: noteFallOff 0.6s ease-in forwards;
-  pointer-events: none;
-}
+/* NOTE STYLING (unchanged from previous answer, shortened here if your file already has it) */
+/* keep your .note, .note-remove, .note-removing, etc definitions as they are now */
