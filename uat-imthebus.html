@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>IMTHEBUS UI playground</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Shared base styles -->
+  <link rel="stylesheet" href="assets/imthebus-base.css" />
+
+  <!-- Page specific tweaks just for UAT -->
+  <style>
+    .uat-section-heading {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 6px;
+      margin-bottom: 2px;
+    }
+
+    .uat-field-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 2px;
+    }
+
+    .uat-note-do     { background-color: var(--q-do); }
+    .uat-note-sched  { background-color: var(--q-schedule); }
+    .uat-note-del    { background-color: var(--q-delegate); }
+    .uat-note-drop   { background-color: var(--q-delete); }
+
+    .uat-note-meta {
+      font-size: 0.7rem;
+      margin-top: 4px;
+    }
+
+    .uat-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.35);
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      background: rgba(255,255,255,0.9);
+    }
+
+    .uat-chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #000;
+    }
+
+    .uat-priority-list {
+      list-style: none;
+      margin: 6px 0 0;
+      padding: 0;
+      font-size: 0.8rem;
+    }
+
+    .uat-priority-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      border: 1px solid #000000;
+      background: rgba(255,255,255,0.9);
+      margin-bottom: 4px;
+    }
+
+    .uat-priority-pill {
+      font-size: 0.7rem;
+      border-radius: 999px;
+      border: 1px solid #000000;
+      padding: 2px 6px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Shared header (loaded by imthebus-core.js) -->
+  <div data-include="partials/header.html"></div>
+
+  <div class="page">
+    <!-- Sidebar demo -->
+    <aside class="sidebar-card">
+      <h1 class="page-title">IMTHEBUS UI playground</h1>
+      <p class="page-subtitle">
+        This page checks shared header, sidebar, collapsibles, notes, and priority layout.
+      </p>
+
+      <div class="uat-section-heading">Step 1 - Example form</div>
+
+      <div class="uat-field-label">Title</div>
+      <input type="text" class="input-text" placeholder="Example: Team planning session" />
+
+      <div class="uat-field-label" style="margin-top:6px;">Date</div>
+      <input type="date" class="input-date input-text" />
+
+      <div class="uat-field-label" style="margin-top:6px;">Context</div>
+      <textarea class="textarea-small" placeholder="Short description for the session."></textarea>
+
+      <div style="display:flex; gap:6px; margin-top:8px;">
+        <button class="btn btn-primary">Primary button</button>
+        <button class="btn">Secondary button</button>
+      </div>
+
+      <div style="margin-top:8px;">
+        <span class="uat-chip">
+          <span class="uat-chip-dot"></span>
+          Shared chip style for hints.
+        </span>
+      </div>
+
+      <!-- Shared collapsible pattern -->
+      <div class="collapsible" data-collapsible style="margin-top:10px;">
+        <button
+          class="collapsible-toggle"
+          data-label-base="Collapsible example"
+        >
+          + Collapsible example
+        </button>
+        <div class="collapsible-body">
+          <p style="margin:6px 0 4px; font-size:0.78rem;">
+            This section shows the shared collapsible behaviour that every tool can use.
+          </p>
+          <p style="margin:0; font-size:0.78rem;">
+            If this opens and closes smoothly here, it will behave the same on all pages that
+            use <code>data-collapsible</code>.
+          </p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Board and priority section demo -->
+    <section class="board-wrapper" id="uatBoardWrapper">
+      <div class="board-inner-shell">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+          <div class="page-title" style="margin-bottom:0;">Shared board and notes</div>
+          <button class="btn-pill-small" id="uatAddNoteBtn">Add test note</button>
+        </div>
+        <div style="font-size:0.75rem; margin:2px 0 8px;">
+          This board uses the shared note style and draggable behaviour.
+        </div>
+
+        <!-- Board -->
+        <div
+          id="uatBoard"
+          style="
+            position:relative;
+            height:320px;
+            border:1px solid #000;
+            border-radius:8px;
+            overflow:hidden;
+          "
+        >
+          <div
+            id="uatBoardInner"
+            style="
+              position:absolute;
+              inset:0;
+              background:
+                url('assets/whiteboard-texture.jpg') repeat;
+              background-size:1200px 1200px;
+            "
+          ></div>
+
+          <!-- crosshair lines just to see the coordinate system -->
+          <div style="position:absolute; inset:0; pointer-events:none;">
+            <div style="position:absolute; left:50%; top:0; bottom:0; width:1px; background:rgba(0,0,0,0.3);"></div>
+            <div style="position:absolute; top:50%; left:0; right:0; height:1px; background:rgba(0,0,0,0.3);"></div>
+          </div>
+        </div>
+
+        <!-- Priority list demo -->
+        <div style="margin-top:10px; border-top:1px solid #000; padding-top:6px;">
+          <div class="page-title" style="font-size:1.1rem; margin-bottom:4px;">
+            Priority list layout
+          </div>
+          <ul class="uat-priority-list" id="uatPriorityList">
+            <li class="uat-priority-item">
+              <span>1. First example item</span>
+              <span class="uat-priority-pill">Impact 4.0 · Timing 3.0</span>
+            </li>
+            <li class="uat-priority-item">
+              <span>2. Second example item</span>
+              <span class="uat-priority-pill">Impact 3.0 · Timing 2.0</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Shared footer (loaded by imthebus-core.js) -->
+  <div data-include="partials/footer.html"></div>
+
+  <!-- Core JS used by all tools -->
+  <script src="assets/imthebus-core.js"></script>
+
+  <!-- Page specific JS to exercise the shared behaviour -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const board = document.getElementById("uatBoard");
+      const inner = document.getElementById("uatBoardInner");
+      const addBtn = document.getElementById("uatAddNoteBtn");
+
+      let noteCounter = 0;
+      let topZ = 10;
+
+      function createNote(text, xNorm, yNorm, cssClass) {
+        const boardRect = board.getBoundingClientRect();
+
+        const el = document.createElement("div");
+        el.className = "note note-new " + (cssClass || "");
+        el.dataset.id = "note_" + Date.now() + "_" + Math.random().toString(16).slice(2);
+        el.style.setProperty("--note-rot", (Math.random() * 8 - 4).toFixed(2) + "deg");
+
+        const body = document.createElement("div");
+        body.textContent = text;
+        el.appendChild(body);
+
+        const meta = document.createElement("div");
+        meta.className = "uat-note-meta";
+        meta.textContent = "x " + xNorm.toFixed(2) + " · y " + yNorm.toFixed(2);
+        el.appendChild(meta);
+
+        const width = 150;
+        const height = 70;
+        const left = xNorm * boardRect.width - width / 2;
+        const top = yNorm * boardRect.height - height / 2;
+
+        el.style.width = width + "px";
+        el.style.minHeight = height + "px";
+        el.style.left = left + "px";
+        el.style.top = top + "px";
+        el.style.zIndex = ++topZ;
+
+        inner.appendChild(el);
+      }
+
+      // Seed a couple of notes
+      createNote("Do it example", 0.25, 0.25, "uat-note-do");
+      createNote("Schedule example", 0.75, 0.25, "uat-note-sched");
+      createNote("Delegate example", 0.25, 0.75, "uat-note-del");
+      createNote("Delete example", 0.75, 0.75, "uat-note-drop");
+
+      // Wire add button
+      addBtn.addEventListener("click", () => {
+        noteCounter += 1;
+        const x = 0.2 + 0.6 * Math.random();
+        const y = 0.2 + 0.6 * Math.random();
+        createNote("New note " + noteCounter, x, y, "uat-note-do");
+      });
+
+      // Hook into shared draggable logic
+      if (window.imthebusCore && typeof window.imthebusCore.initDraggableNotes === "function") {
+        window.imthebusCore.initDraggableNotes({
+          boardEl: board,
+          onDrop: (el, xNorm, yNorm) => {
+            const meta = el.querySelector(".uat-note-meta");
+            if (meta) {
+              meta.textContent = "x " + xNorm.toFixed(2) + " · y " + yNorm.toFixed(2);
+            }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
