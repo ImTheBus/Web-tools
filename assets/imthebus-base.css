@@ -7,7 +7,7 @@
 
   --bg-board: #fdfdfd;
   --bg-noise: url("assets/whiteboard-noise.png");
-  --bg-texture: url("assets/whiteboard-texture.jpg");
+  --bg-texture: url("assets/whiteboard.jpg");
 
   /* Common quadrant note colors */
   --q-do: #c7f9cc;
