@@ -33,10 +33,13 @@ html,
 body {
   margin: 0;
   padding: 0;
+  height: 100%;
 }
 
 body {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   font-size: 14px;
@@ -82,6 +85,7 @@ a:hover {
   gap: 20px;
   align-items: flex-start;
   position: relative;
+  flex: 1 0 auto; /* main content stretches between nav and footer */
 }
 
 /* HEADER / NAV */
@@ -145,6 +149,7 @@ nav.site-nav a:hover {
     var(--bg-texture) repeat;
   background-size: 1200px;
   color: #e5e7eb;
+  flex-shrink: 0; /* footer stays at bottom, does not collapse upward */
 }
 
 .site-footer-left {
@@ -352,14 +357,14 @@ nav.site-nav a:hover {
   background-color: var(--q-delete);
 }
 
-/* QUADRANT BOARD / 2×2 */
+/* QUADRANT BOARD / 2x2 */
 
 .quadrant-board {
   position: relative;
   border-radius: 10px;
   border: 1px solid var(--border-strong);
   padding: 18px 16px 40px;
-  height: 420px;
+  height: clamp(360px, 55vh, 520px); /* responsive height for different screens */
   overflow: hidden;
 
   /* make the whiteboard really visible */
