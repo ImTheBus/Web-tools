@@ -9,8 +9,11 @@
   <link rel="stylesheet" href="assets/imthebus-base.css" />
   <script src="assets/imthebus-core.js" defer></script>
 
+  <!-- Fonts for marker-style headings -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;600&display=swap">
+
   <style>
-    /* Page layout: single full-width whiteboard canvas */
+    /* Layout: single whiteboard canvas */
     .page.silly-dashboard-page {
       grid-template-columns: minmax(0, 1fr);
       gap: 14px;
@@ -18,12 +21,39 @@
 
     .silly-board {
       position: relative;
-      min-height: clamp(520px, 72vh, 820px);
-      padding: 14px 16px 20px;
-      /* drawn directly on whiteboard background; no extra frames */
+      min-height: clamp(520px, 72vh, 860px);
+      padding: 14px 18px 20px;
     }
 
-    /* Header scribbles */
+    /* Hand-drawn style helpers */
+
+    .marker-blue   { color: #2563eb; }
+    .marker-green  { color: #15803d; }
+    .marker-yellow { color: #b45309; }
+    .marker-pink   { color: #db2777; }
+    .marker-grey   { color: #4b5563; }
+
+    .sketch-box {
+      border: 2px solid #111827;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: none;
+      position: relative;
+    }
+
+    .sketch-box::before {
+      /* Slight wobble to the outline */
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border: 1px dashed rgba(15, 23, 42, 0.35);
+      border-radius: 9px;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+
+    /* Header */
+
     .silly-title-row {
       display: flex;
       flex-wrap: wrap;
@@ -34,101 +64,89 @@
     }
 
     .silly-title-main {
-      font-family: "Archivo Black", system-ui, sans-serif;
-      font-size: 1.5rem;
-      text-transform: uppercase;
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 1.9rem;
       letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #1d4ed8;
+      text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
     }
 
     .silly-title-tag {
-      font-size: 0.75rem;
+      font-size: 0.78rem;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      padding: 3px 8px;
-      border-radius: var(--radius-pill);
-      border: 2px solid var(--border-strong);
-      background: rgba(255, 255, 255, 0.9);
+      letter-spacing: 0.16em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 2px solid #111827;
+      background: rgba(255, 255, 255, 0.95);
+      color: #111827;
+      white-space: nowrap;
     }
 
     .silly-subtitle {
-      font-size: 0.84rem;
-      max-width: 640px;
-      color: var(--accent-soft);
-      margin-bottom: 10px;
+      font-size: 0.85rem;
+      max-width: 540px;
+      color: #374151;
+      margin-bottom: 6px;
     }
 
     .silly-pencil-note {
       font-family: "Permanent Marker", system-ui, sans-serif;
       font-size: 0.9rem;
-      color: var(--accent-soft);
+      color: #6b21a8;
       margin-bottom: 10px;
     }
 
-    /* Marker colour helpers – using existing palette values as marker inks */
-    .marker-green {
-      color: var(--q-do);
-    }
-    .marker-blue {
-      color: var(--q-schedule);
-    }
-    .marker-yellow {
-      color: var(--q-delegate);
-    }
-    .marker-pink {
-      color: var(--q-delete);
-    }
-    .marker-neutral {
-      color: var(--accent-soft);
-    }
+    /* KPI strip */
 
-    /* Top KPI strip: drawn as marker headings across the board */
     .silly-kpi-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .silly-kpi {
-      padding: 4px 4px 6px;
-      border-bottom: 2px solid var(--border-strong);
       position: relative;
+      padding: 4px 6px 6px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #111827;
+      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.35);
+      transform-origin: center;
     }
 
+    .silly-kpi:nth-child(1) { transform: rotate(-1.4deg); }
+    .silly-kpi:nth-child(2) { transform: rotate(0.6deg); }
+    .silly-kpi:nth-child(3) { transform: rotate(-0.4deg); }
+    .silly-kpi:nth-child(4) { transform: rotate(1.1deg); }
+    .silly-kpi:nth-child(5) { transform: rotate(-0.8deg); }
+
     .silly-kpi-label {
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.11em;
       margin-bottom: 2px;
     }
 
     .silly-kpi-value {
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       font-weight: 600;
       line-height: 1.1;
     }
 
     .silly-kpi-subtext {
-      font-size: 0.75rem;
-      color: var(--accent-soft);
-      margin-top: 2px;
+      font-size: 0.72rem;
+      color: #4b5563;
+      margin-top: 1px;
     }
 
-    .silly-kpi-under {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -4px;
-      height: 2px;
-      border-bottom: 1px dashed rgba(0, 0, 0, 0.35);
-      transform: skewX(-5deg);
-      pointer-events: none;
-    }
+    /* Middle band: chart and API sticky notes */
 
-    /* Middle band: left chart, right API feed on sticky notes */
     .silly-middle-band {
       display: grid;
-      grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1.1fr);
+      grid-template-columns: minmax(0, 1.7fr) minmax(220px, 1.05fr);
       gap: 16px;
       margin-bottom: 14px;
     }
@@ -139,47 +157,44 @@
       }
     }
 
-    /* Chart area: sketched box with axis lines on board */
+    /* Chart */
+
     .silly-chart-area {
-      position: relative;
-      padding: 10px 10px 12px;
-      border: 1px solid var(--border-strong);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.16);
+      padding: 8px 10px 10px;
+      transform: rotate(-0.6deg);
     }
 
-    .silly-chart-title {
+    .silly-chart-header {
       display: flex;
       justify-content: space-between;
       gap: 8px;
       align-items: baseline;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
-    .silly-chart-title-main {
+    .silly-chart-title {
       font-size: 0.9rem;
       font-weight: 600;
     }
 
     .silly-chart-meta {
       font-size: 0.75rem;
-      color: var(--accent-soft);
+      color: #4b5563;
       text-align: right;
     }
 
     .silly-chart-grid {
       position: relative;
       padding: 6px 4px 0;
-      margin-bottom: 6px;
-      height: 170px;
+      margin-bottom: 4px;
+      height: 165px;
     }
 
     .silly-chart-grid::before,
     .silly-chart-grid::after {
       content: "";
       position: absolute;
-      background: rgba(0, 0, 0, 0.18);
+      background: rgba(0, 0, 0, 0.23);
     }
 
     .silly-chart-grid::before {
@@ -190,7 +205,7 @@
     }
 
     .silly-chart-grid::after {
-      top: 8%;
+      top: 10%;
       bottom: 8%;
       left: 10%;
       width: 1px;
@@ -216,12 +231,7 @@
     .chart-bar {
       width: 100%;
       border-radius: 4px 4px 2px 2px;
-      background:
-        linear-gradient(
-          to top,
-          var(--accent-primary-soft),
-          rgba(0, 0, 0, 0.85)
-        );
+      background: linear-gradient(to top, #fb923c, #111827);
       min-height: 10px;
       transition: height 0.35s ease;
     }
@@ -232,13 +242,13 @@
 
     .chart-bar-label {
       font-size: 0.7rem;
-      color: var(--accent-soft);
+      color: #4b5563;
     }
 
     .silly-chart-legend {
-      font-size: 0.75rem;
-      color: var(--accent-soft);
-      margin-bottom: 5px;
+      font-size: 0.74rem;
+      color: #4b5563;
+      margin-bottom: 4px;
     }
 
     .silly-chart-ticker {
@@ -246,24 +256,28 @@
       align-items: center;
       gap: 6px;
       padding: 4px 6px;
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border-strong);
-      font-size: 0.75rem;
+      border-radius: 999px;
+      border: 1px solid #111827;
+      font-size: 0.74rem;
       max-width: 100%;
+      background: #fff;
     }
 
     .silly-ticker-dot {
       width: 7px;
       height: 7px;
       border-radius: 999px;
-      background: var(--q-do);
+      background: #16a34a;
+      opacity: 0.7;
+      transform-origin: center;
+      animation: dotPulse 1.6s ease-in-out infinite;
     }
 
     .ticker-label {
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      font-size: 0.7rem;
-      color: var(--accent-soft);
+      font-size: 0.68rem;
+      color: #6b7280;
     }
 
     .ticker-text {
@@ -272,10 +286,22 @@
       text-overflow: ellipsis;
     }
 
-    /* API column on sticky notes */
+    @keyframes dotPulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.4); opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .silly-ticker-dot {
+        animation: none;
+      }
+    }
+
+    /* API sticky notes */
+
     .silly-api-column {
       position: relative;
-      min-height: 180px;
+      min-height: 170px;
     }
 
     .silly-api-title {
@@ -286,8 +312,8 @@
 
     .silly-api-meta {
       font-size: 0.75rem;
-      color: var(--accent-soft);
-      margin-bottom: 8px;
+      color: #4b5563;
+      margin-bottom: 7px;
     }
 
     .silly-api-notes {
@@ -296,26 +322,18 @@
       gap: 8px;
     }
 
-    .silly-api-note {
-      position: relative;
-      min-width: 0;
-    }
-
     .silly-api-note .note {
       position: relative;
-      min-width: 100%;
       max-width: none;
-      transform: rotate(var(--note-rot, -1deg));
       cursor: default;
     }
 
-    .silly-api-note .note-title {
-      font-size: 0.78rem;
-      margin-bottom: 2px;
-    }
+    .silly-api-note:nth-child(1) .note { transform: rotate(-1.8deg); }
+    .silly-api-note:nth-child(2) .note { transform: rotate(1.3deg); }
+    .silly-api-note:nth-child(3) .note { transform: rotate(-0.7deg); }
 
-    .silly-api-note .api-label {
-      font-size: 0.7rem;
+    .api-label {
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
@@ -327,15 +345,16 @@
 
     .api-error {
       font-style: italic;
-      color: var(--accent-soft);
+      color: #4b5563;
     }
 
-    /* Lower band: table, culture pulse, and territory notes */
+    /* Lower band */
+
     .silly-lower-band {
       display: grid;
-      grid-template-columns: minmax(0, 2.1fr) minmax(220px, 1.3fr);
+      grid-template-columns: minmax(0, 2.1fr) minmax(220px, 1.2fr);
       gap: 16px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     @media (max-width: 900px) {
@@ -344,13 +363,11 @@
       }
     }
 
-    /* Table area: sketched table on the board */
+    /* Table */
+
     .silly-table-area {
-      padding: 8px 8px 10px;
-      border: 1px solid var(--border-strong);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.88);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.16);
+      padding: 8px 8px 9px;
+      transform: rotate(0.4deg);
     }
 
     .silly-table-header {
@@ -358,7 +375,7 @@
       justify-content: space-between;
       align-items: baseline;
       gap: 8px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .silly-table-title {
@@ -368,7 +385,7 @@
 
     .silly-table-meta {
       font-size: 0.75rem;
-      color: var(--accent-soft);
+      color: #4b5563;
       text-align: right;
     }
 
@@ -381,7 +398,7 @@
 
     .fake-table th,
     .fake-table td {
-      border: 1px solid rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(0, 0, 0, 0.7);
       padding: 3px 4px;
       white-space: nowrap;
       vertical-align: middle;
@@ -391,18 +408,18 @@
       font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
     }
 
     .fake-table tbody tr:nth-child(2n) {
-      background: rgba(0, 0, 0, 0.035);
+      background: rgba(0, 0, 0, 0.03);
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
       padding: 1px 6px;
-      border-radius: var(--radius-pill);
+      border-radius: 999px;
       border: 1px solid rgba(0, 0, 0, 0.7);
       font-size: 0.7rem;
       gap: 4px;
@@ -415,25 +432,20 @@
       border-radius: 999px;
     }
 
-    .badge-dot.green {
-      background: var(--q-do);
-    }
-    .badge-dot.amber {
-      background: var(--q-delegate);
-    }
-    .badge-dot.red {
-      background: var(--q-delete);
-    }
+    .badge-dot.green { background: #16a34a; }
+    .badge-dot.amber { background: #f59e0b; }
+    .badge-dot.red   { background: #ef4444; }
 
     .silly-table-footer {
       display: flex;
       justify-content: space-between;
       gap: 8px;
       font-size: 0.72rem;
-      color: var(--accent-soft);
+      color: #4b5563;
     }
 
-    /* Culture and territory stack: gif strip plus sticky notes */
+    /* Right-hand stack: culture + territory note */
+
     .silly-right-stack {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
@@ -441,11 +453,8 @@
     }
 
     .silly-culture-block {
-      padding: 8px 8px 10px;
-      border-radius: 8px;
-      border: 1px solid var(--border-strong);
-      background: rgba(255, 255, 255, 0.9);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
+      padding: 8px 8px 9px;
+      transform: rotate(-0.3deg);
     }
 
     .silly-culture-header {
@@ -453,7 +462,7 @@
       justify-content: space-between;
       align-items: baseline;
       gap: 8px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .silly-culture-title {
@@ -463,7 +472,7 @@
 
     .silly-culture-meta {
       font-size: 0.75rem;
-      color: var(--accent-soft);
+      color: #4b5563;
       text-align: right;
     }
 
@@ -480,8 +489,8 @@
       height: 100px;
       border-radius: 8px;
       overflow: hidden;
-      border: 1px solid var(--border-strong);
-      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid #111827;
+      background: rgba(0, 0, 0, 0.04);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -502,14 +511,14 @@
       display: block;
       margin-top: 3px;
       font-size: 0.75rem;
-      color: var(--accent-soft);
+      color: #4b5563;
     }
 
     .employee-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 8px;
-      margin-top: 8px;
+      margin-top: 7px;
     }
 
     @media (max-width: 600px) {
@@ -522,10 +531,10 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 6px;
+      padding: 4px 6px;
       border-radius: 8px;
       border: 1px dashed rgba(0, 0, 0, 0.7);
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.88);
     }
 
     .employee-avatar {
@@ -547,13 +556,8 @@
       object-fit: cover;
     }
 
-    .employee-avatar.happy {
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-    }
-
     .employee-avatar.sad {
-      filter: grayscale(0.7) brightness(0.95);
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.45);
+      filter: grayscale(0.75) brightness(0.95);
     }
 
     .employee-info {
@@ -566,7 +570,7 @@
       font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--accent-soft);
+      color: #6b7280;
     }
 
     .employee-name {
@@ -576,23 +580,28 @@
 
     .employee-role {
       font-size: 0.78rem;
-      color: var(--accent-soft);
+      color: #4b5563;
     }
 
-    /* Territory sticky note */
+    /* Territory sticky */
+
     .silly-flag-note .note {
       position: relative;
-      min-width: 100%;
       max-width: none;
-      transform: rotate(var(--note-rot, 1deg));
-      cursor: default;
+      transform: rotate(1.4deg);
+    }
+
+    .flag-meta {
+      font-size: 0.75rem;
+      color: #4b5563;
+      margin-bottom: 3px;
     }
 
     .flag-panel-content {
       display: flex;
       align-items: flex-start;
       gap: 6px;
-      font-size: 0.85rem;
+      font-size: 0.84rem;
     }
 
     .flag-emoji {
@@ -601,25 +610,20 @@
 
     .flag-text-main {
       font-weight: 600;
-      margin-bottom: 2px;
+      margin-bottom: 1px;
     }
 
     .flag-text-sub {
       font-size: 0.8rem;
-      color: var(--accent-soft);
+      color: #4b5563;
     }
 
-    .flag-meta {
-      font-size: 0.75rem;
-      color: var(--accent-soft);
-      margin-bottom: 3px;
-    }
+    /* Footer notes */
 
-    /* Disclaimers at the bottom of the board */
     .silly-footer-notes {
       margin-top: 6px;
-      font-size: 0.75rem;
-      color: var(--accent-soft);
+      font-size: 0.74rem;
+      color: #4b5563;
     }
   </style>
 </head>
@@ -628,69 +632,62 @@
   <header data-include="assets/header.html"></header>
 
   <main class="page silly-dashboard-page">
-    <section class="silly-board" aria-label="Executive alignment scribble dashboard">
+    <section class="silly-board" aria-label="Executive alignment whiteboard">
       <div class="silly-title-row">
-        <div>
-          <div class="silly-title-main marker-blue">Executive Alignment Dashboard</div>
+        <div class="silly-title-main marker-blue">
+          Executive alignment dashboard
         </div>
-        <div class="silly-title-tag marker-neutral">
-          Experimental · Visual noise for people who enjoy dashboards a little too much
+        <div class="silly-title-tag">
+          Experimental · dashboard noise
         </div>
       </div>
 
       <p class="silly-subtitle">
-        A completely serious, allegedly data informed cockpit that looks impressive at a glance
-        and becomes steadily more suspicious the longer you read it.
+        A very serious looking wall of markers, sticky notes and pretend data.
       </p>
-      <p class="silly-pencil-note marker-neutral">
-        Note to self: if anyone tries to use this to make an actual decision, schedule an intervention.
+      <p class="silly-pencil-note">
+        Note to self: if anyone uses this to decide something, book an intervention.
       </p>
 
-      <!-- Top marker KPI strip -->
-      <section class="silly-kpi-row" aria-label="Key performance indicators drawn on whiteboard">
+      <!-- KPIs -->
+      <section class="silly-kpi-row" aria-label="Key performance indicators">
         <article class="silly-kpi">
           <div class="silly-kpi-label marker-blue">Synergy index</div>
           <div class="silly-kpi-value marker-blue" id="kpi-synergy"></div>
           <div class="silly-kpi-subtext" id="kpi-synergy-sub"></div>
-          <div class="silly-kpi-under"></div>
         </article>
 
         <article class="silly-kpi">
           <div class="silly-kpi-label marker-green">Meetings avoided</div>
           <div class="silly-kpi-value marker-green" id="kpi-meetings"></div>
           <div class="silly-kpi-subtext" id="kpi-meetings-sub"></div>
-          <div class="silly-kpi-under"></div>
         </article>
 
         <article class="silly-kpi">
           <div class="silly-kpi-label marker-yellow">Slide deck velocity</div>
           <div class="silly-kpi-value marker-yellow" id="kpi-slides"></div>
           <div class="silly-kpi-subtext" id="kpi-slides-sub"></div>
-          <div class="silly-kpi-under"></div>
         </article>
 
         <article class="silly-kpi">
           <div class="silly-kpi-label marker-pink">Coffee to insight ratio</div>
           <div class="silly-kpi-value marker-pink" id="kpi-coffee"></div>
           <div class="silly-kpi-subtext" id="kpi-coffee-sub"></div>
-          <div class="silly-kpi-under"></div>
         </article>
 
         <article class="silly-kpi">
-          <div class="silly-kpi-label marker-neutral">Revenue per remaining daylight hour</div>
-          <div class="silly-kpi-value marker-neutral" id="kpi-daylight"></div>
+          <div class="silly-kpi-label marker-grey">Revenue per daylight hour</div>
+          <div class="silly-kpi-value marker-grey" id="kpi-daylight"></div>
           <div class="silly-kpi-subtext" id="kpi-daylight-sub"></div>
-          <div class="silly-kpi-under"></div>
         </article>
       </section>
 
-      <!-- Middle band: chart plus API feed -->
+      <!-- Chart + API notes -->
       <section class="silly-middle-band">
-        <!-- Chart area -->
-        <article class="silly-chart-area" aria-label="Quarterly strategic buzzword penetration chart">
-          <div class="silly-chart-title">
-            <div class="silly-chart-title-main">
-              Quarterly strategic buzzword penetration
+        <article class="sketch-box silly-chart-area" aria-label="Quarterly buzzword penetration chart">
+          <div class="silly-chart-header">
+            <div class="silly-chart-title">
+              Quarterly buzzword penetration
             </div>
             <div class="silly-chart-meta" id="chart-meta"></div>
           </div>
@@ -721,13 +718,7 @@
           </div>
 
           <div class="silly-chart-legend">
-            <span class="marker-blue">
-              Buzzwords per slide (adjusted for font size).
-            </span>
-            <br />
-            <span class="marker-neutral">
-              * Q4 heavily forecast using wishful thinking.
-            </span>
+            Buzzwords per slide, scaled for font size. Q4 is mostly optimism.
           </div>
 
           <div class="silly-chart-ticker" aria-live="polite">
@@ -737,57 +728,46 @@
           </div>
         </article>
 
-        <!-- API feed on sticky notes -->
         <article class="silly-api-column" aria-label="Real time executive intelligence feed">
-          <div class="silly-api-title marker-blue">Real time executive intelligence feed</div>
+          <div class="silly-api-title marker-blue">
+            Real time executive feed
+          </div>
           <div class="silly-api-meta" id="api-meta">
-            Contacting very serious data providers...
+            Asking the internet for wisdom, jokes and cats.
           </div>
 
           <div class="silly-api-notes">
             <div class="silly-api-note">
-              <div class="note note-q2" style="--note-rot:-1.5deg;">
-                <div class="note-title">
-                  <span class="api-label marker-blue">Strategic life advice</span>
-                </div>
-                <div class="api-content" id="api-advice">
-                  Loading wisdom...
-                </div>
+              <div class="note note-q2">
+                <div class="api-label marker-blue">Advice</div>
+                <div class="api-content" id="api-advice">Loading advice...</div>
               </div>
             </div>
 
             <div class="silly-api-note">
-              <div class="note note-q3" style="--note-rot:1.2deg;">
-                <div class="note-title">
-                  <span class="api-label marker-yellow">Morale indicator (dad joke)</span>
-                </div>
-                <div class="api-content" id="api-joke">
-                  Calibrating humor module...
-                </div>
+              <div class="note note-q3">
+                <div class="api-label marker-yellow">Dad joke</div>
+                <div class="api-content" id="api-joke">Calibrating humour...</div>
               </div>
             </div>
 
             <div class="silly-api-note">
-              <div class="note note-q1" style="--note-rot:-0.8deg;">
-                <div class="note-title">
-                  <span class="api-label marker-green">Feline risk assessment</span>
-                </div>
-                <div class="api-content" id="api-catfact">
-                  Gathering cat related disruption metrics...
-                </div>
+              <div class="note note-q1">
+                <div class="api-label marker-green">Cat risk</div>
+                <div class="api-content" id="api-catfact">Checking feline disruption levels...</div>
               </div>
             </div>
           </div>
         </article>
       </section>
 
-      <!-- Lower band: table plus culture and territory -->
+      <!-- Lower band -->
       <section class="silly-lower-band">
-        <!-- Table of initiatives -->
-        <article class="silly-table-area" aria-label="Top performing initiatives">
+        <!-- Table -->
+        <article class="sketch-box silly-table-area" aria-label="Top performing initiatives">
           <div class="silly-table-header">
-            <div>
-              <div class="silly-table-title">Top performing initiatives</div>
+            <div class="silly-table-title">
+              Top performing initiatives
             </div>
             <div class="silly-table-meta" id="table-meta"></div>
           </div>
@@ -798,7 +778,7 @@
                 <th>Rank</th>
                 <th>Initiative</th>
                 <th>Owner</th>
-                <th>Confidence</th>
+                <th>Conf.</th>
                 <th>Impact</th>
                 <th>Status</th>
               </tr>
@@ -809,17 +789,14 @@
           </table>
 
           <div class="silly-table-footer">
-            <div>
-              Numbers look convincing. Please do not attempt to audit the methodology.
-            </div>
+            <div>Looks convincing. Please do not audit.</div>
             <div id="footer-updated"></div>
           </div>
         </article>
 
-        <!-- Culture and territory stack -->
+        <!-- Culture and territory -->
         <div class="silly-right-stack">
-          <!-- Culture pulse -->
-          <article class="silly-culture-block" aria-label="Culture pulse">
+          <article class="sketch-box silly-culture-block" aria-label="Culture pulse">
             <div class="silly-culture-header">
               <div class="silly-culture-title">Culture pulse</div>
               <div class="silly-culture-meta" id="culture-meta"></div>
@@ -827,10 +804,10 @@
 
             <div class="silly-culture-inner">
               <div class="gif-wrapper">
-                <img id="nonsense-gif" src="" alt="Very serious motivational gif">
+                <img id="nonsense-gif" src="" alt="Motivational gif">
               </div>
               <div class="gif-quote" id="nonsense-quote">
-                Loading unrelated corporate inspiration...
+                Loading inspiration...
               </div>
             </div>
 
@@ -851,7 +828,7 @@
                   <img id="employee-worst-avatar" src="" alt="Least aligned employee of the day">
                 </div>
                 <div class="employee-info">
-                  <div class="employee-title">Least aligned employee of the day</div>
+                  <div class="employee-title">Least aligned today</div>
                   <div class="employee-name" id="employee-worst-name"></div>
                   <div class="employee-role" id="employee-worst-role"></div>
                 </div>
@@ -859,10 +836,9 @@
             </div>
           </article>
 
-          <!-- Territory sticky note -->
           <article class="silly-flag-note" aria-label="Latest territory update">
-            <div class="note note-q4" style="--note-rot:1.8deg;">
-              <div class="note-title flag-meta" id="flag-meta">
+            <div class="note note-q4">
+              <div class="flag-meta" id="flag-meta">
                 Latest territory update
               </div>
               <div class="flag-panel-content">
@@ -878,13 +854,8 @@
       </section>
 
       <div class="silly-footer-notes">
-        <p>
-          This dashboard is for demonstration and amusement. If you are using it to run an actual business,
-          you may already be in the panic zone.
-        </p>
-        <p>
-          No personal data is stored by this page. Some anonymous requests are sent to third party joke and fact APIs.
-        </p>
+        This wall is for fun. If it matches your real reporting, you may already be in the panic zone.
+        No personal data is stored; this page calls public APIs for jokes, cats and random people.
       </div>
     </section>
   </main>
@@ -911,31 +882,27 @@
       const coffee = (Math.random() * 4 + 0.8).toFixed(1);
 
       const synergySubs = [
-        "Cross functional alignment detected in at least two meetings this week.",
-        "Synergy elevated through strategic overuse of the word synergy.",
-        "Index calibrated against industry leading buzzword saturation levels.",
-        "Marginal gains achieved by adding value to added value."
+        "Cross team vibes are above baseline.",
+        "Index boosted by saying synergy a lot.",
+        "Roughly aligned with industry buzz levels."
       ];
 
       const meetingSubs = [
-        "Estimated number of calendar events that quietly vanished before becoming a meeting.",
-        "Based on canceled invites, vague emails, and people just not turning up.",
-        "Includes all meetings replaced by a single well written message.",
-        "Trend suggests heroic resistance to calendar bloat."
+        "Invites that died before becoming meetings.",
+        "Includes cancels, quiet no-shows and brave emails.",
+        "Trend points to healthy calendar resistance."
       ];
 
       const slideSubs = [
-        "Total slide count produced in the last 30 days, real and hypothetical.",
-        "Includes backups, alternates, and versions named final_final_v7b.",
-        "Velocity spikes whenever someone discovers a new template.",
-        "Most slides contain at least one axis that nobody asked for."
+        "Slides made in the last 30 days.",
+        "Includes finals, backups and v7b.",
+        "Spikes whenever someone finds a new template."
       ];
 
       const coffeeSubs = [
-        "Cups per actionable insight, on a rolling 7 day basis.",
-        "Calculated during core hours. Weekends omitted for legal reasons.",
-        "Ratio improves noticeably when nobody mentions a new initiative.",
-        "Currently exceeding safe levels but still within leadership norms."
+        "Cups per useful idea, 7 day view.",
+        "Drops sharply when nobody launches a new project.",
+        "Firmly within leadership norms."
       ];
 
       document.getElementById("kpi-synergy").textContent = synergy + " pts";
@@ -956,17 +923,13 @@
     function generateDaylightKpi() {
       const now = new Date();
 
-      // Rough assumption: pretend Edinburgh sunset is 16:00 local today
+      // Rough Edinburgh sunset guess
       const sunset = new Date(now);
       sunset.setHours(16, 0, 0, 0);
 
       let hoursLeft = (sunset - now) / 36e5;
-      if (isNaN(hoursLeft)) {
-        hoursLeft = 4;
-      }
-      if (hoursLeft <= 0) {
-        hoursLeft = 0.5;
-      }
+      if (isNaN(hoursLeft)) hoursLeft = 4;
+      if (hoursLeft <= 0) hoursLeft = 0.5;
 
       const nonsenseRevenue = randomInt(120000, 980000);
       const perHour = nonsenseRevenue / hoursLeft;
@@ -976,10 +939,9 @@
       }) + "/hr";
 
       const subVariants = [
-        "Total made up revenue divided by an estimated " + hoursLeft.toFixed(1) + " hours of daylight left in Edinburgh.",
-        "Indexed to the imaginary turnover per remaining sunny-ish hour above Leith.",
-        "Assumes the sun sets over Edinburgh at 16:00, regardless of season or common sense.",
-        "Calculated using complex trigonometry and a complete disregard for actual weather."
+        "Made up revenue divided by about " + hoursLeft.toFixed(1) + " daylight hours left.",
+        "Indexed to imaginary turnover per not-actually-sunny hour.",
+        "Based on a 16:00 sunset and zero respect for weather."
       ];
 
       document.getElementById("kpi-daylight").textContent = valueText;
@@ -995,10 +957,9 @@
       ];
 
       const metaPhrases = [
-        "Model tuned using last years optimism as a baseline.",
-        "Derived from a mix of hard data, soft assumptions, and medium confidence.",
-        "Includes uplift from adding the word strategic to three existing projects.",
-        "Forecast accuracy estimated at somewhere between 3 and 97 percent."
+        "Model tuned using last years optimism.",
+        "Mix of hard data and soft guesses.",
+        "Boosted by adding strategic to slide titles."
       ];
 
       quarters.forEach((q) => {
@@ -1014,11 +975,10 @@
 
       const buzzwords = [
         "Unlocking cross functional leverage in the hybrid value stack.",
-        "Replatforming core synergies into a more agile mindset pipeline.",
-        "Driving asynchronous alignment across the stakeholder surface area.",
-        "Operationalizing thought leadership using next wave frameworks.",
-        "Decommissioning legacy silos in favor of fully buzzword compliant squads.",
-        "Recalibrating KPIs around meaningful vibes and narrative coherence."
+        "Replatforming core synergies into an agile mindset pipeline.",
+        "Driving asynchronous alignment across the stakeholder surface.",
+        "Operationalising thought leadership using next wave frameworks.",
+        "Decommissioning silos in favour of buzzword compliant squads."
       ];
       document.getElementById("buzzword-ticker").textContent = randomFrom(buzzwords);
     }
@@ -1027,25 +987,23 @@
       const initiatives = [
         "Hybrid Meeting Detox Sprint",
         "Slide Deck Reduction Program",
-        "Strategic Coffee Optimization",
-        "Inbox Triage Centre of Excellence",
+        "Strategic Coffee Optimisation",
+        "Inbox Triage Centre",
         "Proactive Alignment Standups",
-        "Zero Blame Retrospective Guild",
-        "Email Subject Line Simplification",
+        "Zero Blame Retro Guild",
+        "Subject Line Simplification",
         "Experimental Four Day Calendar",
         "Passive Aggressive Status Dashboard",
         "Continuous Improvement, Occasional Action"
       ];
 
-      const owners = [
-        "Taylor", "Jordan", "Alex", "Sam", "Casey", "Morgan"
-      ];
+      const owners = ["Taylor", "Jordan", "Alex", "Sam", "Casey", "Morgan"];
 
       const statuses = [
         { label: "On track", color: "green" },
         { label: "It depends", color: "amber" },
         { label: "Conceptual", color: "amber" },
-        { label: "PowerPoint complete", color: "green" },
+        { label: "PowerPoint done", color: "green" },
         { label: "Emotionally delayed", color: "red" },
         { label: "Awaiting alignment", color: "amber" }
       ];
@@ -1068,7 +1026,6 @@
         const status = randomFrom(statuses);
 
         const tr = document.createElement("tr");
-
         tr.innerHTML = `
           <td>${i + 1}</td>
           <td>${initiatives[idx]}</td>
@@ -1082,22 +1039,20 @@
             </span>
           </td>
         `;
-
         tbody.appendChild(tr);
       }
 
       const baselines = [
-        "Benchmarked against the top 3 percent of PowerPoint centric organizations.",
-        "Calibrated using a proprietary blend of gut feel and spreadsheet magic.",
-        "Underlying data structure last reviewed at an off site nobody recalls clearly.",
-        "Confidence scores are mostly a measure of how convincing the last meeting felt."
+        "Calibrated with gut feel and a spreadsheet.",
+        "Benchmarked against highly slide-driven companies.",
+        "Confidence mostly reflects how good the last meeting felt."
       ];
 
       document.getElementById("table-meta").textContent = randomFrom(baselines);
 
       const now = new Date();
       document.getElementById("footer-updated").textContent =
-        "Last regenerated at " + now.toLocaleTimeString(undefined, {
+        "Last wiped and rewritten at " + now.toLocaleTimeString(undefined, {
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit"
@@ -1114,15 +1069,13 @@
 
       const quotes = [
         "If you stare at the dashboard long enough, the dashboard starts managing you.\n\n" +
-          "<span>- Ancient Agile Proverb Probably</span>",
-        "Reach for the stars. If you miss, you will at least update the slide deck.\n\n" +
-          "<span>- Strategic Optimism Department</span>",
+          "<span>- Probably someone in agile</span>",
+        "Reach for the stars. Worst case, update the slide deck.\n\n" +
+          "<span>- Strategy team</span>",
         "What gets measured gets pretended to be managed.\n\n" +
-          "<span>- Anonymous KPI Enthusiast</span>",
-        "Believe in yourself. Everyone else is still waiting for the meeting invite.\n\n" +
-          "<span>- Calendar Overlord</span>",
-        "Synergy is just teamwork that has had too much coffee.\n\n" +
-          "<span>- Chief Caffeine Officer</span>"
+          "<span>- KPI enthusiast</span>",
+        "Believe in yourself. Everyone else is still waiting for the invite.\n\n" +
+          "<span>- Calendar overlord</span>"
       ];
 
       const gifEl = document.getElementById("nonsense-gif");
@@ -1132,10 +1085,9 @@
       quoteEl.innerHTML = randomFrom(quotes);
 
       const cultureMetaVariants = [
-        "Motivation calibrated using cutting edge animated cat science.",
-        "All cultural insights are derived from looping gifs and vibes.",
-        "Tested on focus groups consisting entirely of people avoiding real work.",
-        "Certified 0 percent evidence based, 100 percent committed."
+        "Tested on people avoiding real work.",
+        "Culture metrics powered by cats and vibes.",
+        "Sample size: whoever clicked this page today."
       ];
       document.getElementById("culture-meta").textContent = randomFrom(cultureMetaVariants);
     }
@@ -1143,9 +1095,7 @@
     async function fetchJson(url, options) {
       try {
         const response = await fetch(url, options);
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status);
-        }
+        if (!response.ok) throw new Error("HTTP " + response.status);
         return await response.json();
       } catch (error) {
         return { error: String(error) };
@@ -1154,7 +1104,7 @@
 
     async function loadApis() {
       const meta = document.getElementById("api-meta");
-      meta.textContent = "Connecting to high integrity joke and fact providers...";
+      meta.textContent = "Talking to advice, joke and cat servers...";
 
       const [adviceRes, jokeRes, catRes] = await Promise.all([
         fetchJson("https://api.adviceslip.com/advice", { cache: "no-store" }),
@@ -1170,7 +1120,7 @@
         adviceEl.textContent = adviceRes.slip.advice;
       } else {
         adviceEl.innerHTML =
-          '<span class="api-error">Advice service unavailable. Consider trusting your instincts instead.</span>';
+          '<span class="api-error">Advice service down. Use your best guess.</span>';
       }
 
       const jokeEl = document.getElementById("api-joke");
@@ -1178,7 +1128,7 @@
         jokeEl.textContent = jokeRes.joke;
       } else {
         jokeEl.innerHTML =
-          '<span class="api-error">Joke API failed. Please reuse a story from three all hands ago.</span>';
+          '<span class="api-error">Joke API failed. Reuse an all hands story.</span>';
       }
 
       const catEl = document.getElementById("api-catfact");
@@ -1186,16 +1136,17 @@
         catEl.textContent = catRes.fact;
       } else {
         catEl.innerHTML =
-          '<span class="api-error">Could not retrieve cat data. Assume a cat is currently on at least one laptop.</span>';
+          '<span class="api-error">No cat data. Assume one is on somebodys keyboard.</span>';
       }
 
-      meta.textContent = "Feed updated via public APIs. Scientific rigor not included.";
+      meta.textContent = "Feed updated via public APIs. Scientific rigour not included.";
     }
 
     async function loadEmployees() {
-      const result = await fetchJson("https://randomuser.me/api/?results=2&inc=name,picture&noinfo=1", {
-        cache: "no-store"
-      });
+      const result = await fetchJson(
+        "https://randomuser.me/api/?results=2&inc=name,picture&noinfo=1",
+        { cache: "no-store" }
+      );
 
       const bestNameEl = document.getElementById("employee-best-name");
       const bestRoleEl = document.getElementById("employee-best-role");
@@ -1206,44 +1157,42 @@
       const worstAvatarEl = document.getElementById("employee-worst-avatar");
 
       const bestRoles = [
-        "Chief Headphone Enthusiasm Officer",
-        "Director of Positive Vibes in Shared Channels",
-        "Senior Beam-From-Behind-The-Glass Specialist",
-        "Head of Smiling While Muted",
-        "Lead Synchronized Nodding Strategist"
+        "Lead synchronized nodding strategist",
+        "Head of premium noise cancelling",
+        "Director of quiet competence",
+        "Chief slide sanity checker"
       ];
 
       const worstRoles = [
-        "Vice President of Forgetting To Unmute",
-        "Director of Spreadsheet Existential Dread",
-        "Chief Passive Aggressive Reply All Architect",
-        "Head of Mic Feedback And Echo",
-        "Senior Calendar Overbooking Technician"
+        "VP of forgetting to unmute",
+        "Head of spreadsheet dread",
+        "Chief reply all architect",
+        "Calendar overbooking technician"
       ];
 
       if (!result.error && result.results && result.results.length >= 2) {
         const [best, worst] = result.results;
 
         bestNameEl.textContent = capitalizeName(best.name);
-        bestRoleEl.textContent = randomFrom(bestRoles) + " (with premium noise cancelling)";
+        bestRoleEl.textContent = randomFrom(bestRoles);
         bestAvatarEl.src = best.picture.medium;
 
         worstNameEl.textContent = capitalizeName(worst.name);
-        worstRoleEl.textContent = randomFrom(worstRoles) + " (using laptop mic in a busy cafe)";
+        worstRoleEl.textContent = randomFrom(worstRoles);
         worstAvatarEl.src = worst.picture.medium;
       } else {
         bestNameEl.textContent = "Alex Placeholder";
-        bestRoleEl.textContent = randomFrom(bestRoles) + " (stock photo edition)";
+        bestRoleEl.textContent = randomFrom(bestRoles);
         bestAvatarEl.src = "https://cataas.com/cat/says/hi";
 
         worstNameEl.textContent = "Jordan Fallback";
-        worstRoleEl.textContent = randomFrom(worstRoles) + " (rendered entirely from memory)";
+        worstRoleEl.textContent = randomFrom(worstRoles);
         worstAvatarEl.src = "https://cataas.com/cat/sad";
       }
     }
 
     function capitalizeName(nameObj) {
-      if (!nameObj) return "Mystery Colleague";
+      if (!nameObj) return "Mystery colleague";
       const first = nameObj.first || "";
       const last = nameObj.last || "";
       return (first + " " + last).replace(/\b\w/g, function (c) {
@@ -1256,47 +1205,46 @@
         {
           name: "Finland",
           flag: "🇫🇮",
-          stat: "Drinks more coffee per person than any other country on Earth."
+          stat: "More coffee per person than anywhere else."
         },
         {
           name: "Japan",
           flag: "🇯🇵",
-          stat: "Has vending machines for almost everything, including hot drinks and business socks."
+          stat: "Vending machines for almost everything."
         },
         {
           name: "New Zealand",
           flag: "🇳🇿",
-          stat: "Has more sheep than people, which is still fewer than your unread emails."
+          stat: "More sheep than people. Fewer than your unread emails."
         },
         {
           name: "Canada",
           flag: "🇨🇦",
-          stat: "Apologises so efficiently it may count as a renewable energy source."
+          stat: "Apologies may be a renewable energy source."
         },
         {
           name: "Italy",
           flag: "🇮🇹",
-          stat: "Consumes espresso at a rate that would terrify most HR departments."
+          stat: "Espresso habits that would worry HR."
         },
         {
           name: "Brazil",
           flag: "🇧🇷",
-          stat: "Produces a large share of the worlds coffee, powering dashboards like this everywhere."
+          stat: "Coffee that powers dashboards like this."
         },
         {
           name: "Norway",
           flag: "🇳🇴",
-          stat: "Has some of the worlds longest tunnels, yet still fewer than your folder structure."
+          stat: "Lots of tunnels. Still fewer than your folders."
         }
       ];
 
       const chosen = randomFrom(countries);
 
       const headlineVariants = [
-        "Most recent imaginary order came from " + chosen.name + ".",
-        "New territory acquired on a very optimistic sales slide: " + chosen.name + ".",
-        "Reported as a growth market in at least one confident conversation: " + chosen.name + ".",
-        "Flag added to the slide deck before an actual customer: " + chosen.name + "."
+        "Imaginary order recorded from " + chosen.name + ".",
+        "New growth story on a sales slide: " + chosen.name + ".",
+        "Flag added to the deck before a customer in " + chosen.name + "."
       ];
 
       document.getElementById("flag-emoji").textContent = chosen.flag;
