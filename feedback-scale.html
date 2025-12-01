@@ -16,6 +16,14 @@
   <style>
     :root {
       --fs-muted: #4b5563;
+      --fs-border-soft: rgba(0, 0, 0, 0.18);
+      --fs-border-strong: #000000;
+      --fs-bg-panel: rgba(255, 255, 255, 0.97);
+      --fs-zone-silent: #6b7280;
+      --fs-zone-sparse: #0ea5e9;
+      --fs-zone-resonant: #22c55e;
+      --fs-zone-loud: #f97316;
+      --fs-zone-over: #ef4444;
     }
 
     .sidebar-title {
@@ -29,11 +37,6 @@
     .sidebar-subtitle {
       font-size: 0.85rem;
       margin-bottom: 8px;
-    }
-
-    .sidebar-field-label {
-      font-size: 0.78rem;
-      margin: 4px 0 2px;
     }
 
     .sidebar-note {
@@ -62,72 +65,51 @@
       margin: 2px 0 4px;
     }
 
-    .board-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .board-title {
-      font-family: "Archivo Black", system-ui, sans-serif;
-      font-size: 1.4rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .board-subtitle {
-      font-size: 0.78rem;
-      color: var(--fs-muted);
-    }
-
-    .board-meta {
-      font-size: 0.78rem;
-      color: var(--fs-muted);
-      margin-top: 4px;
-    }
-
-    .board-actions {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .board-grid {
+    .fs-input-group {
       margin-top: 10px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-      grid-template-rows: auto auto;
-      gap: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.85rem;
     }
 
-    @media (max-width: 980px) {
-      .board-grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    .board-panel {
-      border-radius: 8px;
-      border: 1px solid #000000;
-      background: rgba(255, 255, 255, 0.96);
-      padding: 8px 10px;
+    .fs-input-group label {
       font-size: 0.8rem;
     }
 
-    .board-panel-title {
+    .fs-input {
+      width: 100%;
+    }
+
+    .fs-select {
+      width: 100%;
+    }
+
+    .fs-questions-card {
+      margin-top: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--fs-border-soft);
+      background: var(--fs-bg-panel);
+      padding: 8px 10px 8px;
+      font-size: 0.8rem;
+    }
+
+    .fs-questions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .fs-questions-title {
       font-weight: 600;
-      margin-bottom: 4px;
     }
 
-    .board-panel-subtitle {
-      font-size: 0.76rem;
+    .fs-questions-subtitle {
+      font-size: 0.78rem;
       color: var(--fs-muted);
-      margin-bottom: 4px;
     }
-
-    /* Question list */
 
     .fs-questions {
       display: flex;
@@ -136,34 +118,39 @@
       margin-top: 4px;
     }
 
+    .fs-section-heading {
+      margin-top: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .fs-section-subtitle {
+      font-size: 0.78rem;
+      color: var(--fs-muted);
+      margin-bottom: 2px;
+    }
+
     .fs-question-row {
-      border-top: 1px solid rgba(0, 0, 0, 0.12);
-      padding: 4px 0;
       display: grid;
-      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.1fr);
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.4fr);
       gap: 8px;
       align-items: center;
+      padding: 4px 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
     }
 
     .fs-question-row:first-of-type {
       border-top: none;
-      padding-top: 0;
-    }
-
-    @media (max-width: 800px) {
-      .fs-question-row {
-        grid-template-columns: minmax(0, 1fr);
-      }
     }
 
     .fs-question-text {
-      font-size: 0.78rem;
+      font-size: 0.8rem;
     }
 
     .fs-question-zone {
-      font-weight: 600;
-      font-size: 0.78rem;
-      margin-bottom: 1px;
+      font-size: 0.72rem;
+      color: var(--fs-muted);
+      margin-top: 1px;
     }
 
     .fs-scale {
@@ -178,48 +165,90 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      text-align: center;
-    }
-
-    .fs-scale-option input[type="radio"] {
-      cursor: pointer;
-      margin-bottom: 1px;
-    }
-
-    .fs-scale-option span {
       white-space: nowrap;
     }
 
-    .fs-scale-header {
-      display: grid;
-      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.1fr);
-      gap: 8px;
-      font-size: 0.72rem;
-      color: var(--fs-muted);
-      margin-bottom: 2px;
-    }
-
-    .fs-scale-header-labels {
-      display: flex;
-      justify-content: space-between;
-      gap: 4px;
-    }
-
-    .fs-scale-header-labels span {
-      flex: 1;
-      text-align: center;
+    .fs-scale-option input {
+      margin-bottom: 1px;
+      cursor: pointer;
     }
 
     .fs-question-footer {
       margin-top: 6px;
       font-size: 0.75rem;
       color: var(--fs-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
     }
 
-    /* Pattern bars */
+    .fs-question-footer .btn {
+      margin-top: 0;
+    }
+
+    .board-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .board-title {
+      font-family: "Archivo Black", system-ui, sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .board-subtitle {
+      font-size: 0.78rem;
+      color: var(--fs-muted);
+    }
+
+    .fs-toolbar {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--fs-muted);
+    }
+
+    .fs-toolbar .btn {
+      font-size: 0.7rem;
+    }
+
+    .fs-bars-card {
+      margin-top: 8px;
+      border-radius: 10px;
+      border: 1px solid var(--fs-border-soft);
+      background: var(--fs-bg-panel);
+      padding: 8px 10px 10px;
+      font-size: 0.8rem;
+    }
+
+    .fs-bars-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .fs-bars-title {
+      font-weight: 600;
+    }
+
+    .fs-bars-subtitle {
+      font-size: 0.78rem;
+      color: var(--fs-muted);
+    }
 
     .fs-bars {
-      margin-top: 4px;
+      margin-top: 6px;
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -228,85 +257,125 @@
     .fs-bar-row {
       display: grid;
       grid-template-columns: 80px minmax(0, 1fr) 40px;
-      gap: 4px;
+      gap: 6px;
       align-items: center;
-      font-size: 0.76rem;
+      font-size: 0.78rem;
     }
 
     .fs-bar-label {
-      font-weight: 500;
+      text-align: right;
+      padding-right: 2px;
     }
 
     .fs-bar-track {
       position: relative;
-      height: 10px;
+      height: 14px;
       border-radius: 999px;
-      background: #e5e7eb;
+      border: 1px solid rgba(0, 0, 0, 0.16);
       overflow: hidden;
+      background: #f9fafb;
     }
 
     .fs-bar-fill {
       position: absolute;
       inset: 0;
-      width: 0%;
-      background: linear-gradient(90deg, #f97316, #0ea5e9);
-      transition: width 0.2s ease-out;
+      transform-origin: left center;
+      transform: scaleX(0);
     }
 
-    .fs-bar-value {
+    .fs-bar-percent {
       text-align: right;
       font-variant-numeric: tabular-nums;
+      font-size: 0.76rem;
     }
 
-    /* Summary and history */
+    .fs-bar-fill.fs-zone-silent {
+      background: var(--fs-zone-silent);
+    }
 
-    .fs-summary-text {
+    .fs-bar-fill.fs-zone-sparse {
+      background: var(--fs-zone-sparse);
+    }
+
+    .fs-bar-fill.fs-zone-resonant {
+      background: var(--fs-zone-resonant);
+    }
+
+    .fs-bar-fill.fs-zone-loud {
+      background: var(--fs-zone-loud);
+    }
+
+    .fs-bar-fill.fs-zone-over {
+      background: var(--fs-zone-over);
+    }
+
+    .fs-summary-card {
+      margin-top: 8px;
+      border-radius: 10px;
+      border: 1px solid var(--fs-border-soft);
+      background: var(--fs-bg-panel);
+      padding: 8px 10px 10px;
+      font-size: 0.8rem;
+    }
+
+    .fs-summary-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .fs-summary-body {
       font-size: 0.78rem;
       color: var(--fs-muted);
-      margin-top: 4px;
     }
 
-    .fs-summary-text p {
-      margin: 2px 0;
+    .fs-history-card {
+      margin-top: 8px;
+      border-radius: 10px;
+      border: 1px solid var(--fs-border-soft);
+      background: var(--fs-bg-panel);
+      padding: 8px 10px 10px;
+      font-size: 0.78rem;
+    }
+
+    .fs-history-title {
+      font-weight: 600;
+      margin-bottom: 4px;
     }
 
     .fs-history-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.74rem;
       margin-top: 4px;
+      font-size: 0.75rem;
     }
 
     .fs-history-table th,
     .fs-history-table td {
-      border: 1px solid #000000;
+      border: 1px solid rgba(0, 0, 0, 0.2);
       padding: 2px 4px;
-      text-align: center;
+      text-align: right;
       font-variant-numeric: tabular-nums;
     }
 
     .fs-history-table th {
       background: #f3f4f6;
+      text-align: center;
     }
 
     .fs-history-empty {
       font-size: 0.76rem;
       color: var(--fs-muted);
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
-    /* Fullscreen helper (page-local) */
+    @media (max-width: 900px) {
+      .fs-question-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
 
-    .board-wrapper--fullscreen {
-      position: fixed;
-      inset: 52px 12px 12px;
-      z-index: 50;
-      max-width: none;
-      width: auto;
-    }
-
-    body.fs-fullscreen {
-      overflow: hidden;
+      .fs-bar-row {
+        grid-template-columns: 70px minmax(0, 1fr) 34px;
+      }
     }
   </style>
 </head>
@@ -320,32 +389,13 @@
     <aside class="sidebar-card">
       <div class="sidebar-title">Feedback scale</div>
       <div class="sidebar-subtitle">
-        Map how feedback has felt recently across five zones: Silent, Sparse, Resonant, Loud and Overwhelming.
+        A quick way to map how feedback feels at the moment across five zones:
+        Silent, Sparse, Resonant, Loud and Overwhelming.
       </div>
 
-      <label class="sidebar-field-label" for="fsName">Name (optional)</label>
-      <input id="fsName" class="input-text" type="text" placeholder="e.g. Alex Smith" autocomplete="off" />
-
-      <label class="sidebar-field-label" for="fsRole">Role level</label>
-      <select id="fsRole" class="input-select">
-        <option value="">Select role level</option>
-        <option value="individual">Individual contributor</option>
-        <option value="team-lead">Team lead / supervisor</option>
-        <option value="manager">Manager</option>
-        <option value="senior">Senior leader</option>
-      </select>
-
-      <label class="sidebar-field-label" for="fsContext">Context</label>
-      <select id="fsContext" class="input-select">
-        <option value="">Select context</option>
-        <option value="1-1s">1-1s and check-ins</option>
-        <option value="team">Team meetings</option>
-        <option value="project">Project / initiative</option>
-        <option value="whole-role">Whole role</option>
-      </select>
-
-      <div id="fsAssessmentCount" class="sidebar-counter">
-        Assessments completed in this browser: 0
+      <div class="sidebar-note">
+        Use this with a colleague or manager to get a shared picture of how feedback
+        is landing, then agree one or two experiments to improve it.
       </div>
 
       <!-- About this tool -->
@@ -353,25 +403,59 @@
         <button
           class="btn btn-pill-small"
           data-collapsible-toggle
-          data-collapsible-target="#aboutFsBody"
+          data-collapsible-target="#aboutToolBody"
           data-label-base="About this tool"
         >
           + About this tool
         </button>
-        <div id="aboutFsBody" data-collapsible-body class="about-body">
+        <div id="aboutToolBody" data-collapsible-body class="about-body">
           <p>
-            This tool turns gut feelings about feedback into a simple picture you can look at with your manager.
+            This tool turns gut feelings about feedback into a simple picture you can look at with your
+            manager or team. It does not judge whether feedback is good or bad. Instead it shows where
+            the weight sits: in silence, in useful conversation, or in noisy or overwhelming feedback.
           </p>
           <p>
-            It doesn’t label feedback as “good” or “bad”. Instead it shows how much time is spent in each zone:
-            <strong>Silent</strong>, <strong>Sparse</strong>, <strong>Resonant</strong>,
-            <strong>Loud</strong> and <strong>Overwhelming</strong>.
+            Answer the questions based on how feedback has felt over the last few days or weeks, then use
+            the results to have a constructive conversation about what would make feedback more useful and
+            sustainable for you.
           </p>
           <p>
-            Use it during check-ins to talk about what is working, what feels missing and where you might want to
-            adjust how feedback happens.
+            It is often safest to talk through the results together and treat them as a shared problem to solve,
+            not a scorecard on any one person.
           </p>
         </div>
+      </div>
+
+      <div class="fs-input-group">
+        <label for="fsNameInput">Name (optional)</label>
+        <input id="fsNameInput" class="input-text fs-input" type="text" placeholder="e.g. Alex Smith" autocomplete="off" />
+      </div>
+
+      <div class="fs-input-group">
+        <label for="fsRoleSelect">Role level</label>
+        <select id="fsRoleSelect" class="input-select fs-select">
+          <option value="">Select role level</option>
+          <option value="individual">Individual contributor</option>
+          <option value="team_lead">Team lead or supervisor</option>
+          <option value="manager">Manager of managers</option>
+          <option value="director">Director or senior leader</option>
+        </select>
+      </div>
+
+      <div class="fs-input-group">
+        <label for="fsContextSelect">Context</label>
+        <select id="fsContextSelect" class="input-select fs-select">
+          <option value="">Select context</option>
+          <option value="whole_role">Whole role</option>
+          <option value="project">Specific project or team</option>
+          <option value="probation">Probation or new role</option>
+          <option value="review">Performance or salary review period</option>
+        </select>
+      </div>
+
+      <div class="sidebar-counter">
+        Assessments completed in this browser:
+        <span id="fsAssessmentCount">0</span>
       </div>
     </aside>
 
@@ -382,82 +466,60 @@
           <div>
             <div class="board-title">Feedback scale assessment board</div>
             <div class="board-subtitle">
-              Silent and Overwhelming are zones we rarely enjoy. The aim is to spend more time in Resonant feedback,
-              with occasional Loud moments when focus or urgency is needed.
+              Map how feedback has felt recently, then use the pattern to talk about what would help you most.
             </div>
           </div>
-          <div class="board-actions">
+          <div class="fs-toolbar">
             <button class="btn btn-pill-small" id="fsFullscreenButton">Fullscreen board</button>
             <button class="btn btn-pill-small" id="fsPdfButton">Save as PDF</button>
           </div>
         </div>
 
-        <div class="board-meta">
-          Answer the questions, click <strong>Calculate from answers</strong>, then review the pattern and decide
-          what you want to change.
+        <!-- Questions -->
+        <div class="fs-questions-card">
+          <div class="fs-questions-header">
+            <div class="fs-questions-title">Questions about recent feedback</div>
+            <div class="fs-questions-subtitle">
+              Think about the last few weeks and answer for how feedback has mostly felt in that time.
+            </div>
+          </div>
+
+          <div id="fsQuestions" class="fs-questions"></div>
+
+          <div class="fs-question-footer">
+            <div>
+              Use the 1 to 5 scale for each statement. There are no right answers. The aim is to capture how it
+              feels, not how it ought to be.
+            </div>
+            <div>
+              <button type="button" class="btn btn-pill-small" id="fsClearAnswersButton">Clear answers</button>
+              <button type="button" class="btn btn-pill-small" id="fsCalculateButton">Calculate from answers</button>
+            </div>
+          </div>
         </div>
 
-        <div class="board-grid">
-          <!-- Questions -->
-          <section class="board-panel" id="fsQuestionsPanel">
-            <div class="board-panel-title">Questions</div>
-            <div class="board-panel-subtitle">
-              Think about the last few days or weeks. For each row, pick the answer that best fits.
+        <!-- Bars and summary -->
+        <div class="fs-bars-card">
+          <div class="fs-bars-header">
+            <div class="fs-bars-title">Zone pattern</div>
+            <div class="fs-bars-subtitle">
+              Higher bars show zones where more of your recent feedback time seems to sit.
             </div>
+          </div>
+          <div id="fsBars" class="fs-bars"></div>
+        </div>
 
-            <div class="fs-scale-header">
-              <div>Statement</div>
-              <div class="fs-scale-header-labels">
-                <span>1</span>
-                <span>2</span>
-                <span>3</span>
-                <span>4</span>
-                <span>5</span>
-              </div>
-            </div>
+        <div class="fs-summary-card">
+          <div class="fs-summary-title">Overall feedback pattern</div>
+          <div id="fsSummary" class="fs-summary-body">
+            Answer the questions and click Calculate from answers to see your pattern across Silent, Sparse,
+            Resonant, Loud and Overwhelming feedback.
+          </div>
+        </div>
 
-            <div id="fsQuestions" class="fs-questions"></div>
-
-            <div class="fs-question-footer">
-              1 = very rarely, 3 = sometimes, 5 = very often. You don’t need to overthink each answer.
-            </div>
-
-            <div style="margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
-              <button class="btn btn-pill-small" id="fsCalculateButton">Calculate from answers</button>
-              <button class="btn btn-pill-small" id="fsClearAnswersButton">Clear answers</button>
-            </div>
-          </section>
-
-          <!-- Pattern -->
-          <section class="board-panel">
-            <div class="board-panel-title">Zone pattern</div>
-            <div class="board-panel-subtitle">
-              Shows how your recent feedback “time” is distributed across the five zones.
-            </div>
-            <div id="fsBars" class="fs-bars"></div>
-          </section>
-
-          <!-- Summary -->
-          <section class="board-panel">
-            <div class="board-panel-title">Overall feedback pattern</div>
-            <div class="board-panel-subtitle">
-              A short description of what this pattern might feel like day to day.
-            </div>
-            <div id="fsSummary" class="fs-summary-text">
-              <p>No results yet. Complete the questions and calculate to see a summary.</p>
-            </div>
-          </section>
-
-          <!-- History -->
-          <section class="board-panel">
-            <div class="board-panel-title">Recorded entries (this browser)</div>
-            <div class="board-panel-subtitle">
-              Each time you calculate, a row is added here so you can track how feedback changes over time.
-            </div>
-            <div id="fsHistoryContainer">
-              <div class="fs-history-empty">No entries yet.</div>
-            </div>
-          </section>
+        <div class="fs-history-card">
+          <div class="fs-history-title">Recorded entries in this browser</div>
+          <div id="fsHistoryContainer"></div>
         </div>
       </div>
     </section>
@@ -469,38 +531,131 @@
   <!-- Page logic -->
   <script>
     (function () {
-      "use strict";
+      const ZONES = ["Silent", "Sparse", "Resonant", "Loud", "Overwhelming"];
+
+      // Questions and sections
 
       const questions = [
+        // Volume and frequency
         {
-          id: "silent",
+          id: 1,
           zone: "Silent",
-          text: "I go for long stretches without getting any feedback at all."
+          text: "I can go for weeks without getting any meaningful feedback on my work."
         },
         {
-          id: "sparse",
+          id: 2,
           zone: "Sparse",
-          text: "I get the occasional comment, but not enough to feel well-informed."
+          text: "Most of the feedback I get is a quick thanks or looks fine without much detail."
         },
         {
-          id: "resonant",
+          id: 3,
           zone: "Resonant",
-          text: "I regularly get specific feedback that helps me learn or adjust."
+          text: "I regularly get specific feedback that tells me what worked and why."
         },
         {
-          id: "loud",
+          id: 4,
           zone: "Loud",
-          text: "Feedback often arrives in a rushed or intense way (for example under pressure)."
+          text: "I often get a lot of comments from different people in a short space of time."
         },
         {
-          id: "overwhelming",
+          id: 5,
           zone: "Overwhelming",
-          text: "Overall, feedback feels noisy, conflicting or hard to process."
+          text: "It can feel like feedback is arriving constantly, even while I am still working on something."
+        },
+
+        // Quality and usefulness
+        {
+          id: 6,
+          zone: "Resonant",
+          text: "Feedback usually helps me understand what to repeat or change next time."
+        },
+        {
+          id: 7,
+          zone: "Silent",
+          text: "I rarely hear about what is going well or what people value in my work."
+        },
+        {
+          id: 8,
+          zone: "Overwhelming",
+          text: "I sometimes get mixed messages or conflicting feedback about the same piece of work."
+        },
+        {
+          id: 9,
+          zone: "Loud",
+          text: "Feedback focuses more on problems or urgency than on what would be helpful in future."
+        },
+        {
+          id: 10,
+          zone: "Silent",
+          text: "When I ask for feedback, people are unsure what to say or postpone the conversation."
+        },
+
+        // Safety and tone
+        {
+          id: 11,
+          zone: "Resonant",
+          text: "I feel comfortable asking for more detail or clarifying feedback if I do not understand it."
+        },
+        {
+          id: 12,
+          zone: "Overwhelming",
+          text: "I sometimes worry that being honest about feedback will be held against me later."
+        },
+        {
+          id: 13,
+          zone: "Loud",
+          text: "Feedback sometimes feels rushed or dropped into the middle of other pressures."
+        },
+        {
+          id: 14,
+          zone: "Sparse",
+          text: "Important feedback is sometimes shared indirectly instead of being discussed with me."
+        },
+        {
+          id: 15,
+          zone: "Resonant",
+          text: "I usually have space to absorb feedback before more arrives."
         }
       ];
 
-      const ZONES = ["Silent", "Sparse", "Resonant", "Loud", "Overwhelming"];
-      const STORAGE_KEY = "imthebus_feedback_scale_entries_v1";
+      const sections = [
+        {
+          id: "volume",
+          title: "How often you get feedback",
+          subtitle: "Frequency and consistency over the last few weeks.",
+          questions: [1, 2, 3, 4, 5]
+        },
+        {
+          id: "quality",
+          title: "Quality and usefulness",
+          subtitle: "Whether feedback helps you learn and make decisions.",
+          questions: [6, 7, 8, 9, 10]
+        },
+        {
+          id: "safety",
+          title: "Safety and tone",
+          subtitle: "How safe, respectful and workable feedback feels.",
+          questions: [11, 12, 13, 14, 15]
+        }
+      ];
+
+      const zoneShortLabels = {
+        Silent: "Silent",
+        Sparse: "Sparse",
+        Resonant: "Resonant",
+        Loud: "Loud",
+        Overwhelming: "Overwhelming"
+      };
+
+      const zoneClassNames = {
+        Silent: "fs-zone-silent",
+        Sparse: "fs-zone-sparse",
+        Resonant: "fs-zone-resonant",
+        Loud: "fs-zone-loud",
+        Overwhelming: "fs-zone-over"
+      };
+
+      const STORAGE_KEY = "imthebus_feedback_scale_entries_v2";
 
       const qsContainer = document.getElementById("fsQuestions");
       const barsContainer = document.getElementById("fsBars");
@@ -514,157 +669,240 @@
       const pdfButton = document.getElementById("fsPdfButton");
       const boardWrapper = document.querySelector(".board-wrapper");
 
+      const nameInput = document.getElementById("fsNameInput");
+      const roleSelect = document.getElementById("fsRoleSelect");
+      const contextSelect = document.getElementById("fsContextSelect");
+
       let entries = [];
+
+      function buildQuestionRow(question) {
+        const row = document.createElement("div");
+        row.className = "fs-question-row";
+
+        const left = document.createElement("div");
+        const qText = document.createElement("div");
+        qText.className = "fs-question-text";
+        qText.textContent = question.text;
+
+        const qZone = document.createElement("div");
+        qZone.className = "fs-question-zone";
+        qZone.textContent = "Mainly about: " + question.zone;
+
+        left.appendChild(qText);
+        left.appendChild(qZone);
+
+        const scale = document.createElement("div");
+        scale.className = "fs-scale";
+
+        const labels = ["Rarely", "Sometimes", "About half the time", "Often", "Almost always"];
+
+        for (let i = 1; i <= 5; i++) {
+          const opt = document.createElement("label");
+          opt.className = "fs-scale-option";
+
+          const radio = document.createElement("input");
+          radio.type = "radio";
+          radio.name = "fs-q-" + question.id;
+          radio.value = String(i);
+
+          const span = document.createElement("span");
+          span.textContent = labels[i - 1];
+
+          opt.appendChild(radio);
+          opt.appendChild(span);
+          scale.appendChild(opt);
+        }
+
+        row.appendChild(left);
+        row.appendChild(scale);
+        return row;
+      }
 
       function renderQuestions() {
         qsContainer.innerHTML = "";
-        questions.forEach(function (q) {
-          const row = document.createElement("div");
-          row.className = "fs-question-row";
 
-          const left = document.createElement("div");
-          const zone = document.createElement("div");
-          zone.className = "fs-question-zone";
-          zone.textContent = q.zone;
+        sections.forEach(function (section) {
+          const heading = document.createElement("div");
+          heading.className = "fs-section-heading";
+          heading.textContent = section.title;
+          qsContainer.appendChild(heading);
 
-          const text = document.createElement("div");
-          text.className = "fs-question-text";
-          text.textContent = q.text;
-
-          left.appendChild(zone);
-          left.appendChild(text);
-
-          const scale = document.createElement("div");
-          scale.className = "fs-scale";
-
-          const labels = [
-            "Very rarely",
-            "Occasionally",
-            "Sometimes",
-            "Often",
-            "Very often"
-          ];
-
-          for (let i = 1; i <= 5; i++) {
-            const opt = document.createElement("label");
-            opt.className = "fs-scale-option";
-
-            const input = document.createElement("input");
-            input.type = "radio";
-            input.name = "q-" + q.id;
-            input.value = String(i);
-
-            const span = document.createElement("span");
-            span.textContent = i + " – " + labels[i - 1];
-
-            opt.appendChild(input);
-            opt.appendChild(span);
-            scale.appendChild(opt);
+          if (section.subtitle) {
+            const sub = document.createElement("div");
+            sub.className = "fs-section-subtitle";
+            sub.textContent = section.subtitle;
+            qsContainer.appendChild(sub);
           }
 
-          row.appendChild(left);
-          row.appendChild(scale);
-          qsContainer.appendChild(row);
+          section.questions.forEach(function (id) {
+            const q = questions.find(function (qq) { return qq.id === id; });
+            if (!q) return;
+            const row = buildQuestionRow(q);
+            qsContainer.appendChild(row);
+          });
         });
+      }
+
+      function clearAnswers() {
+        const inputs = qsContainer.querySelectorAll("input[type=radio]");
+        inputs.forEach(function (input) {
+          input.checked = false;
+        });
+      }
+
+      function getAnswers() {
+        const scores = {};
+        const counts = {};
+
+        for (const q of questions) {
+          const name = "fs-q-" + q.id;
+          const checked = qsContainer.querySelector("input[name=\"" + name + "\"]:checked");
+          if (!checked) {
+            return null;
+          }
+          const val = Number(checked.value);
+          if (!Number.isFinite(val)) continue;
+          const base = val - 1; // 0 to 4
+
+          const zone = q.zone;
+          scores[zone] = (scores[zone] || 0) + base;
+          counts[zone] = (counts[zone] || 0) + 1;
+        }
+
+        // Convert sums to averages so each zone is weighted fairly
+        ZONES.forEach(function (zone) {
+          if (!counts[zone]) {
+            scores[zone] = 0;
+          } else {
+            scores[zone] = scores[zone] / counts[zone];
+          }
+        });
+
+        return scores;
+      }
+
+      function scoresToPercentages(scores) {
+        const values = ZONES.map(function (z) { return scores[z] || 0; });
+        const maxVal = Math.max.apply(null, values);
+        const minVal = Math.min.apply(null, values);
+
+        if (maxVal === minVal) {
+          const equal = 100 / ZONES.length;
+          const result = {};
+          ZONES.forEach(function (z) {
+            result[z] = equal;
+          });
+          return result;
+        }
+
+        const shifted = values.map(function (v) { return v - minVal; });
+        const total = shifted.reduce(function (sum, v) { return sum + v; }, 0) || 1;
+
+        const result = {};
+        ZONES.forEach(function (z, i) {
+          const perc = (shifted[i] / total) * 100;
+          result[z] = Math.round(perc);
+        });
+
+        // Adjust rounding so total equals 100
+        let sumPerc = ZONES.reduce(function (sum, z) { return sum + result[z]; }, 0);
+        while (sumPerc > 100) {
+          const z = ZONES[0];
+          if (result[z] > 0) result[z] -= 1;
+          sumPerc -= 1;
+        }
+        while (sumPerc < 100) {
+          const z = ZONES[0];
+          result[z] += 1;
+          sumPerc += 1;
+        }
+
+        return result;
       }
 
       function renderBars(percentages) {
         barsContainer.innerHTML = "";
+
         if (!percentages) {
-          ZONES.forEach(function (z) {
-            const row = document.createElement("div");
-            row.className = "fs-bar-row";
-
-            const label = document.createElement("div");
-            label.className = "fs-bar-label";
-            label.textContent = z;
-
-            const track = document.createElement("div");
-            track.className = "fs-bar-track";
-
-            const fill = document.createElement("div");
-            fill.className = "fs-bar-fill";
-            track.appendChild(fill);
-
-            const value = document.createElement("div");
-            value.className = "fs-bar-value";
-            value.textContent = "0%";
-
-            row.appendChild(label);
-            row.appendChild(track);
-            row.appendChild(value);
-            barsContainer.appendChild(row);
-          });
+          const msg = document.createElement("div");
+          msg.className = "fs-history-empty";
+          msg.textContent = "No pattern yet. Answer the questions and click Calculate from answers.";
+          barsContainer.appendChild(msg);
           return;
         }
 
-        ZONES.forEach(function (z) {
-          const pct = percentages[z] || 0;
+        ZONES.forEach(function (zone) {
           const row = document.createElement("div");
           row.className = "fs-bar-row";
 
           const label = document.createElement("div");
           label.className = "fs-bar-label";
-          label.textContent = z;
+          label.textContent = zoneShortLabels[zone];
 
           const track = document.createElement("div");
           track.className = "fs-bar-track";
 
           const fill = document.createElement("div");
-          fill.className = "fs-bar-fill";
-          fill.style.width = pct + "%";
+          fill.className = "fs-bar-fill " + zoneClassNames[zone];
+
+          const perc = percentages[zone] || 0;
+          fill.style.transform = "scaleX(" + (perc / 100) + ")";
+
           track.appendChild(fill);
 
-          const value = document.createElement("div");
-          value.className = "fs-bar-value";
-          value.textContent = pct.toString().padStart(2, " ") + "%";
+          const pct = document.createElement("div");
+          pct.className = "fs-bar-percent";
+          pct.textContent = perc.toString().padStart(2, " ") + "%";
 
           row.appendChild(label);
           row.appendChild(track);
-          row.appendChild(value);
+          row.appendChild(pct);
+
           barsContainer.appendChild(row);
         });
       }
 
       function summarise(percentages) {
         if (!percentages) {
-          summaryEl.innerHTML = "<p>No results yet. Complete the questions and calculate to see a summary.</p>";
+          summaryEl.textContent =
+            "Answer the questions and click Calculate from answers to see your pattern across Silent, Sparse, Resonant, Loud and Overwhelming feedback.";
           return;
         }
-        const entriesArr = Object.entries(percentages);
-        const sorted = entriesArr
-          .slice()
-          .sort(function (a, b) { return b[1] - a[1]; });
 
-        const top = sorted[0];
-        const topZone = top ? top[0] : null;
+        const entries = ZONES.map(function (z) {
+          return { zone: z, value: percentages[z] || 0 };
+        }).sort(function (a, b) {
+          return b.value - a.value;
+        });
 
-        let mainLine = "";
-        if (topZone === "Resonant") {
-          mainLine =
-            "Most of your recent time is in Resonant feedback. You are getting useful information that helps you learn or adjust.";
-        } else if (topZone === "Silent" || topZone === "Sparse") {
-          mainLine =
-            "A lot of your recent time is in " + topZone + " feedback. You may not be getting enough clear, timely information.";
-        } else if (topZone === "Loud" || topZone === "Overwhelming") {
-          mainLine =
-            "Loud and Overwhelming feedback are dominant. Feedback may feel noisy, stressful or hard to process.";
-        } else {
-          mainLine =
-            "Your pattern is more mixed. Use this as a starting point for a conversation about what is helping and what isn’t.";
+        const top = entries[0];
+        const second = entries[1];
+        const bottom = entries[entries.length - 1];
+
+        let text = "Your feedback currently leans most toward " + top.zone + " feedback";
+
+        if (second && second.value > 0) {
+          text += ", with " + second.zone + " also present";
+        }
+        text += ". ";
+
+        if (top.zone === "Resonant") {
+          text +=
+            "You are getting a good amount of useful and constructive feedback. Look at places where Silent, Sparse or Overwhelming feedback still show up and agree small experiments to shift them.";
+        } else if (top.zone === "Silent" || top.zone === "Sparse") {
+          text +=
+            "There may be long gaps or light feedback that makes it hard to know how you are doing. Use this as a starting point to ask for more specific, practical feedback on real pieces of work.";
+        } else if (top.zone === "Loud" || top.zone === "Overwhelming") {
+          text +=
+            "Feedback may feel noisy, pressured or emotionally heavy. It could help to slow some conversations down, focus on one or two priorities at a time and agree clearer timings and boundaries.";
         }
 
-        const detailLine =
-          "Silent " + percentages.Silent + "% · " +
-          "Sparse " + percentages.Sparse + "% · " +
-          "Resonant " + percentages.Resonant + "% · " +
-          "Loud " + percentages.Loud + "% · " +
-          "Overwhelming " + percentages.Overwhelming + "%";
+        if (bottom && bottom.zone !== "Resonant") {
+          text +=
+            " Resonant feedback shows up least in this pattern. Talking together about what resonant feedback looks like for you can help build a shared target.";
+        }
 
-        summaryEl.innerHTML =
-          "<p>" + mainLine + "</p>" +
-          "<p>" + detailLine + "</p>" +
-          "<p>Agree with the picture? Decide one or two changes you want to try before your next check-in.</p>";
+        summaryEl.textContent = text;
       }
 
       function loadEntries() {
@@ -672,9 +910,8 @@
           const raw = localStorage.getItem(STORAGE_KEY);
           if (!raw) return [];
           const parsed = JSON.parse(raw);
-          if (!Array.isArray(parsed)) return [];
-          return parsed;
-        } catch {
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
           return [];
         }
       }
@@ -682,24 +919,21 @@
       function saveEntries() {
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-        } catch {
-          // ignore storage errors
+        } catch (e) {
+          // ignore
         }
       }
 
       function renderHistory() {
         historyContainer.innerHTML = "";
-        if (!entries.length) {
-          const empty = document.createElement("div");
-          empty.className = "fs-history-empty";
-          empty.textContent = "No entries yet.";
-          historyContainer.appendChild(empty);
-          if (countEl) countEl.textContent = "Assessments completed in this browser: 0";
-          return;
-        }
+        countEl.textContent = String(entries.length);
 
-        if (countEl) {
-          countEl.textContent = "Assessments completed in this browser: " + entries.length;
+        if (!entries.length) {
+          const msg = document.createElement("div");
+          msg.className = "fs-history-empty";
+          msg.textContent = "No previous entries yet. Each calculation you save will appear here.";
+          historyContainer.appendChild(msg);
+          return;
         }
 
         const table = document.createElement("table");
@@ -707,128 +941,75 @@
 
         const thead = document.createElement("thead");
         const headRow = document.createElement("tr");
-        ["Date/time", "Silent %", "Sparse %", "Resonant %", "Loud %", "Overw. %"].forEach(function (h) {
+
+        ["Date", "Silent %", "Sparse %", "Resonant %", "Loud %", "Over %"].forEach(function (label) {
           const th = document.createElement("th");
-          th.textContent = h;
+          th.textContent = label;
           headRow.appendChild(th);
         });
+
         thead.appendChild(headRow);
         table.appendChild(thead);
 
         const tbody = document.createElement("tbody");
-        entries.forEach(function (entry) {
+
+        entries.slice().reverse().forEach(function (entry) {
           const tr = document.createElement("tr");
-          const cells = [
-            entry.timestamp,
-            entry.percentages.Silent,
-            entry.percentages.Sparse,
-            entry.percentages.Resonant,
-            entry.percentages.Loud,
-            entry.percentages.Overwhelming
-          ];
-          cells.forEach(function (val) {
+          const dateCell = document.createElement("td");
+          dateCell.textContent = entry.date;
+          dateCell.style.textAlign = "left";
+          tr.appendChild(dateCell);
+
+          ZONES.forEach(function (zone) {
             const td = document.createElement("td");
-            td.textContent = typeof val === "number" ? val + "%" : val;
+            td.textContent = (entry[zone] != null ? entry[zone] : 0) + "%";
             tr.appendChild(td);
           });
+
           tbody.appendChild(tr);
         });
+
         table.appendChild(tbody);
         historyContainer.appendChild(table);
-      }
-
-      function getAnswers() {
-        const scores = {};
-        let missing = false;
-
-        questions.forEach(function (q) {
-          const checked = document.querySelector('input[name="q-' + q.id + '"]:checked');
-          if (!checked) {
-            missing = true;
-            return;
-          }
-          const val = Number(checked.value) || 0;
-          scores[q.zone] = val;
-        });
-
-        if (missing) return null;
-        return scores;
-      }
-
-      function scoresToPercentages(scores) {
-        if (!scores) return null;
-        let total = 0;
-        ZONES.forEach(function (z) { total += scores[z] || 0; });
-        if (!total) return null;
-
-        const raw = {};
-        ZONES.forEach(function (z) {
-          raw[z] = (scores[z] || 0) / total * 100;
-        });
-
-        // Neaten to whole numbers and ensure sum = 100
-        const rounded = {};
-        let sum = 0;
-        ZONES.forEach(function (z) {
-          const v = Math.round(raw[z]);
-          rounded[z] = v;
-          sum += v;
-        });
-        const diff = 100 - sum;
-        if (diff !== 0) {
-          const target = "Resonant";
-          rounded[target] = Math.max(0, rounded[target] + diff);
-        }
-        return rounded;
-      }
-
-      function clearAnswers() {
-        questions.forEach(function (q) {
-          const inputs = document.querySelectorAll('input[name="q-' + q.id + '"]');
-          inputs.forEach(function (inp) { inp.checked = false; });
-        });
       }
 
       function handleCalculate() {
         const scores = getAnswers();
         if (!scores) {
-          alert("Please answer each question before calculating.");
+          alert("Please answer every question before calculating.");
           return;
         }
-        const percentages = scoresToPercentages(scores);
-        if (!percentages) return;
 
+        const percentages = scoresToPercentages(scores);
         renderBars(percentages);
         summarise(percentages);
 
         const now = new Date();
-        const timestamp = now.toLocaleString();
+        const dateStr = now.toLocaleString();
 
         const entry = {
-          timestamp: timestamp,
-          percentages: percentages
+          date: dateStr,
+          name: nameInput.value.trim() || null,
+          role: roleSelect.value || null,
+          context: contextSelect.value || null
         };
 
-        entries.unshift(entry);
-        if (entries.length > 30) entries = entries.slice(0, 30);
+        ZONES.forEach(function (zone) {
+          entry[zone] = percentages[zone];
+        });
+
+        entries.push(entry);
         saveEntries();
         renderHistory();
       }
 
       function handleFullscreenToggle() {
-        const isFull = boardWrapper.classList.toggle("board-wrapper--fullscreen");
-        document.body.classList.toggle("fs-fullscreen", isFull);
-        fullscreenButton.textContent = isFull ? "Exit fullscreen" : "Fullscreen board";
-      }
-
-      function formatDateForFilename(date) {
-        function pad(n) { return String(n).padStart(2, "0"); }
-        const yyyy = date.getFullYear();
-        const mm = pad(date.getMonth() + 1);
-        const dd = pad(date.getDate());
-        const hh = pad(date.getHours());
-        const mi = pad(date.getMinutes());
-        return yyyy + "-" + mm + "-" + dd + "_" + hh + "-" + mi;
+        if (!boardWrapper) return;
+        if (boardWrapper.classList.contains("board-wrapper--fullscreen")) {
+          boardWrapper.classList.remove("board-wrapper--fullscreen");
+        } else {
+          boardWrapper.classList.add("board-wrapper--fullscreen");
+        }
       }
 
       function handlePdfExport() {
@@ -836,87 +1017,112 @@
           alert("PDF export is not available in this browser.");
           return;
         }
-        const latest = entries[0];
+
+        const answers = getAnswers();
+        if (!answers) {
+          alert("Please answer every question before exporting.");
+          return;
+        }
+
+        const percentages = scoresToPercentages(answers);
         const jsPDF = window.jspdf.jsPDF;
         const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
 
         const margin = 40;
         let y = margin;
+
         const now = new Date();
+        const title = "Feedback scale assessment";
+        const subtitle = now.toLocaleString();
 
         doc.setFont("helvetica", "bold");
         doc.setFontSize(16);
-        doc.text("Feedback scale assessment", margin, y);
+        doc.text(title, margin, y);
         y += 18;
 
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
-        doc.text(now.toLocaleString(), margin, y);
-        y += 18;
 
-        if (latest) {
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(12);
-          doc.text("Latest pattern", margin, y);
-          y += 14;
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(10);
+        doc.text(subtitle, margin, y);
+        y += 16;
 
-          const p = latest.percentages;
-          const lines = [
-            "Silent: " + p.Silent + "%, Sparse: " + p.Sparse + "%, Resonant: " + p.Resonant + "%,",
-            "Loud: " + p.Loud + "%, Overwhelming: " + p.Overwhelming + "%"
-          ];
-          lines.forEach(function (ln) {
-            doc.text(ln, margin + 14, y);
-            y += 14;
+        const name = nameInput.value.trim();
+        const role = roleSelect.value || "";
+        const context = contextSelect.value || "";
+
+        if (name || role || context) {
+          const metaLines = [];
+          if (name) metaLines.push("Name: " + name);
+          if (role) metaLines.push("Role level: " + role);
+          if (context) metaLines.push("Context: " + context);
+          metaLines.forEach(function (line) {
+            doc.text(line, margin, y);
+            y += 12;
           });
-          y += 10;
-        } else {
-          doc.text("No calculated results yet.", margin + 14, y);
-          y += 18;
+          y += 4;
         }
 
-        if (entries.length) {
-          if (y > 720) {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.text("Zone pattern", margin, y);
+        y += 14;
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+
+        ZONES.forEach(function (zone) {
+          const line = zone + ": " + (percentages[zone] || 0) + "%";
+          doc.text(line, margin + 10, y);
+          y += 12;
+        });
+
+        y += 10;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.text("Questions and answers", margin, y);
+        y += 14;
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+
+        questions.forEach(function (q) {
+          const name = "fs-q-" + q.id;
+          const checked = qsContainer.querySelector("input[name=\"" + name + "\"]:checked");
+          if (!checked) return;
+          const val = Number(checked.value);
+          const line = q.id + ". " + q.text + " (Answer: " + val + ")";
+          const split = doc.splitTextToSize(line, 500);
+          doc.text(split, margin + 10, y);
+          y += 12 + (split.length - 1) * 10;
+          if (y > 760) {
             doc.addPage();
             y = margin;
           }
+        });
 
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(12);
-          doc.text("Recorded entries", margin, y);
-          y += 14;
+        const filename =
+          "feedback-scale-" +
+          now.getFullYear() +
+          "-" +
+          String(now.getMonth() + 1).padStart(2, "0") +
+          "-" +
+          String(now.getDate()).padStart(2, "0") +
+          "_" +
+          String(now.getHours()).padStart(2, "0") +
+          "-" +
+          String(now.getMinutes()).padStart(2, "0") +
+          ".pdf";
 
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(9);
-
-          entries.forEach(function (entry) {
-            const line =
-              entry.timestamp +
-              " – S " + entry.percentages.Silent + "%, Sp " + entry.percentages.Sparse +
-              "%, R " + entry.percentages.Resonant + "%, L " + entry.percentages.Loud +
-              "%, O " + entry.percentages.Overwhelming + "%";
-            const split = doc.splitTextToSize(line, 500);
-            doc.text(split, margin + 14, y);
-            y += 12 + (split.length - 1) * 10;
-            if (y > 760) {
-              doc.addPage();
-              y = margin;
-            }
-          });
-        }
-
-        const filename = "feedback-scale-" + formatDateForFilename(now) + ".pdf";
         doc.save(filename);
       }
 
-      // Initialise
+      // Init
       renderQuestions();
-      renderBars(null);
-
       entries = loadEntries();
       renderHistory();
+      renderBars(null);
+      summarise(null);
 
       calcButton.addEventListener("click", handleCalculate);
       clearAnswersButton.addEventListener("click", function () {
