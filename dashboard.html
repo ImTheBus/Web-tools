@@ -1,413 +1,412 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Executive Alignment Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <title>Executive Alignment Dashboard – IMTHEBUS Tools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Shared base styles and core helpers -->
+  <link rel="stylesheet" href="assets/imthebus-base.css" />
+  <script src="assets/imthebus-core.js" defer></script>
 
   <style>
-    :root {
-      --bg-page: #020617;
-      --card-bg: #0b1020;
-      --accent: #4f46e5;
-      --accent-soft: rgba(79, 70, 229, 0.35);
-      --accent-alt: #0ea5e9;
-      --border-soft: #1f2933;
-      --border-subtle: rgba(148, 163, 184, 0.32);
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
-      --danger: #ef4444;
-      --radius-lg: 16px;
-      --radius-xl: 999px;
-      --shadow-soft:
-        0 18px 45px rgba(0, 0, 0, 0.75),
-        0 0 0 1px rgba(148, 163, 184, 0.06);
+    /* Page layout: single full-width whiteboard canvas */
+    .page.silly-dashboard-page {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 0;
-      padding: 24px;
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #065f46 0, #020716 60%);
-      color: var(--text-main);
-      display: flex;
-      justify-content: center;
-    }
-
-    .shell {
-      width: 100%;
-      max-width: 1180px;
-      margin: 0 auto;
-    }
-
-    .card {
-      background: radial-gradient(circle at top left, #1f2937 0, #020617 55%);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border-soft);
-      padding: 20px;
-      box-shadow: var(--shadow-soft);
-      margin-bottom: 20px;
+    .silly-board {
       position: relative;
-      overflow: hidden;
+      min-height: clamp(520px, 72vh, 820px);
+      padding: 14px 16px 20px;
+      /* drawn directly on whiteboard background; no extra frames */
     }
 
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      background:
-        radial-gradient(circle at 0% 0%, rgba(34, 197, 94, 0.08), transparent 55%),
-        radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.09), transparent 55%);
-      opacity: 0.7;
-      pointer-events: none;
-      z-index: -1;
+    /* Header scribbles */
+    .silly-title-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
     }
 
-    h1 {
-      font-size: clamp(2rem, 3vw, 2.4rem);
-      letter-spacing: 0.05em;
+    .silly-title-main {
+      font-family: "Archivo Black", system-ui, sans-serif;
+      font-size: 1.5rem;
       text-transform: uppercase;
-      margin: 0 0 0.35rem;
-      text-align: left;
+      letter-spacing: 0.06em;
     }
 
-    .page-kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      border-radius: var(--radius-xl);
-      padding: 0.25rem 0.75rem;
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-bottom: 0.6rem;
+    .silly-title-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      border: 2px solid var(--border-strong);
+      background: rgba(255, 255, 255, 0.9);
     }
 
-    .page-kicker-pill {
-      border-radius: var(--radius-xl);
-      padding: 0.15rem 0.55rem;
+    .silly-subtitle {
+      font-size: 0.84rem;
+      max-width: 640px;
+      color: var(--accent-soft);
+      margin-bottom: 10px;
+    }
+
+    .silly-pencil-note {
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 0.9rem;
+      color: var(--accent-soft);
+      margin-bottom: 10px;
+    }
+
+    /* Marker colour helpers – using existing palette values as marker inks */
+    .marker-green {
+      color: var(--q-do);
+    }
+    .marker-blue {
+      color: var(--q-schedule);
+    }
+    .marker-yellow {
+      color: var(--q-delegate);
+    }
+    .marker-pink {
+      color: var(--q-delete);
+    }
+    .marker-neutral {
+      color: var(--accent-soft);
+    }
+
+    /* Top KPI strip: drawn as marker headings across the board */
+    .silly-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .silly-kpi {
+      padding: 4px 4px 6px;
+      border-bottom: 2px solid var(--border-strong);
+      position: relative;
+    }
+
+    .silly-kpi-label {
       font-size: 0.7rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      background: var(--accent-soft);
-      color: #e0e7ff;
-      border: 1px solid rgba(79, 70, 229, 0.65);
-    }
-
-    .subtitle {
-      color: var(--text-muted);
-      margin-bottom: 1.1rem;
-      max-width: 46rem;
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-
-    .tiny {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-    }
-
-    .section-spacer {
-      margin-top: 1.3rem;
-    }
-
-    /* KPI cards */
-
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 0.9rem;
-      margin-bottom: 1.6rem;
-    }
-
-    .kpi-card {
-      background: rgba(15, 23, 42, 0.96);
-      border-radius: 14px;
-      border: 1px solid var(--border-subtle);
-      padding: 0.85rem 1rem;
-      position: relative;
-      overflow: hidden;
-      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.9);
-    }
-
-    .kpi-card::after {
-      content: "";
-      position: absolute;
-      inset: auto -40px -18px auto;
-      height: 42px;
-      background: radial-gradient(circle at right, rgba(79, 70, 229, 0.6), transparent 60%);
-      opacity: 0.55;
-      pointer-events: none;
-    }
-
-    .kpi-label {
-      font-size: 0.78rem;
-      text-transform: uppercase;
       letter-spacing: 0.11em;
-      color: var(--text-muted);
-      margin-bottom: 0.2rem;
+      margin-bottom: 2px;
     }
 
-    .kpi-value {
-      font-size: 1.6rem;
+    .silly-kpi-value {
+      font-size: 1.3rem;
       font-weight: 600;
-      margin-bottom: 0.15rem;
+      line-height: 1.1;
     }
 
-    .kpi-subtext {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      max-width: 18rem;
+    .silly-kpi-subtext {
+      font-size: 0.75rem;
+      color: var(--accent-soft);
+      margin-top: 2px;
     }
 
-    .kpi-sparkline {
+    .silly-kpi-under {
       position: absolute;
-      right: -26px;
+      left: 0;
+      right: 0;
       bottom: -4px;
-      width: 120px;
-      height: 40px;
-      opacity: 0.26;
+      height: 2px;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.35);
+      transform: skewX(-5deg);
       pointer-events: none;
     }
 
-    .kpi-sparkline svg {
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Panels */
-
-    .panels-grid {
+    /* Middle band: left chart, right API feed on sticky notes */
+    .silly-middle-band {
       display: grid;
-      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.5fr);
-      gap: 1.25rem;
-      margin-bottom: 1.5rem;
+      grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1.1fr);
+      gap: 16px;
+      margin-bottom: 14px;
     }
 
     @media (max-width: 900px) {
-      .panels-grid {
+      .silly-middle-band {
         grid-template-columns: minmax(0, 1fr);
       }
     }
 
-    .panel {
-      background: rgba(15, 23, 42, 0.96);
-      border-radius: 14px;
-      border: 1px solid var(--border-subtle);
-      padding: 1rem 1.1rem 1.15rem;
-      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+    /* Chart area: sketched box with axis lines on board */
+    .silly-chart-area {
+      position: relative;
+      padding: 10px 10px 12px;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.16);
     }
 
-    .panel-header {
+    .silly-chart-title {
       display: flex;
       justify-content: space-between;
+      gap: 8px;
       align-items: baseline;
-      gap: 0.75rem;
-      margin-bottom: 0.7rem;
+      margin-bottom: 6px;
     }
 
-    .panel-title {
-      font-size: 0.98rem;
-      font-weight: 500;
+    .silly-chart-title-main {
+      font-size: 0.9rem;
+      font-weight: 600;
     }
 
-    .panel-meta {
+    .silly-chart-meta {
       font-size: 0.75rem;
-      color: var(--text-muted);
+      color: var(--accent-soft);
       text-align: right;
     }
 
-    /* Chart */
+    .silly-chart-grid {
+      position: relative;
+      padding: 6px 4px 0;
+      margin-bottom: 6px;
+      height: 170px;
+    }
+
+    .silly-chart-grid::before,
+    .silly-chart-grid::after {
+      content: "";
+      position: absolute;
+      background: rgba(0, 0, 0, 0.18);
+    }
+
+    .silly-chart-grid::before {
+      left: 8%;
+      right: 4%;
+      top: 50%;
+      height: 1px;
+    }
+
+    .silly-chart-grid::after {
+      top: 8%;
+      bottom: 8%;
+      left: 10%;
+      width: 1px;
+    }
 
     .chart-bars {
+      position: absolute;
+      inset: 0 4px 0 14px;
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 0.75rem;
+      gap: 8px;
       align-items: flex-end;
-      height: 180px;
-      margin-top: 0.3rem;
     }
 
     .chart-bar-group {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.25rem;
+      gap: 2px;
+      font-size: 0.7rem;
     }
 
     .chart-bar {
       width: 100%;
-      border-radius: 6px 6px 3px 3px;
-      background: linear-gradient(
-        to top,
-        rgba(79, 70, 229, 0.9),
-        rgba(56, 189, 248, 0.8)
-      );
+      border-radius: 4px 4px 2px 2px;
+      background:
+        linear-gradient(
+          to top,
+          var(--accent-primary-soft),
+          rgba(0, 0, 0, 0.85)
+        );
       min-height: 10px;
       transition: height 0.35s ease;
     }
 
+    .chart-bar-value {
+      font-size: 0.75rem;
+    }
+
     .chart-bar-label {
       font-size: 0.7rem;
-      color: var(--text-muted);
+      color: var(--accent-soft);
     }
 
-    .chart-bar-value {
-      font-size: 0.78rem;
-      color: #e5e7eb;
+    .silly-chart-legend {
+      font-size: 0.75rem;
+      color: var(--accent-soft);
+      margin-bottom: 5px;
     }
 
-    .legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.8rem;
-      margin-top: 0.7rem;
-      font-size: 0.76rem;
-      color: var(--text-muted);
-    }
-
-    .legend-item {
+    .silly-chart-ticker {
       display: inline-flex;
       align-items: center;
-      gap: 0.3rem;
+      gap: 6px;
+      padding: 4px 6px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-strong);
+      font-size: 0.75rem;
+      max-width: 100%;
     }
 
-    .legend-swatch {
-      width: 10px;
-      height: 10px;
+    .silly-ticker-dot {
+      width: 7px;
+      height: 7px;
       border-radius: 999px;
-      background: linear-gradient(
-        to right,
-        rgba(79, 70, 229, 0.9),
-        rgba(56, 189, 248, 0.9)
-      );
-    }
-
-    .ticker {
-      margin-top: 0.6rem;
-      padding: 0.55rem 0.75rem;
-      border-radius: var(--radius-xl);
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.8rem;
-      overflow: hidden;
-      white-space: nowrap;
+      background: var(--q-do);
     }
 
     .ticker-label {
       text-transform: uppercase;
       letter-spacing: 0.12em;
       font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-
-    .ticker-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
-      flex-shrink: 0;
+      color: var(--accent-soft);
     }
 
     .ticker-text {
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    /* API feed */
+    /* API column on sticky notes */
+    .silly-api-column {
+      position: relative;
+      min-height: 180px;
+    }
 
-    .api-grid {
+    .silly-api-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .silly-api-meta {
+      font-size: 0.75rem;
+      color: var(--accent-soft);
+      margin-bottom: 8px;
+    }
+
+    .silly-api-notes {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.7rem;
-      margin-top: 0.3rem;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
     }
 
-    .api-card {
-      padding: 0.65rem 0.7rem;
-      border-radius: 10px;
-      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 1));
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      font-size: 0.8rem;
+    .silly-api-note {
+      position: relative;
+      min-width: 0;
     }
 
-    .api-label {
+    .silly-api-note .note {
+      position: relative;
+      min-width: 100%;
+      max-width: none;
+      transform: rotate(var(--note-rot, -1deg));
+      cursor: default;
+    }
+
+    .silly-api-note .note-title {
+      font-size: 0.78rem;
+      margin-bottom: 2px;
+    }
+
+    .silly-api-note .api-label {
       font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--text-muted);
-      margin-bottom: 0.25rem;
     }
 
     .api-content {
-      font-size: 0.84rem;
-      line-height: 1.4;
+      font-size: 0.8rem;
+      line-height: 1.35;
     }
 
     .api-error {
-      color: var(--text-muted);
       font-style: italic;
+      color: var(--accent-soft);
     }
 
-    /* Table */
+    /* Lower band: table, culture pulse, and territory notes */
+    .silly-lower-band {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(220px, 1.3fr);
+      gap: 16px;
+      margin-bottom: 10px;
+    }
 
-    .table-panel {
-      margin-bottom: 1.5rem;
+    @media (max-width: 900px) {
+      .silly-lower-band {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    /* Table area: sketched table on the board */
+    .silly-table-area {
+      padding: 8px 8px 10px;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.16);
+    }
+
+    .silly-table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .silly-table-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .silly-table-meta {
+      font-size: 0.75rem;
+      color: var(--accent-soft);
+      text-align: right;
     }
 
     .fake-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 0.5rem;
-      font-size: 0.8rem;
-      background: rgba(15, 23, 42, 0.97);
-      border-radius: 12px;
-      overflow: hidden;
+      font-size: 0.78rem;
+      margin-bottom: 4px;
     }
 
     .fake-table th,
     .fake-table td {
-      border: 1px solid rgba(148, 163, 184, 0.32);
-      padding: 0.4rem 0.55rem;
-      text-align: left;
-      vertical-align: middle;
+      border: 1px solid rgba(0, 0, 0, 0.6);
+      padding: 3px 4px;
       white-space: nowrap;
+      vertical-align: middle;
     }
 
     .fake-table th {
-      background: rgba(15, 23, 42, 0.96);
-      font-weight: 600;
-      color: var(--text-muted);
+      font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      font-size: 0.72rem;
+      background: rgba(255, 255, 255, 0.9);
     }
 
     .fake-table tbody tr:nth-child(2n) {
-      background: rgba(15, 23, 42, 0.96);
+      background: rgba(0, 0, 0, 0.035);
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
-      padding: 0.08rem 0.45rem;
-      border-radius: var(--radius-xl);
+      padding: 1px 6px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(0, 0, 0, 0.7);
       font-size: 0.7rem;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      gap: 0.25rem;
-      background: rgba(15, 23, 42, 0.96);
+      gap: 4px;
+      background: #ffffff;
     }
 
     .badge-dot {
@@ -417,45 +416,72 @@
     }
 
     .badge-dot.green {
-      background: #22c55e;
+      background: var(--q-do);
     }
-
     .badge-dot.amber {
-      background: #eab308;
+      background: var(--q-delegate);
     }
-
     .badge-dot.red {
-      background: #ef4444;
+      background: var(--q-delete);
     }
 
-    .footer-meta {
-      margin-top: 0.75rem;
+    .silly-table-footer {
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
-      gap: 0.7rem;
-      font-size: 0.76rem;
-      color: var(--text-muted);
+      gap: 8px;
+      font-size: 0.72rem;
+      color: var(--accent-soft);
     }
 
-    /* Culture panel */
+    /* Culture and territory stack: gif strip plus sticky notes */
+    .silly-right-stack {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+    }
 
-    .gif-panel-inner {
+    .silly-culture-block {
+      padding: 8px 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
+    }
+
+    .silly-culture-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .silly-culture-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .silly-culture-meta {
+      font-size: 0.75rem;
+      color: var(--accent-soft);
+      text-align: right;
+    }
+
+    .silly-culture-inner {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.9rem;
+      gap: 8px;
       align-items: center;
-      margin-top: 0.3rem;
     }
 
     .gif-wrapper {
       flex-shrink: 0;
-      width: 180px;
-      height: 120px;
-      border-radius: 12px;
+      width: 150px;
+      height: 100px;
+      border-radius: 8px;
       overflow: hidden;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.4);
+      border: 1px solid var(--border-strong);
+      background: rgba(0, 0, 0, 0.05);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -469,45 +495,50 @@
 
     .gif-quote {
       flex: 1;
-      font-size: 0.9rem;
-      color: #e5e7eb;
+      font-size: 0.83rem;
     }
 
     .gif-quote span {
       display: block;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-top: 0.25rem;
+      margin-top: 3px;
+      font-size: 0.75rem;
+      color: var(--accent-soft);
     }
 
     .employee-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 0.9rem;
-      margin-top: 0.9rem;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .employee-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
     }
 
     .employee-card {
       display: flex;
-      gap: 0.7rem;
       align-items: center;
-      padding: 0.7rem 0.75rem;
-      border-radius: 12px;
-      background: rgba(15, 23, 42, 0.98);
-      border: 1px solid rgba(148, 163, 184, 0.35);
+      gap: 6px;
+      padding: 5px 6px;
+      border-radius: 8px;
+      border: 1px dashed rgba(0, 0, 0, 0.7);
+      background: rgba(255, 255, 255, 0.85);
     }
 
     .employee-avatar {
-      width: 54px;
-      height: 54px;
+      width: 44px;
+      height: 44px;
       border-radius: 999px;
       overflow: hidden;
-      flex-shrink: 0;
-      border: 2px solid rgba(148, 163, 184, 0.65);
+      border: 2px solid rgba(0, 0, 0, 0.7);
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(0, 0, 0, 0.05);
+      flex-shrink: 0;
     }
 
     .employee-avatar img {
@@ -517,342 +548,348 @@
     }
 
     .employee-avatar.happy {
-      box-shadow: 0 0 14px rgba(34, 197, 94, 0.7);
-      border-color: rgba(34, 197, 94, 0.9);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
     }
 
     .employee-avatar.sad {
-      filter: grayscale(0.7) brightness(0.9);
-      box-shadow: 0 0 14px rgba(239, 68, 68, 0.8);
-      border-color: rgba(239, 68, 68, 0.9);
+      filter: grayscale(0.7) brightness(0.95);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.45);
     }
 
     .employee-info {
       display: flex;
       flex-direction: column;
-      gap: 0.1rem;
+      gap: 1px;
     }
 
     .employee-title {
       font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--text-muted);
+      color: var(--accent-soft);
     }
 
     .employee-name {
-      font-size: 0.94rem;
+      font-size: 0.9rem;
       font-weight: 600;
     }
 
     .employee-role {
-      font-size: 0.8rem;
-      color: var(--text-muted);
+      font-size: 0.78rem;
+      color: var(--accent-soft);
     }
 
-    /* Flag panel */
+    /* Territory sticky note */
+    .silly-flag-note .note {
+      position: relative;
+      min-width: 100%;
+      max-width: none;
+      transform: rotate(var(--note-rot, 1deg));
+      cursor: default;
+    }
 
     .flag-panel-content {
       display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      margin-top: 0.35rem;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 0.85rem;
     }
 
     .flag-emoji {
-      font-size: 2.1rem;
+      font-size: 1.6rem;
     }
 
     .flag-text-main {
-      font-size: 0.95rem;
       font-weight: 600;
+      margin-bottom: 2px;
     }
 
     .flag-text-sub {
       font-size: 0.8rem;
-      color: var(--text-muted);
+      color: var(--accent-soft);
     }
 
-    /* Focus */
-
-    a:focus-visible,
-    button:focus-visible {
-      outline: 2px solid var(--accent-alt);
-      outline-offset: 3px;
+    .flag-meta {
+      font-size: 0.75rem;
+      color: var(--accent-soft);
+      margin-bottom: 3px;
     }
 
-    /* Reduced motion */
-
-    @media (prefers-reduced-motion: reduce) {
-      html {
-        scroll-behavior: auto;
-      }
+    /* Disclaimers at the bottom of the board */
+    .silly-footer-notes {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: var(--accent-soft);
     }
   </style>
 </head>
 
-<body>
-  <div class="shell">
-    <div class="card" id="dashboardCard">
-      <div class="page-kicker">
-        <span class="page-kicker-pill">Experimental</span>
-        <span>Visual noise for executives who enjoy dashboards a little too much</span>
+<body data-counter-key="exec-dashboard">
+  <header data-include="assets/header.html"></header>
+
+  <main class="page silly-dashboard-page">
+    <section class="silly-board" aria-label="Executive alignment scribble dashboard">
+      <div class="silly-title-row">
+        <div>
+          <div class="silly-title-main marker-blue">Executive Alignment Dashboard</div>
+        </div>
+        <div class="silly-title-tag marker-neutral">
+          Experimental · Visual noise for people who enjoy dashboards a little too much
+        </div>
       </div>
 
-      <h1>Executive Alignment Dashboard</h1>
-      <p class="subtitle">
+      <p class="silly-subtitle">
         A completely serious, allegedly data informed cockpit that looks impressive at a glance
         and becomes steadily more suspicious the longer you read it.
       </p>
+      <p class="silly-pencil-note marker-neutral">
+        Note to self: if anyone tries to use this to make an actual decision, schedule an intervention.
+      </p>
 
-      <!-- KPI strip -->
-      <section class="kpi-grid" aria-label="Key performance indicators">
-        <article class="kpi-card">
-          <div class="kpi-label">Synergy Index</div>
-          <div class="kpi-value" id="kpi-synergy"></div>
-          <div class="kpi-subtext" id="kpi-synergy-sub"></div>
-          <div class="kpi-sparkline" aria-hidden="true">
-            <svg viewBox="0 0 140 40" preserveAspectRatio="none">
-              <polyline fill="none" stroke="currentColor" stroke-width="2"
-                        points="0,32 20,10 40,24 60,8 80,20 100,6 120,18 140,4" />
-            </svg>
-          </div>
+      <!-- Top marker KPI strip -->
+      <section class="silly-kpi-row" aria-label="Key performance indicators drawn on whiteboard">
+        <article class="silly-kpi">
+          <div class="silly-kpi-label marker-blue">Synergy index</div>
+          <div class="silly-kpi-value marker-blue" id="kpi-synergy"></div>
+          <div class="silly-kpi-subtext" id="kpi-synergy-sub"></div>
+          <div class="silly-kpi-under"></div>
         </article>
 
-        <article class="kpi-card">
-          <div class="kpi-label">Meetings Avoided</div>
-          <div class="kpi-value" id="kpi-meetings"></div>
-          <div class="kpi-subtext" id="kpi-meetings-sub"></div>
-          <div class="kpi-sparkline" aria-hidden="true">
-            <svg viewBox="0 0 140 40" preserveAspectRatio="none">
-              <polyline fill="none" stroke="currentColor" stroke-width="2"
-                        points="0,20 20,18 40,26 60,14 80,22 100,16 120,28 140,12" />
-            </svg>
-          </div>
+        <article class="silly-kpi">
+          <div class="silly-kpi-label marker-green">Meetings avoided</div>
+          <div class="silly-kpi-value marker-green" id="kpi-meetings"></div>
+          <div class="silly-kpi-subtext" id="kpi-meetings-sub"></div>
+          <div class="silly-kpi-under"></div>
         </article>
 
-        <article class="kpi-card">
-          <div class="kpi-label">Slide Deck Velocity</div>
-          <div class="kpi-value" id="kpi-slides"></div>
-          <div class="kpi-subtext" id="kpi-slides-sub"></div>
-          <div class="kpi-sparkline" aria-hidden="true">
-            <svg viewBox="0 0 140 40" preserveAspectRatio="none">
-              <polyline fill="none" stroke="currentColor" stroke-width="2"
-                        points="0,30 20,26 40,18 60,22 80,12 100,18 120,8 140,16" />
-            </svg>
-          </div>
+        <article class="silly-kpi">
+          <div class="silly-kpi-label marker-yellow">Slide deck velocity</div>
+          <div class="silly-kpi-value marker-yellow" id="kpi-slides"></div>
+          <div class="silly-kpi-subtext" id="kpi-slides-sub"></div>
+          <div class="silly-kpi-under"></div>
         </article>
 
-        <article class="kpi-card">
-          <div class="kpi-label">Coffee to Insight Ratio</div>
-          <div class="kpi-value" id="kpi-coffee"></div>
-          <div class="kpi-subtext" id="kpi-coffee-sub"></div>
-          <div class="kpi-sparkline" aria-hidden="true">
-            <svg viewBox="0 0 140 40" preserveAspectRatio="none">
-              <polyline fill="none" stroke="currentColor" stroke-width="2"
-                        points="0,34 20,30 40,22 60,26 80,18 100,22 120,14 140,18" />
-            </svg>
-          </div>
+        <article class="silly-kpi">
+          <div class="silly-kpi-label marker-pink">Coffee to insight ratio</div>
+          <div class="silly-kpi-value marker-pink" id="kpi-coffee"></div>
+          <div class="silly-kpi-subtext" id="kpi-coffee-sub"></div>
+          <div class="silly-kpi-under"></div>
         </article>
 
-        <article class="kpi-card">
-          <div class="kpi-label">Revenue Per Remaining Daylight Hour</div>
-          <div class="kpi-value" id="kpi-daylight"></div>
-          <div class="kpi-subtext" id="kpi-daylight-sub"></div>
+        <article class="silly-kpi">
+          <div class="silly-kpi-label marker-neutral">Revenue per remaining daylight hour</div>
+          <div class="silly-kpi-value marker-neutral" id="kpi-daylight"></div>
+          <div class="silly-kpi-subtext" id="kpi-daylight-sub"></div>
+          <div class="silly-kpi-under"></div>
         </article>
       </section>
 
-      <!-- Main panels -->
-      <section class="panels-grid section-spacer">
-        <!-- Chart panel -->
-        <article class="panel">
-          <div class="panel-header">
-            <div>
-              <div class="panel-title">Quarterly Strategic Buzzword Penetration</div>
-              <div class="tiny">
-                Synthetic KPI built from random numbers and good intentions.
+      <!-- Middle band: chart plus API feed -->
+      <section class="silly-middle-band">
+        <!-- Chart area -->
+        <article class="silly-chart-area" aria-label="Quarterly strategic buzzword penetration chart">
+          <div class="silly-chart-title">
+            <div class="silly-chart-title-main">
+              Quarterly strategic buzzword penetration
+            </div>
+            <div class="silly-chart-meta" id="chart-meta"></div>
+          </div>
+
+          <div class="silly-chart-grid">
+            <div class="chart-bars" aria-hidden="true">
+              <div class="chart-bar-group">
+                <div class="chart-bar" id="bar-q1"></div>
+                <div class="chart-bar-value" id="bar-q1-val"></div>
+                <div class="chart-bar-label">Q1</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bar" id="bar-q2"></div>
+                <div class="chart-bar-value" id="bar-q2-val"></div>
+                <div class="chart-bar-label">Q2</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bar" id="bar-q3"></div>
+                <div class="chart-bar-value" id="bar-q3-val"></div>
+                <div class="chart-bar-label">Q3</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bar" id="bar-q4"></div>
+                <div class="chart-bar-value" id="bar-q4-val"></div>
+                <div class="chart-bar-label">Q4*</div>
               </div>
             </div>
-            <div class="panel-meta" id="chart-meta"></div>
           </div>
 
-          <div class="chart-bars" aria-hidden="true">
-            <div class="chart-bar-group">
-              <div class="chart-bar" id="bar-q1"></div>
-              <div class="chart-bar-value" id="bar-q1-val"></div>
-              <div class="chart-bar-label">Q1</div>
-            </div>
-            <div class="chart-bar-group">
-              <div class="chart-bar" id="bar-q2"></div>
-              <div class="chart-bar-value" id="bar-q2-val"></div>
-              <div class="chart-bar-label">Q2</div>
-            </div>
-            <div class="chart-bar-group">
-              <div class="chart-bar" id="bar-q3"></div>
-              <div class="chart-bar-value" id="bar-q3-val"></div>
-              <div class="chart-bar-label">Q3</div>
-            </div>
-            <div class="chart-bar-group">
-              <div class="chart-bar" id="bar-q4"></div>
-              <div class="chart-bar-value" id="bar-q4-val"></div>
-              <div class="chart-bar-label">Q4*</div>
-            </div>
+          <div class="silly-chart-legend">
+            <span class="marker-blue">
+              Buzzwords per slide (adjusted for font size).
+            </span>
+            <br />
+            <span class="marker-neutral">
+              * Q4 heavily forecast using wishful thinking.
+            </span>
           </div>
 
-          <div class="legend">
-            <div class="legend-item">
-              <span class="legend-swatch"></span>
-              <span>Buzzwords per slide (adjusted for font size)</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-swatch" style="opacity:0.5;"></span>
-              <span>* Q4 heavily forecast using wishful thinking</span>
-            </div>
-          </div>
-
-          <div class="ticker" aria-live="polite">
-            <span class="ticker-dot"></span>
+          <div class="silly-chart-ticker" aria-live="polite">
+            <span class="silly-ticker-dot"></span>
             <span class="ticker-label">Ticker</span>
             <span class="ticker-text" id="buzzword-ticker"></span>
           </div>
         </article>
 
-        <!-- API fun panel -->
-        <article class="panel">
-          <div class="panel-header">
-            <div class="panel-title">Real Time Executive Intelligence Feed</div>
-            <div class="panel-meta" id="api-meta">Contacting very serious data providers...</div>
+        <!-- API feed on sticky notes -->
+        <article class="silly-api-column" aria-label="Real time executive intelligence feed">
+          <div class="silly-api-title marker-blue">Real time executive intelligence feed</div>
+          <div class="silly-api-meta" id="api-meta">
+            Contacting very serious data providers...
           </div>
 
-          <div class="api-grid">
-            <div class="api-card">
-              <div class="api-label">Strategic Life Advice</div>
-              <div class="api-content" id="api-advice">Loading wisdom...</div>
+          <div class="silly-api-notes">
+            <div class="silly-api-note">
+              <div class="note note-q2" style="--note-rot:-1.5deg;">
+                <div class="note-title">
+                  <span class="api-label marker-blue">Strategic life advice</span>
+                </div>
+                <div class="api-content" id="api-advice">
+                  Loading wisdom...
+                </div>
+              </div>
             </div>
 
-            <div class="api-card">
-              <div class="api-label">Morale Indicator (Dad Joke)</div>
-              <div class="api-content" id="api-joke">Calibrating humor module...</div>
+            <div class="silly-api-note">
+              <div class="note note-q3" style="--note-rot:1.2deg;">
+                <div class="note-title">
+                  <span class="api-label marker-yellow">Morale indicator (dad joke)</span>
+                </div>
+                <div class="api-content" id="api-joke">
+                  Calibrating humor module...
+                </div>
+              </div>
             </div>
 
-            <div class="api-card">
-              <div class="api-label">Feline Risk Assessment</div>
-              <div class="api-content" id="api-catfact">Gathering cat related disruption metrics...</div>
+            <div class="silly-api-note">
+              <div class="note note-q1" style="--note-rot:-0.8deg;">
+                <div class="note-title">
+                  <span class="api-label marker-green">Feline risk assessment</span>
+                </div>
+                <div class="api-content" id="api-catfact">
+                  Gathering cat related disruption metrics...
+                </div>
+              </div>
             </div>
           </div>
         </article>
       </section>
 
-      <!-- Fake table -->
-      <section class="panel table-panel section-spacer">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Top Performing Initiatives</div>
-            <div class="tiny">
-              Ranked using a proprietary algorithm that nobody remembers how to justify.
+      <!-- Lower band: table plus culture and territory -->
+      <section class="silly-lower-band">
+        <!-- Table of initiatives -->
+        <article class="silly-table-area" aria-label="Top performing initiatives">
+          <div class="silly-table-header">
+            <div>
+              <div class="silly-table-title">Top performing initiatives</div>
             </div>
+            <div class="silly-table-meta" id="table-meta"></div>
           </div>
-          <div class="panel-meta" id="table-meta"></div>
-        </div>
 
-        <table class="fake-table" aria-label="Top initiatives">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Initiative</th>
-              <th>Owner</th>
-              <th>Confidence</th>
-              <th>Impact</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="initiatives-body">
-            <!-- Filled by JS -->
-          </tbody>
-        </table>
+          <table class="fake-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Initiative</th>
+                <th>Owner</th>
+                <th>Confidence</th>
+                <th>Impact</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="initiatives-body">
+              <!-- Filled by JS -->
+            </tbody>
+          </table>
 
-        <div class="footer-meta">
-          <div>Numbers look convincing. Please do not attempt to audit the methodology.</div>
-          <div id="footer-updated"></div>
-        </div>
-      </section>
-
-      <!-- Gif and employees panel -->
-      <section class="panel section-spacer">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Culture Pulse</div>
-            <div class="tiny">
-              Recognition, motivation, and whatever this gif is trying to say.
+          <div class="silly-table-footer">
+            <div>
+              Numbers look convincing. Please do not attempt to audit the methodology.
             </div>
+            <div id="footer-updated"></div>
           </div>
-          <div class="panel-meta" id="culture-meta"></div>
-        </div>
+        </article>
 
-        <div class="gif-panel-inner">
-          <div class="gif-wrapper">
-            <img id="nonsense-gif" src="" alt="Very serious motivational gif">
-          </div>
-          <div class="gif-quote" id="nonsense-quote">
-            Loading unrelated corporate inspiration...
-          </div>
-        </div>
+        <!-- Culture and territory stack -->
+        <div class="silly-right-stack">
+          <!-- Culture pulse -->
+          <article class="silly-culture-block" aria-label="Culture pulse">
+            <div class="silly-culture-header">
+              <div class="silly-culture-title">Culture pulse</div>
+              <div class="silly-culture-meta" id="culture-meta"></div>
+            </div>
 
-        <div class="employee-grid" aria-label="Employees of the day">
-          <div class="employee-card">
-            <div class="employee-avatar happy">
-              <img id="employee-best-avatar" src="" alt="Employee of the day">
+            <div class="silly-culture-inner">
+              <div class="gif-wrapper">
+                <img id="nonsense-gif" src="" alt="Very serious motivational gif">
+              </div>
+              <div class="gif-quote" id="nonsense-quote">
+                Loading unrelated corporate inspiration...
+              </div>
             </div>
-            <div class="employee-info">
-              <div class="employee-title">Employee of the day</div>
-              <div class="employee-name" id="employee-best-name"></div>
-              <div class="employee-role" id="employee-best-role"></div>
-            </div>
-          </div>
 
-          <div class="employee-card">
-            <div class="employee-avatar sad">
-              <img id="employee-worst-avatar" src="" alt="Least aligned employee of the day">
-            </div>
-            <div class="employee-info">
-              <div class="employee-title">Least aligned employee of the day</div>
-              <div class="employee-name" id="employee-worst-name"></div>
-              <div class="employee-role" id="employee-worst-role"></div>
-            </div>
-          </div>
-        </div>
-      </section>
+            <div class="employee-grid" aria-label="Employees of the day">
+              <div class="employee-card">
+                <div class="employee-avatar happy">
+                  <img id="employee-best-avatar" src="" alt="Employee of the day">
+                </div>
+                <div class="employee-info">
+                  <div class="employee-title">Employee of the day</div>
+                  <div class="employee-name" id="employee-best-name"></div>
+                  <div class="employee-role" id="employee-best-role"></div>
+                </div>
+              </div>
 
-      <!-- Flag panel -->
-      <section class="panel section-spacer">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Latest Territory Update</div>
-            <div class="tiny">
-              Based on the most recent imaginary order logged in our imagination.
+              <div class="employee-card">
+                <div class="employee-avatar sad">
+                  <img id="employee-worst-avatar" src="" alt="Least aligned employee of the day">
+                </div>
+                <div class="employee-info">
+                  <div class="employee-title">Least aligned employee of the day</div>
+                  <div class="employee-name" id="employee-worst-name"></div>
+                  <div class="employee-role" id="employee-worst-role"></div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="panel-meta" id="flag-meta"></div>
-        </div>
+          </article>
 
-        <div class="flag-panel-content">
-          <div class="flag-emoji" id="flag-emoji">🏳️</div>
-          <div>
-            <div class="flag-text-main" id="flag-main"></div>
-            <div class="flag-text-sub" id="flag-sub"></div>
-          </div>
+          <!-- Territory sticky note -->
+          <article class="silly-flag-note" aria-label="Latest territory update">
+            <div class="note note-q4" style="--note-rot:1.8deg;">
+              <div class="note-title flag-meta" id="flag-meta">
+                Latest territory update
+              </div>
+              <div class="flag-panel-content">
+                <div class="flag-emoji" id="flag-emoji">🏳️</div>
+                <div>
+                  <div class="flag-text-main" id="flag-main"></div>
+                  <div class="flag-text-sub" id="flag-sub"></div>
+                </div>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
 
-      <p class="tiny" style="margin-top:1.1rem;">
-        This dashboard is for demonstration and amusement. If you are using it to run an actual business,
-        you may already be in the panic zone.
-      </p>
-      <p class="tiny">
-        No personal data is stored by this page. Some anonymous requests are sent to third party joke and fact APIs.
-      </p>
-    </div>
-  </div>
+      <div class="silly-footer-notes">
+        <p>
+          This dashboard is for demonstration and amusement. If you are using it to run an actual business,
+          you may already be in the panic zone.
+        </p>
+        <p>
+          No personal data is stored by this page. Some anonymous requests are sent to third party joke and fact APIs.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer data-include="assets/footer.html"></footer>
 
   <script>
     function randomInt(min, max) {
@@ -1280,4 +1317,3 @@
   </script>
 </body>
 </html>
-
