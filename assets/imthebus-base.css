@@ -149,7 +149,7 @@ nav.site-nav a:hover {
     var(--bg-texture) repeat;
   background-size: 1200px;
   color: #e5e7eb;
-  flex-shrink: 0; /* footer stays at bottom, does not collapse upward */
+  flex-shrink: 0; /* keep footer pinned to bottom on short pages */
 }
 
 .site-footer-left {
@@ -364,7 +364,7 @@ nav.site-nav a:hover {
   border-radius: 10px;
   border: 1px solid var(--border-strong);
   padding: 18px 16px 40px;
-  height: clamp(360px, 55vh, 520px); /* responsive height for different screens */
+  height: clamp(360px, 55vh, 520px); /* responsive height across screens */
   overflow: hidden;
 
   /* make the whiteboard really visible */
