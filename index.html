@@ -2,156 +2,163 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>IMTHEBUS tools – Whiteboard</title>
+  <title>IMTHEBUS – Browser tools for better conversations</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A growing collection of lightweight browser tools to help teams think, decide, and prioritise together. No login. No platform.">
 
-  <!-- Shared base styles and core helpers -->
   <link rel="stylesheet" href="assets/imthebus-base.css" />
   <script src="assets/imthebus-core.js" defer></script>
-  
-  <!-- Page-specific styling kept minimal -->
+
   <style>
-    /* Sidebar tweaks for the home intro */
-    .home-sidebar-tagline {
-      font-size: 0.9rem;
-      margin: 0 0 8px;
+    /* ── HOME SIDEBAR ─────────────────────────────── */
+
+    .home-intro {
+      font-size: 0.85rem;
+      color: var(--ink-mid);
+      line-height: 1.6;
+      margin: 0;
     }
 
-    .home-sidebar-section {
-      border-top: 1px solid rgba(0, 0, 0, 0.12);
-      padding-top: 8px;
-      margin-top: 8px;
-      font-size: 0.84rem;
-    }
-
-    .home-sidebar-section-header {
+    .home-principles {
       display: flex;
-      justify-content: space-between;
-      align-items: baseline;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .principle {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .principle-marker {
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 1.1rem;
+      color: var(--ink);
+      flex-shrink: 0;
+      width: 22px;
+      padding-top: 1px;
+    }
+
+    .principle-text strong {
+      display: block;
+      font-size: 0.82rem;
       font-weight: 600;
-      font-size: 0.86rem;
+      margin-bottom: 1px;
     }
 
-    .home-sidebar-section-body {
-      margin-top: 4px;
-      color: #4b5563;
-    }
-
-    .home-sidebar-section-body ul {
-      padding-left: 1.05rem;
-      margin: 2px 0 0;
-    }
-
-    .home-sidebar-section-body li + li {
-      margin-top: 2px;
-    }
-
-    /* Home whiteboard layout */
-    .home-board-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 4px;
-    }
-
-    .home-board-meta {
+    .principle-text span {
       font-size: 0.78rem;
-      color: #4b5563;
-      margin-bottom: 8px;
+      color: var(--ink-mid);
+      line-height: 1.4;
+    }
+
+    /* ── TOOL BOARD ───────────────────────────────── */
+
+    .board-heading {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px 14px;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .board-hint {
+      font-size: 0.75rem;
+      color: var(--ink-mid);
+      margin-bottom: 14px;
     }
 
     .tool-note-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 12px;
       position: relative;
       z-index: 1;
     }
 
-    /* Tool “post-it” cards (not the draggable notes) */
+    /* Post-it note cards */
+
     .tool-note-link {
       text-decoration: none;
       color: inherit;
+      display: block;
     }
 
     .tool-note {
       position: relative;
-      border-radius: 9px;
-      border: 2px solid #000;
-      padding: 8px 9px 9px;
-      box-shadow: 0 7px 14px rgba(0, 0, 0, 0.22);
+      border-radius: 8px;
+      border: 1.5px solid rgba(0,0,0,0.75);
+      padding: 20px 12px 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15), 0 10px 18px rgba(0,0,0,0.1);
       background: #fff8a7;
       transform-origin: center top;
-      transition:
-        transform 0.12s ease-out,
-        box-shadow 0.12s ease-out;
+      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+      cursor: pointer;
+      height: 100%;
     }
 
+    /* tape strip at top */
     .tool-note::before {
       content: "";
       position: absolute;
-      top: 6px;
+      top: 8px;
       left: 50%;
       transform: translateX(-50%);
-      width: 30px;
-      height: 8px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.8);
-      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
-    }
-
-    .tool-note-body {
-      font-size: 0.8rem;
-      line-height: 1.35;
-      margin-bottom: 3px;
+      width: 36px;
+      height: 10px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.75);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.12);
     }
 
     .tool-note-status {
-      font-size: 0.7rem;
+      font-family: "Inter", sans-serif;
+      font-size: 0.62rem;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.09em;
-      margin-bottom: 2px;
+      letter-spacing: 0.1em;
+      color: rgba(0,0,0,0.5);
+      margin-bottom: 3px;
     }
 
     .tool-note-title {
       font-family: "Permanent Marker", system-ui, sans-serif;
-      font-size: 1rem;
-      margin: 2px 0 3px;
+      font-size: 1.05rem;
+      line-height: 1.2;
+      margin: 0 0 6px;
+      color: #111;
+    }
+
+    .tool-note-body {
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: rgba(0,0,0,0.75);
+      margin: 0 0 6px;
     }
 
     .tool-note-meta {
       font-size: 0.7rem;
-      color: #374151;
-      opacity: 0.9;
+      color: rgba(0,0,0,0.45);
+      font-style: italic;
     }
 
-    .tool-note-available {
-      background: #c7f9cc;
-    }
-
-    .tool-note-dev {
-      background: #ffb3c1;
-    }
-
-    .tool-note-prototype {
-      background: #ffeaa7;
-    }
-
-    .tool-note-coming {
-      background: #bde0fe;
-    }
+    /* colour variants */
+    .tool-note-available  { background: #d1fae5; }
+    .tool-note-prototype  { background: #fef9c3; }
+    .tool-note-dev        { background: #fee2e2; }
+    .tool-note-coming     { background: #dbeafe; }
 
     .tool-note:hover {
-      transform: translateY(-2px) rotate(var(--note-rot, 0deg));
-      box-shadow: 0 11px 20px rgba(0, 0, 0, 0.3);
+      transform: translateY(-3px) rotate(var(--note-rot, 0deg));
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2), 0 16px 28px rgba(0,0,0,0.12);
     }
 
+    /* entry animation */
     .tool-note-enter {
-      animation: toolNoteEnter 260ms ease-out forwards;
+      animation: toolNoteEnter 280ms ease-out forwards;
     }
 
     .tool-note-drop {
@@ -159,36 +166,21 @@
     }
 
     @keyframes toolNoteEnter {
-      0% {
-        opacity: 0;
-        transform: translateY(-12px) rotate(var(--note-rot, 0deg));
-      }
-      60% {
-        opacity: 1;
-        transform: translateY(4px) rotate(calc(var(--note-rot, 0deg) * 1.1));
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) rotate(var(--note-rot, 0deg));
-      }
+      0%   { opacity: 0; transform: translateY(-14px) rotate(var(--note-rot, 0deg)); }
+      60%  { opacity: 1; transform: translateY(4px) rotate(calc(var(--note-rot, 0deg) * 1.1)); }
+      100% { opacity: 1; transform: translateY(0) rotate(var(--note-rot, 0deg)); }
     }
 
     @keyframes toolNoteDrop {
-      0% {
-        opacity: 1;
-        transform: translateY(0) rotate(var(--note-rot, 0deg));
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(80px) rotate(calc(var(--note-rot, 0deg) + 6deg));
-      }
+      0%   { opacity: 1; transform: translateY(0) rotate(var(--note-rot, 0deg)); }
+      100% { opacity: 0; transform: translateY(80px) rotate(calc(var(--note-rot, 0deg) + 6deg)); }
     }
 
-    /* Board wipe overlay when leaving the page */
+    /* page wipe overlay */
     .board-wipe {
       position: absolute;
       inset: 0;
-      background: #ffffff;
+      background: #fff;
       transform: translateY(100%);
       z-index: 2;
       pointer-events: none;
@@ -199,184 +191,165 @@
     }
 
     @keyframes boardWipe {
-      0% {
-        transform: translateY(100%);
-      }
-      60% {
-        transform: translateY(0%);
-      }
-      100% {
-        transform: translateY(-100%);
-      }
+      0%   { transform: translateY(100%); }
+      60%  { transform: translateY(0%); }
+      100% { transform: translateY(-100%); }
+    }
+
+    /* available count badge on board heading */
+    .available-count {
+      font-family: "Permanent Marker", system-ui, sans-serif;
+      font-size: 0.75rem;
+      color: var(--ink-mid);
     }
   </style>
 </head>
 
 <body data-counter-key="home_board">
-  <!-- Shared header -->
   <header data-include="partials/header.html"></header>
 
   <main class="page">
-    <!-- Sidebar card (shared style) -->
-    <aside class="sidebar-card">
-      <h1 class="page-title">IMTHEBUS toolbox</h1>
-      <p class="home-sidebar-tagline">
-        A shared whiteboard of simple browser tools to help you think, decide, and manage with other humans.
-      </p>
 
-      <section class="home-sidebar-section">
-        <div class="home-sidebar-section-header">
-          <div>About this site</div>
+    <!-- Sidebar -->
+    <aside class="sidebar-card">
+
+      <div class="sidebar-section">
+        <h1 class="page-title">IMTHEBUS</h1>
+        <p class="home-intro">Browser tools for better conversations and decisions. Open in a tab, use with your team, close when you're done.</p>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="home-principles">
+          <div class="principle">
+            <span class="principle-marker">↗</span>
+            <div class="principle-text">
+              <strong>Lightweight</strong>
+              <span>Open in a browser tab. Nothing to install, no account needed.</span>
+            </div>
+          </div>
+          <div class="principle">
+            <span class="principle-marker">◎</span>
+            <div class="principle-text">
+              <strong>Focused</strong>
+              <span>Each tool does one thing well. One problem, one conversation.</span>
+            </div>
+          </div>
+          <div class="principle">
+            <span class="principle-marker">⇄</span>
+            <div class="principle-text">
+              <strong>Conversation-first</strong>
+              <span>Built to sit in the middle of a room, not quietly solo.</span>
+            </div>
+          </div>
         </div>
-        <div class="home-sidebar-section-body">
-          <p>
-            IMTHEBUS is a small, evolving collection of tools built for practical day to day work.
-            The aim is to make better conversations and clearer decisions easier, without another platform or login.
-          </p>
-          <p>Each tool is designed to be:</p>
-          <ul>
-            <li><strong>Lightweight</strong> open in a browser and it is ready.</li>
-            <li><strong>Focused</strong> built to solve one problem in one conversation.</li>
-            <li><strong>Conversation first</strong> intended to sit in the middle of a group, not quietly solo.</li>
-          </ul>
-        </div>
-      </section>
+      </div>
+
+      <div class="sidebar-section" style="background: rgba(0,0,0,0.03);">
+        <p style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.09em; color:var(--ink-mid); margin:0 0 8px;">Get new tools first</p>
+        <form id="sidebarSubscribeForm" action="https://subscribe.imthebus.workers.dev" method="POST">
+          <input type="hidden" name="source" value="imthebus-sidebar">
+          <div class="subscribe-row" style="gap:6px;">
+            <input type="email" name="email" placeholder="your@email.com" required
+              style="flex:1;min-width:0;padding:7px 10px;border:1.5px solid var(--border-soft);border-radius:5px;font-family:inherit;font-size:0.78rem;background:#fff;color:var(--ink);outline:none;"
+              autocomplete="email">
+            <button type="submit"
+              style="padding:7px 12px;background:var(--ink);color:#fff;border:none;border-radius:5px;font-family:inherit;font-size:0.76rem;font-weight:600;cursor:pointer;white-space:nowrap;">
+              Subscribe
+            </button>
+          </div>
+          <p id="sidebarSubscribeStatus" style="font-size:0.72rem;margin:5px 0 0;" hidden></p>
+        </form>
+      </div>
+
     </aside>
 
-    <!-- Whiteboard with pinned tools -->
-    <section
-      class="board-wrapper"
-      id="tools-board"
-      aria-label="Tools pinned to the IMTHEBUS whiteboard"
-    >
+    <!-- Board -->
+    <section class="board-wrapper" id="tools-board" aria-label="Tools pinned to the IMTHEBUS whiteboard">
       <div class="board-inner-shell">
-        <div class="home-board-header">
-          <h2 class="page-title" style="margin-bottom:0;">Tools pinned to the board</h2>
-        </div>
 
-        <div class="home-board-meta">
-          <span>Click any note to open that tool.</span>
-          <span>New tools will appear here as they are ready.</span>
+        <div class="board-heading">
+          <h2 class="page-title" style="margin-bottom:0;">On the board</h2>
+          <span class="available-count">3 ready to use</span>
         </div>
+        <p class="board-hint">Click a note to open the tool. Your work is saved in your browser.</p>
 
-        <div class="tool-note-grid" aria-label="Tool list as notes">
-          <!-- Bored to Panic -->
+        <div class="tool-note-grid" aria-label="Tool list">
+
+          <a class="tool-note-link" data-board-nav href="swot.html">
+            <article class="tool-note tool-note-available">
+              <div class="tool-note-status">Ready</div>
+              <h3 class="tool-note-title">SWOT wall</h3>
+              <p class="tool-note-body">Capture strengths, weaknesses, opportunities, and threats on a shared board. Add notes, drag them, export the result.</p>
+              <p class="tool-note-meta">Solo or group. Sessions are saved.</p>
+            </article>
+          </a>
+
+          <a class="tool-note-link" data-board-nav href="impact-vs-effort.html">
+            <article class="tool-note tool-note-available">
+              <div class="tool-note-status">Ready</div>
+              <h3 class="tool-note-title">Impact vs Effort</h3>
+              <p class="tool-note-body">Sort ideas into quick wins, big bets, fillers, and time sinks. Answer a few questions and the tool plots each one.</p>
+              <p class="tool-note-meta">Good for team prioritisation. Board is saved.</p>
+            </article>
+          </a>
+
           <a class="tool-note-link" data-board-nav href="bored-to-panic.html">
             <article class="tool-note tool-note-available">
-              <div class="tool-note-status">Available</div>
-              <h3 class="tool-note-title">Bored to Panic scale</h3>
-              <p class="tool-note-body">
-                A quick self check on where you sit between boredom and overwhelm so you can stay in a healthy performance zone.
-              </p>
-              <p class="tool-note-meta">
-                Best used in 1 to 1s and coaching sessions.
-              </p>
+              <div class="tool-note-status">Ready</div>
+              <h3 class="tool-note-title">Bored to Panic</h3>
+              <p class="tool-note-body">A quick check on where you sit between boredom and overwhelm. Useful for coaching conversations and 1-to-1s.</p>
+              <p class="tool-note-meta">Best used in a guided conversation.</p>
             </article>
           </a>
 
-          <!-- Feedback scale -->
-          <a class="tool-note-link" data-board-nav href="feedback-scale.html">
-            <article class="tool-note tool-note-dev">
-              <div class="tool-note-status">In development</div>
-              <h3 class="tool-note-title">Feedback Scale</h3>
-              <p class="tool-note-body">
-                A calibration tool to see whether feedback is sparse, resonant, loud, or excessive, so you can tune how you give and receive it.
-              </p>
-              <p class="tool-note-meta">Status: work in progress.</p>
-            </article>
-          </a>
-
-          <!-- Important vs Urgent -->
           <a class="tool-note-link" data-board-nav href="important-vs-urgent.html">
             <article class="tool-note tool-note-prototype">
               <div class="tool-note-status">Prototype</div>
               <h3 class="tool-note-title">Important vs Urgent</h3>
-              <p class="tool-note-body">
-                A classic 2 by 2 prioritisation board that helps you decide what to do now, schedule, delegate, or delete.
-              </p>
-              <p class="tool-note-meta">Status: internal testing.</p>
+              <p class="tool-note-body">The Eisenhower matrix. Decide what to do now, schedule, delegate, or drop. Questions guide the placement.</p>
+              <p class="tool-note-meta">In testing.</p>
             </article>
           </a>
 
-          <!-- Silly KPI dashboard -->
-          <a class="tool-note-link" data-board-nav href="dashboard.html">
-            <article class="tool-note tool-note-prototype">
-              <div class="tool-note-status">Prototype</div>
-              <h3 class="tool-note-title">Silly KPI dashboard</h3>
-              <p class="tool-note-body">
-                A tongue in cheek dashboard that looks serious at first glance and more ridiculous the longer you stare at it.
-              </p>
-              <p class="tool-note-meta">Status: internal testing.</p>
+          <a class="tool-note-link" data-board-nav href="feedback-scale.html">
+            <article class="tool-note tool-note-dev">
+              <div class="tool-note-status">In development</div>
+              <h3 class="tool-note-title">Feedback Scale</h3>
+              <p class="tool-note-body">Calibrate whether feedback is sparse, resonant, loud, or excessive — so you can tune how you give and receive it.</p>
+              <p class="tool-note-meta">Work in progress.</p>
             </article>
           </a>
 
-          <!-- Impact vs Effort -->
-          <a class="tool-note-link" data-board-nav href="impact-vs-effort.html">
-            <article class="tool-note tool-note-available">
-              <div class="tool-note-status">Available</div>
-              <h3 class="tool-note-title">Impact vs Effort</h3>
-              <p class="tool-note-body">
-                A 2 by 2 to sort ideas into quick wins, big bets, fillers, and time sinks so you can spend energy where it counts.
-              </p>
-              <p class="tool-note-meta">
-                Best used in planning and prioritisation sessions.
-              </p>
-            </article>
-          </a>
-
-          <!-- SWOT wall -->
-          <a class="tool-note-link" data-board-nav href="swot.html">
-            <article class="tool-note tool-note-available">
-              <div class="tool-note-status">Available</div>
-              <h3 class="tool-note-title">SWOT wall</h3>
-              <p class="tool-note-body">
-                You want a SWOT tool? Have a SWOT tool. Capture strengths, weaknesses, opportunities, and threats on the same board.
-              </p>
-              <p class="tool-note-meta">
-                Use solo or as a group. SWOTing is better with friends.
-              </p>
-            </article>
-          </a>
-
-          <!-- Placeholder -->
-          <article class="tool-note tool-note-coming">
+          <article class="tool-note tool-note-coming" style="cursor:default;">
             <div class="tool-note-status">Coming soon</div>
-            <h3 class="tool-note-title">Next tool on the board</h3>
-            <p class="tool-note-body">
-              Future tools will reuse the same whiteboard. When they are ready, a new note will appear here and link to them.
-            </p>
-            <p class="tool-note-meta">
-              You can email ideas to contact@imthebus.co.uk.
-            </p>
+            <h3 class="tool-note-title">Next tool</h3>
+            <p class="tool-note-body">New tools are added as they are built. Subscribe to hear when the next one is ready.</p>
+            <p class="tool-note-meta">Subscribe below to be first.</p>
           </article>
+
         </div>
 
-        <!-- Wipe overlay for leaving animation -->
         <div class="board-wipe" id="boardWipe"></div>
       </div>
     </section>
+
   </main>
 
-  <!-- Shared footer -->
   <footer data-include="partials/footer.html"></footer>
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const notes = Array.from(document.querySelectorAll(".tool-note"));
-      const boardWrapper = document.getElementById("tools-board");
-      const boardWipe = document.getElementById("boardWipe");
+      var notes = Array.from(document.querySelectorAll(".tool-note"));
+      var boardWipe = document.getElementById("boardWipe");
 
       function seedNotes() {
-        notes.forEach((note, index) => {
-          const base = ((index * 13) % 7) - 3; // between about -3 and +3
-          note.classList.remove("tool-note-drop");
-          note.classList.remove("tool-note-enter");
+        notes.forEach(function (note, index) {
+          var base = ((index * 13) % 7) - 3;
+          note.classList.remove("tool-note-drop", "tool-note-enter");
           note.style.setProperty("--note-rot", base + "deg");
-          // force reflow so the enter animation restarts
           void note.offsetWidth;
           note.classList.add("tool-note-enter");
         });
-
         if (boardWipe) {
           boardWipe.classList.remove("board-wipe-active");
           boardWipe.style.transform = "";
@@ -385,56 +358,66 @@
 
       seedNotes();
 
-      // Helper: animate notes dropping + board wipe, then navigate
-      function animateExitAndNavigate(targetHref) {
-        if (!targetHref) return;
-
-        notes.forEach((note) => {
+      function animateExitAndNavigate(href) {
+        notes.forEach(function (note) {
           note.classList.remove("tool-note-enter");
           note.classList.add("tool-note-drop");
         });
-
-        if (boardWipe) {
-          boardWipe.classList.add("board-wipe-active");
-        }
-
-        setTimeout(function () {
-          window.location.href = targetHref;
-        }, 420);
+        if (boardWipe) boardWipe.classList.add("board-wipe-active");
+        setTimeout(function () { window.location.href = href; }, 420);
       }
 
-      // Intercept clicks on home board note links
-      document.addEventListener("click", function (event) {
-        const link = event.target.closest("a");
+      document.addEventListener("click", function (e) {
+        var link = e.target.closest("a");
         if (!link) return;
-
-        const href = link.getAttribute("href") || "";
-        const isBoardLink = link.hasAttribute("data-board-nav");
-
-        // Skip if no href, mailto, external, or hash-only
-        if (!href || href.startsWith("mailto:") || href.startsWith("http") || href.startsWith("#")) {
-          return;
-        }
-
-        const current = window.location.pathname.split("/").pop() || "index.html";
-        if (!isBoardLink && !link.closest(".site-nav")) {
-          // Not a board link, not from shared header: let it behave normally.
-          return;
-        }
-
-        // Do nothing if already on this page
+        var href = link.getAttribute("href") || "";
+        if (!href || href.startsWith("mailto:") || href.startsWith("http") || href.startsWith("#")) return;
+        if (!link.hasAttribute("data-board-nav") && !link.closest(".site-nav")) return;
+        var current = window.location.pathname.split("/").pop() || "index.html";
         if (href === current) return;
-
-        event.preventDefault();
+        e.preventDefault();
         animateExitAndNavigate(href);
       });
 
-      // When returning via back/forward cache, re-seed notes so board is never blank
-      window.addEventListener("pageshow", function (event) {
-        if (event.persisted || performance.getEntriesByType("navigation")[0]?.type === "back_forward") {
+      window.addEventListener("pageshow", function (e) {
+        if (e.persisted || (performance.getEntriesByType("navigation")[0] || {}).type === "back_forward") {
           seedNotes();
         }
       });
+
+      // Sidebar subscribe form
+      var sForm = document.getElementById("sidebarSubscribeForm");
+      var sStatus = document.getElementById("sidebarSubscribeStatus");
+      if (sForm && sStatus) {
+        sForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+          var btn = sForm.querySelector("button");
+          btn.disabled = true; btn.textContent = "...";
+          try {
+            var res = await fetch(sForm.action, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: sForm.email.value, source: sForm.source.value })
+            });
+            var data = await res.json().catch(function () { return {}; });
+            sStatus.hidden = false;
+            if (res.ok) {
+              sStatus.style.color = "#15803d";
+              sStatus.textContent = "Done. You will hear from us when the next tool lands.";
+              sForm.reset();
+            } else {
+              sStatus.style.color = "#b91c1c";
+              sStatus.textContent = data.error || "Something went wrong.";
+              btn.disabled = false; btn.textContent = "Subscribe";
+            }
+          } catch {
+            sStatus.hidden = false;
+            sStatus.style.color = "#b91c1c";
+            sStatus.textContent = "Could not connect.";
+            btn.disabled = false; btn.textContent = "Subscribe";
+          }
+        });
+      }
     });
   </script>
 </body>
