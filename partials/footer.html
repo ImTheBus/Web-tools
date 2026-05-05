@@ -1,26 +1,73 @@
 <footer class="site-footer">
-  <div class="site-footer-left">
-    <a href="index.html" class="site-brand">IMTHEBUS</a><br />
-    Small experiments in tools that help people work together better.
-    <div style="margin-top:8px;">
-      <a href="https://imthebus.github.io/OfCourseItWentWrong/" target="_blank" rel="noopener" style="font-size:0.8rem;">
-        Also: Of Course It Went Wrong →
-      </a>
-    </div>
+
+  <div>
+    <span class="footer-brand-name">IMTHEBUS</span>
+    <p class="footer-tagline">Browser tools for better conversations and decisions. No login. No platform. Open in a tab and it works.</p>
+    <p class="footer-tagline" style="margin-top:6px;">
+      Also: <a href="https://imthebus.github.io/OfCourseItWentWrong/" target="_blank" rel="noopener">Of Course It Went Wrong</a>
+    </p>
   </div>
 
-  <div class="site-footer-right">
-    <div class="footer-row">
-      <span>
-        Tool uses on this page:
-        <span id="toolUsageCount">–</span>
-      </span>
-      <span>
-        <a href="stuff.html">Stuff</a>
-      </span>
-    </div>
-    <div class="footer-note">
-      Data lives in your browser wherever possible.
-    </div>
+  <div class="subscribe-box">
+    <span class="subscribe-label">New tools by email</span>
+    <p class="subscribe-sub">When a new tool is ready, you will hear about it first.</p>
+    <form id="footerSubscribeForm" action="https://subscribe.imthebus.workers.dev" method="POST">
+      <input type="hidden" name="source" value="imthebus-footer">
+      <div class="subscribe-row">
+        <input type="email" name="email" placeholder="your@email.com" required class="subscribe-input" autocomplete="email">
+        <button type="submit" class="subscribe-btn">Subscribe</button>
+      </div>
+      <p class="subscribe-status" id="footerSubscribeStatus" hidden></p>
+    </form>
   </div>
+
+  <div class="footer-links">
+    <span class="footer-links-heading">Tools</span>
+    <a href="swot.html">SWOT wall</a>
+    <a href="impact-vs-effort.html">Impact vs Effort</a>
+    <a href="important-vs-urgent.html">Important vs Urgent</a>
+    <a href="bored-to-panic.html">Bored to Panic scale</a>
+    <div class="footer-note" style="margin-top:8px;">Data lives in your browser wherever possible.</div>
+  </div>
+
 </footer>
+
+<script>
+(function () {
+  var form = document.getElementById('footerSubscribeForm');
+  var status = document.getElementById('footerSubscribeStatus');
+  if (!form || !status) return;
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var btn = form.querySelector('button[type=submit]');
+    btn.disabled = true;
+    btn.textContent = '...';
+    try {
+      var res = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email.value, source: form.source.value })
+      });
+      var data = await res.json().catch(function () { return {}; });
+      status.hidden = false;
+      if (res.ok) {
+        status.className = 'subscribe-status subscribe-status--ok';
+        status.textContent = 'Done. You will hear from us when the next tool lands.';
+        form.reset();
+      } else {
+        status.className = 'subscribe-status subscribe-status--err';
+        status.textContent = data.error || 'Something went wrong. Try again.';
+        btn.disabled = false;
+        btn.textContent = 'Subscribe';
+      }
+    } catch {
+      status.hidden = false;
+      status.className = 'subscribe-status subscribe-status--err';
+      status.textContent = 'Could not connect. Check your connection and try again.';
+      btn.disabled = false;
+      btn.textContent = 'Subscribe';
+    }
+  });
+})();
+</script>
