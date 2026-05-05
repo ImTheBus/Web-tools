@@ -446,6 +446,13 @@ nav.site-nav a:hover {
   pointer-events: none;
 }
 
+/* Prevent flash of empty partials before JS injects content */
+[data-include]:empty { visibility: hidden; }
+
+/* External cross-promo link in nav */
+.site-nav-external { opacity: 0.7; }
+.site-nav-external:hover { opacity: 1; }
+
 /* SIMPLE COLLAPSIBLE BODY (for pages that choose to use it) */
 
 [data-collapsible-body] {
@@ -483,3 +490,4 @@ nav.site-nav a:hover {
     align-items: flex-start;
   }
 }
+
