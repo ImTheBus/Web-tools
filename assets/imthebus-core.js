@@ -162,6 +162,27 @@
     }
 
     boardEl.addEventListener("mousedown", onMouseDown);
+
+    // Touch support: translate touch events to the same drag logic
+    boardEl.addEventListener("touchstart", function (e) {
+      const touch = e.touches[0];
+      if (!touch) return;
+      const el = touch.target.closest(noteSelector);
+      if (!el) return;
+      e.preventDefault();
+      onMouseDown({ target: touch.target, button: 0, clientX: touch.clientX, clientY: touch.clientY });
+    }, { passive: false });
+
+    document.addEventListener("touchmove", function (e) {
+      if (!dragging) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      if (touch) onMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
+    }, { passive: false });
+
+    document.addEventListener("touchend", function () {
+      if (dragging) onMouseUp();
+    });
   }
 
   // Expose helpers for tool pages
@@ -178,3 +199,4 @@
     });
   });
 })();
+
