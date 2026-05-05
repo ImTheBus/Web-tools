@@ -1,11 +1,29 @@
 <nav class="site-nav">
-  <div class="site-nav-left">
+  <div class="site-nav-left" id="siteNavLeft">
     <a href="index.html">Home</a>
-    <a href="index.html#tools">Tools</a>
+    <a href="swot.html">SWOT</a>
+    <a href="impact-vs-effort.html">Impact vs Effort</a>
+    <a href="important-vs-urgent.html">Important vs Urgent</a>
+    <a href="bored-to-panic.html">Bored to Panic</a>
     <a href="stuff.html">Stuff</a>
   </div>
   <div class="site-nav-right">
     <a href="https://imthebus.github.io/OfCourseItWentWrong/" target="_blank" rel="noopener" class="site-nav-external">Of Course It Went Wrong</a>
     <a href="index.html" class="site-brand">IMTHEBUS</a>
   </div>
+  <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Toggle menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<script>
+(function () {
+  var toggle = document.getElementById('navMobileToggle');
+  var nav = document.getElementById('siteNavLeft');
+  if (toggle && nav) {
+    toggle.addEventListener('click', function () {
+      var open = nav.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+  }
+})();
+</script>
