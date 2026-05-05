@@ -534,6 +534,10 @@
       const boardInner = document.getElementById("boardInner");
       const priorityList = document.getElementById("priorityList");
 
+      const STORAGE_KEY = "imthebus-ive-tasks";
+      function saveTasks() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); } catch {} }
+      function loadTasks() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; } }
+
       let tasks = [];
       let assessmentState = null;
       let dragInitialised = false;
@@ -1097,6 +1101,7 @@
             task.quadrant = quadrantFromScores(task.impact, task.effort);
             renderTasks();
             renderPriorities();
+            saveTasks();
             setStatus("Position updated.");
           }
         });
@@ -1108,6 +1113,7 @@
         renderBoard();
         renderPriorities();
         setupDragging();
+        saveTasks();
       }
 
       function formatDateForFilename(date) {
@@ -1309,9 +1315,11 @@
         renderBoard();
       });
 
+      tasks = loadTasks();
       renderAll();
-      setStatus("Add a task to get started.");
+      setStatus(tasks.length ? "Board restored." : "Add a task to get started.");
     })();
   </script>
 </body>
 </html>
+
