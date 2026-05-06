@@ -2,493 +2,196 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Important vs Urgent – IMTHEBUS Toolbox</title>
+  <title>Important vs Urgent – IMTHEBUS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The Eisenhower matrix. Put everything on the board and let it show you what to act on, schedule, hand off, or stop.">
 
-  <!-- Shared styles and core helpers -->
   <link rel="stylesheet" href="assets/imthebus-base.css" />
   <script src="assets/imthebus-core.js" defer></script>
-
-  <!-- jsPDF for PDF export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 
-  <!-- Page-specific styles -->
   <style>
-    :root {
-      --muted: #4b5563;
-      --q1-note: var(--q-do);
-      --q2-note: var(--q-schedule);
-      --q3-note: var(--q-delegate);
-      --q4-note: var(--q-delete);
-    }
+    :root { --muted: #4b5563; }
 
-    .sidebar-title {
-      font-family: "Archivo Black", system-ui, sans-serif;
-      font-size: 1.4rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .sidebar-subtitle {
-      font-size: 0.85rem;
-      margin-bottom: 8px;
-    }
-
-    .task-input-row {
-      display: flex;
-      gap: 8px;
-      margin: 8px 0 6px;
-    }
-
-    .task-input-row input[type="text"] {
-      flex: 1;
-    }
+    .task-input-row { display: flex; gap: 8px; margin: 0 0 6px; }
+    .task-input-row input[type="text"] { flex: 1; }
 
     .task-list {
-      list-style: none;
-      padding: 0;
-      margin: 8px 0 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 0.8rem;
+      list-style: none; padding: 0; margin: 0 0 6px;
+      display: flex; flex-direction: column; gap: 5px; font-size: 0.82rem;
     }
 
     .task-item {
-      border-radius: 8px;
-      border: 1px solid #000000;
-      padding: 6px 6px 4px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      background: rgba(255, 255, 255, 0.95);
+      border-radius: 8px; border: 1.5px solid var(--border-strong);
+      padding: 8px 8px 6px; display: flex; flex-direction: column; gap: 4px;
+      background: rgba(255,255,255,0.96);
     }
 
-    .task-item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 6px;
-    }
-
-    .task-main {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .task-name {
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .task-meta {
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-
-    .task-actions {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-      flex-wrap: nowrap;
-    }
+    .task-item-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
+    .task-main { flex: 1; min-width: 0; }
+    .task-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .task-meta { font-size: 0.74rem; color: var(--muted); margin-top: 2px; }
+    .task-actions { display: flex; gap: 4px; align-items: center; flex-wrap: nowrap; }
 
     .pill {
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid #000000;
-      font-size: 0.7rem;
-      white-space: nowrap;
-      background: #ffffff;
+      padding: 3px 9px; border-radius: 999px; border: 1.5px solid var(--border-strong);
+      font-size: 0.72rem; white-space: nowrap; background: #fff;
     }
+    .pill-q1 { background: var(--q-do); }
+    .pill-q2 { background: var(--q-schedule); }
+    .pill-q3 { background: var(--q-delegate); }
+    .pill-q4 { background: var(--q-delete); }
 
-    .pill-q1 { background: var(--q1-note); }
-    .pill-q2 { background: var(--q2-note); }
-    .pill-q3 { background: var(--q3-note); }
-    .pill-q4 { background: var(--q4-note); }
-
-    .empty-state {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin: 4px 0 6px;
-    }
+    .empty-state { font-size: 0.82rem; color: var(--muted); padding: 4px 0; }
 
     .quadrant-explainer-toggle {
-      margin-top: 4px;
-      font-size: 0.8rem;
-      text-decoration: underline;
-      cursor: pointer;
+      font-size: 0.8rem; color: var(--ink-mid); cursor: pointer; padding: 4px 0;
+      border: none; background: none; font-family: inherit; text-align: left;
+      text-decoration: underline; width: 100%;
     }
 
     .quadrant-explainer-body {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.2s ease;
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 2px;
+      max-height: 0; overflow: hidden; transition: max-height 0.25s ease;
+      font-size: 0.8rem; color: var(--muted); margin-top: 2px;
     }
+    .quadrant-explainer-body.open { max-height: 320px; }
+    .quadrant-explainer-body p { margin: 5px 0; line-height: 1.5; }
 
-    .quadrant-explainer-body.open {
-      max-height: 260px;
-    }
-
-    .quadrant-explainer-body p {
-      margin: 4px 0;
-    }
-
-    .task-status {
-      min-height: 1.1em;
-      margin-top: 4px;
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-
-    .task-status.flash {
-      animation: statusFlash 0.3s ease-out;
-    }
+    .task-status { min-height: 1.1em; margin-top: 4px; font-size: 0.76rem; color: var(--muted); }
+    .task-status.flash { animation: statusFlash 0.3s ease-out; }
 
     @keyframes statusFlash {
-      from {
-        opacity: 0;
-        transform: translateY(-2px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-2px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-
-    /* About section */
-
-    .about-tool {
-      margin-bottom: 8px;
-    }
-
-    .about-body {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .about-body p {
-      margin: 2px 0 4px;
-    }
-
-    /* Inline assessment panel */
 
     .assessment-panel {
-      margin-top: 6px;
-      border-radius: 8px;
-      border: 1px solid #000000;
-      padding: 8px 8px 10px;
-      background: rgba(255, 255, 255, 0.96);
-      font-size: 0.78rem;
+      margin-top: 6px; border-radius: 8px; border: 1.5px solid var(--border-strong);
+      padding: 10px 10px 12px; background: rgba(255,255,255,0.98); font-size: 0.8rem;
     }
+    .assessment-header { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; margin-bottom: 6px; }
+    .assessment-task-name { font-weight: 700; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .assessment-body { margin-top: 2px; }
 
-    .assessment-header {
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
-      align-items: baseline;
-      margin-bottom: 4px;
-    }
+    .question-row { padding-top: 6px; margin-top: 6px; border-top: 1px dashed rgba(0,0,0,0.14); }
+    .question-row:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+    .question-text { margin-bottom: 4px; line-height: 1.4; }
 
-    .assessment-task-name {
-      font-weight: 700;
-      font-size: 0.9rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .question-scale { display: flex; justify-content: space-between; gap: 2px; margin-top: 4px; }
+    .scale-option { flex: 1; display: flex; flex-direction: column; align-items: center; font-size: 0.68rem; text-align: center; }
+    .scale-option input[type="radio"] { cursor: pointer; margin-bottom: 2px; }
 
-    .assessment-body {
-      margin-top: 2px;
-    }
+    .assessment-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.76rem; gap: 6px; flex-wrap: wrap; }
+    .assessment-footer-hint { color: var(--muted); line-height: 1.4; }
+    .task-item--active { box-shadow: 0 0 0 2px rgba(0,0,0,0.5) inset; }
 
-    .question-row {
-      padding-top: 4px;
-      margin-top: 4px;
-      border-top: 1px dashed rgba(0, 0, 0, 0.16);
-    }
+    .board-header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
+    .board-title { font-family: "Archivo Black", system-ui, sans-serif; font-size: 1.35rem; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 2px; }
+    .board-subtitle { font-size: 0.82rem; color: var(--muted); line-height: 1.45; }
+    .board-meta { font-size: 0.78rem; color: var(--ink-light); margin: 6px 0 10px; }
 
-    .question-row:first-of-type {
-      border-top: none;
-      margin-top: 0;
-      padding-top: 0;
-    }
-
-    .question-text {
-      margin-bottom: 2px;
-    }
-
-    .question-scale {
-      display: flex;
-      justify-content: space-between;
-      gap: 4px;
-      margin-top: 2px;
-    }
-
-    .scale-option {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-size: 0.7rem;
-    }
-
-    .scale-option input[type="radio"] {
-      cursor: pointer;
-      margin-bottom: 1px;
-    }
-
-    .assessment-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 6px;
-      font-size: 0.74rem;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .task-item--active {
-      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5) inset;
-    }
-
-    /* Board / priority panel text */
-
-    .board-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .board-title {
-      font-family: "Archivo Black", system-ui, sans-serif;
-      font-size: 1.4rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .board-subtitle {
-      font-size: 0.78rem;
-      color: var(--muted);
-    }
-
-    .board-meta {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .task-note[data-quadrant="q1"] { background-color: var(--q1-note); }
-    .task-note[data-quadrant="q2"] { background-color: var(--q2-note); }
-    .task-note[data-quadrant="q3"] { background-color: var(--q3-note); }
-    .task-note[data-quadrant="q4"] { background-color: var(--q4-note); }
+    .task-note[data-quadrant="q1"] { background-color: var(--q-do); }
+    .task-note[data-quadrant="q2"] { background-color: var(--q-schedule); }
+    .task-note[data-quadrant="q3"] { background-color: var(--q-delegate); }
+    .task-note[data-quadrant="q4"] { background-color: var(--q-delete); }
 
     .priority-panel {
-      margin-top: 8px;
-      border-radius: 8px;
-      border: 1px solid #000000;
-      background: rgba(255, 255, 255, 0.96);
-      padding: 6px 8px 6px;
-      font-size: 0.8rem;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+      margin-top: 14px; border-radius: 8px; border: 1.5px solid var(--border-strong);
+      background: rgba(255,255,255,0.96); padding: 12px 14px; font-size: 0.82rem;
     }
-
     .priority-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 8px;
-      font-family: "Archivo Black", system-ui, sans-serif;
-      text-transform: uppercase;
-      font-size: 0.9rem;
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 8px; margin-bottom: 8px;
+      font-family: "Archivo Black", system-ui, sans-serif; text-transform: uppercase; font-size: 0.88rem;
     }
+    .priority-panel-header small { font-family: "Inter", system-ui, sans-serif; font-size: 0.72rem; color: var(--muted); text-transform: none; }
+    .priority-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; font-size: 0.82rem; }
 
-    .priority-panel-header small {
-      font-family: "Inter", system-ui, sans-serif;
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-transform: none;
-    }
-
-    .priority-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      max-height: 130px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 0.8rem;
-    }
-
-    .priority-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
-      align-items: center;
-      border-radius: 6px;
-      border: 1px solid #000000;
-      padding: 4px 6px;
-      background: #ffffff;
-    }
-
-    .priority-main {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex: 1;
-      min-width: 0;
-    }
-
-    .priority-rank {
-      width: 16px;
-      font-size: 0.75rem;
-      color: var(--muted);
-      text-align: right;
-    }
-
-    .priority-name {
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .priority-meta {
-      font-size: 0.7rem;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .priority-pill {
-      font-size: 0.7rem;
-      padding: 2px 6px;
-      border-radius: 999px;
-      border: 1px solid #000000;
-      white-space: nowrap;
-      background: #f9fafb;
-    }
+    .priority-item { display: flex; justify-content: space-between; gap: 8px; align-items: center; border-radius: 6px; border: 1.5px solid var(--border-strong); padding: 5px 8px; background: #fff; }
+    .priority-main { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+    .priority-rank { width: 18px; font-size: 0.74rem; color: var(--muted); text-align: right; flex-shrink: 0; }
+    .priority-name { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .priority-meta { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
+    .priority-pill { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; border: 1.5px solid var(--border-strong); white-space: nowrap; background: #f9fafb; flex-shrink: 0; }
   </style>
 </head>
 
 <body data-counter-key="important_vs_urgent">
-  <!-- Shared header -->
   <header data-include="partials/header.html"></header>
 
   <main class="page">
-    <!-- Sidebar -->
+
     <aside class="sidebar-card">
-      <div class="sidebar-title">Important vs Urgent</div>
-      <div class="sidebar-subtitle">
-        Use the classic Eisenhower matrix to decide what to do now, later, pass on, or drop.
+
+      <div class="sidebar-section">
+        <h1 class="page-title">Important vs Urgent</h1>
+        <p class="page-subtitle">Put everything on the board. Let it show you what to act on now, what to schedule, what to hand off, and what to stop.</p>
       </div>
 
-      <!-- About this tool -->
-      <div class="about-tool">
-        <button
-          class="btn btn-pill-small"
-          data-collapsible-toggle
-          data-collapsible-target="#aboutToolBody"
-          data-label-base="About this tool"
-        >
-          + About this tool
-        </button>
-        <div id="aboutToolBody" data-collapsible-body class="about-body">
-          <p>
-            This layout comes from the <strong>Important vs Urgent</strong> matrix,
-            often called the <strong>Eisenhower matrix</strong>. Dwight D. Eisenhower
-            talked about how important work is rarely urgent, and urgent work is rarely important.
-          </p>
-          <p>
-            The idea was later popularised in productivity books and leadership training.
-            It helps you separate work that moves long-term goals forward from work that only
-            feels urgent in the moment.
-          </p>
-          <p>
-            Add tasks on the left, answer the questions to place each one on the board,
-            then work from the priority list at the bottom. “Do it” items come first,
-            followed by “Schedule it”, then “Delegate it” and finally “Delete it”.
-          </p>
+      <div class="sidebar-section">
+        <div class="task-input-row">
+          <input
+            type="text"
+            id="taskInput"
+            class="input-text"
+            placeholder="Name a task, then hit Add"
+            autocomplete="off"
+          />
+          <button class="btn btn-primary" id="addTaskButton">Add</button>
+        </div>
+
+        <ul class="task-list" id="taskList"></ul>
+        <div class="empty-state" id="noTasksMessage">
+          No tasks yet. Add one and it will appear here.
+        </div>
+
+        <div class="task-status" id="taskStatus"></div>
+
+        <div style="margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-pill-small" id="clearAllButton">Clear all</button>
+          <button class="quadrant-explainer-toggle" id="quadrantExplainerToggle">+ What the quadrants mean</button>
+        </div>
+
+        <div class="quadrant-explainer-body" id="quadrantExplainerBody">
+          <p><strong>Do it</strong> — Important and urgent. Clear deadline, real consequence. Act now.</p>
+          <p><strong>Schedule it</strong> — Important but not urgent. Moves long-term goals forward. Protect time for it or it will never happen.</p>
+          <p><strong>Delegate it</strong> — Urgent but less important for you personally. Needs doing — just not necessarily by you.</p>
+          <p><strong>Delete it</strong> — Neither important nor urgent. Distraction or a nice-to-have. Question whether it belongs on the list at all.</p>
         </div>
       </div>
 
-      <div class="task-input-row">
-        <input
-          type="text"
-          id="taskInput"
-          class="input-text"
-          placeholder="Example: Draft Q1 board report"
-          autocomplete="off"
-        />
-        <button class="btn btn-primary" id="addTaskButton">Add</button>
-      </div>
-
-      <button class="btn btn-pill-small" id="clearAllButton">Clear</button>
-
-      <ul class="task-list" id="taskList"></ul>
-      <div class="empty-state" id="noTasksMessage">
-        No tasks yet. Add one above to get started.
-      </div>
-
-      <div class="quadrant-explainer-toggle" id="quadrantExplainerToggle">
-        + What the quadrants mean
-      </div>
-      <div class="quadrant-explainer-body" id="quadrantExplainerBody">
-        <p><strong>Do it</strong> · Important and urgent with clear deadlines and real consequences.</p>
-        <p><strong>Schedule it</strong> · Important but not urgent. Moves you toward your goals but is easy to postpone.</p>
-        <p><strong>Delegate it</strong> · Less important for you but time sensitive. Needs doing, just not necessarily by you.</p>
-        <p><strong>Delete it</strong> · Less important and not urgent. Distractions, nice to haves, or things to question.</p>
-      </div>
-
-      <div class="task-status" id="taskStatus"></div>
     </aside>
 
-    <!-- Board and priority -->
     <section class="board-wrapper">
       <div class="board-inner-shell">
         <div class="board-header-row">
           <div>
-            <div class="board-title">Important vs Urgent board</div>
+            <div class="board-title">Important vs Urgent</div>
             <div class="board-subtitle">
-              Grid: Important (vertical) vs Urgent (horizontal). Do → Schedule → Delegate → Delete.
+              Important (↑ high / ↓ low) vs Urgent (← not urgent / → urgent). Answer six questions per task — it lands where the answers point.
             </div>
           </div>
-          <div>
-            <button class="btn btn-pill-small" id="exportPdfButton">PDF</button>
-          </div>
+          <button class="btn btn-pill-small" id="exportPdfButton">Export PDF</button>
         </div>
 
-        <div class="board-meta">
-          Drag notes to fine tune where they sit. Moving a note updates impact and timing.
-        </div>
+        <div class="board-meta">Drag any note to fine-tune its position. The priority list updates as you move things.</div>
 
         <div class="quadrant-board" id="board">
           <div class="quadrant-grid" id="quadrantGrid">
             <div class="quadrant-lines"></div>
 
             <div class="axis-label-x">
-              <span>Urgent</span> / <span>Not urgent</span>
+              <span>Not urgent</span> / <span>Urgent</span>
             </div>
             <div class="axis-label-y">
-              Important ↑ / ↓ Not important
+              Important ↑ / ↓ Less important
             </div>
 
             <div class="quadrant-headings">
-              <div>Do it</div>
               <div>Schedule it</div>
-              <div>Delegate it</div>
+              <div>Do it</div>
               <div>Delete it</div>
+              <div>Delegate it</div>
             </div>
 
             <div class="board-inner" id="boardInner"></div>
@@ -498,20 +201,19 @@
         <div class="priority-panel">
           <div class="priority-panel-header">
             <div>Priority order</div>
-            <small>Ordered by quadrant (Do → Schedule → Delegate → Delete), then by impact and timing.</small>
+            <small>Do it first · Schedule next · Delegate · Delete last</small>
           </div>
           <ul class="priority-list" id="priorityList">
-            <li class="empty-state">Assess at least one task to see a working list.</li>
+            <li class="empty-state">Assess at least one task to see the ranked list here.</li>
           </ul>
         </div>
       </div>
     </section>
+
   </main>
 
-  <!-- Shared footer -->
   <footer data-include="partials/footer.html"></footer>
 
-  <!-- Page logic -->
   <script>
     (function () {
       const taskInput = document.getElementById("taskInput");
@@ -595,7 +297,7 @@
           if (existing && existing[q.id] != null) {
             answers[q.id] = existing[q.id];
           } else {
-            answers[q.id] = 3; // middle
+            answers[q.id] = 3;
           }
         });
         return answers;
@@ -630,10 +332,7 @@
       }
 
       function clearAllTasks() {
-        if (!tasks.length) {
-          setStatus("Nothing to clear.");
-          return;
-        }
+        if (!tasks.length) { setStatus("Nothing to clear."); return; }
         if (!confirm("Clear all tasks?")) return;
         tasks = [];
         assessmentState = null;
@@ -643,9 +342,7 @@
 
       function deleteTask(id) {
         tasks = tasks.filter(function (x) { return x.id !== id; });
-        if (assessmentState && assessmentState.taskId === id) {
-          assessmentState = null;
-        }
+        if (assessmentState && assessmentState.taskId === id) assessmentState = null;
         renderAll();
         setStatus("Task removed.");
       }
@@ -653,12 +350,9 @@
       function startAssessment(taskId) {
         const task = tasks.find(function (t) { return t.id === taskId; });
         if (!task) return;
-        assessmentState = {
-          taskId: taskId,
-          answers: defaultAnswers(task.answers)
-        };
+        assessmentState = { taskId: taskId, answers: defaultAnswers(task.answers) };
         renderAll();
-        setStatus("Answer the questions below this task.");
+        setStatus("Answer the questions to place this task on the board.");
       }
 
       function cancelAssessment() {
@@ -676,17 +370,9 @@
       function computeScoresFromAnswers(a) {
         const impIds = ["impImpact", "impStake", "impGoal"];
         const urgIds = ["urgDeadline", "urgBlock", "urgDelay"];
-
-        const impAvg =
-          impIds.reduce(function (sum, id) { return sum + (a[id] || 3); }, 0) /
-          impIds.length;
-        const urgAvg =
-          urgIds.reduce(function (sum, id) { return sum + (a[id] || 3); }, 0) /
-          urgIds.length;
-
-        const importance = clamp(Number(impAvg.toFixed(1)), 1, 5);
-        const urgency = clamp(Number(urgAvg.toFixed(1)), 1, 5);
-        return { importance: importance, urgency: urgency };
+        const impAvg = impIds.reduce(function (sum, id) { return sum + (a[id] || 3); }, 0) / impIds.length;
+        const urgAvg = urgIds.reduce(function (sum, id) { return sum + (a[id] || 3); }, 0) / urgIds.length;
+        return { importance: clamp(Number(impAvg.toFixed(1)), 1, 5), urgency: clamp(Number(urgAvg.toFixed(1)), 1, 5) };
       }
 
       function quadrantFromScores(importance, urgency) {
@@ -715,18 +401,13 @@
       function positionFromScores(importance, urgency) {
         const x = (urgency - 1) / 4;
         const y = 1 - (importance - 1) / 4;
-        return {
-          x: clamp(x, 0, 1),
-          y: clamp(y, 0, 1)
-        };
+        return { x: clamp(x, 0, 1), y: clamp(y, 0, 1) };
       }
 
       function scoresFromPosition(x, y) {
-        const urgency = clamp(1 + 4 * x, 1, 5);
-        const importance = clamp(1 + 4 * (1 - y), 1, 5);
         return {
-          importance: Number(importance.toFixed(1)),
-          urgency: Number(urgency.toFixed(1))
+          importance: clamp(Number((1 + 4 * (1 - y)).toFixed(1)), 1, 5),
+          urgency: clamp(Number((1 + 4 * x).toFixed(1)), 1, 5)
         };
       }
 
@@ -734,67 +415,47 @@
         if (!assessmentState) return;
         const task = tasks.find(function (t) { return t.id === assessmentState.taskId; });
         if (!task) return;
-
-        const a = assessmentState.answers;
-        const scores = computeScoresFromAnswers(a);
+        const scores = computeScoresFromAnswers(assessmentState.answers);
         task.importance = scores.importance;
         task.urgency = scores.urgency;
-        task.answers = Object.assign({}, a);
+        task.answers = Object.assign({}, assessmentState.answers);
         task.quadrant = quadrantFromScores(task.importance, task.urgency);
-
         if (task.x == null || task.y == null) {
           const pos = positionFromScores(task.importance, task.urgency);
           task.x = pos.x;
           task.y = pos.y;
         }
-
         assessmentState = null;
         renderAll();
         setStatus("Assessment saved.");
       }
 
       function ensureNoteDefaults(task) {
-        if (task.rotation == null) {
-          task.rotation = (Math.random() * 8 - 4).toFixed(2);
-        }
+        if (task.rotation == null) task.rotation = (Math.random() * 8 - 4).toFixed(2);
       }
 
       function renderTasks() {
         taskList.innerHTML = "";
-        if (!tasks.length) {
-          noTasksMessage.style.display = "block";
-          return;
-        }
+        if (!tasks.length) { noTasksMessage.style.display = "block"; return; }
         noTasksMessage.style.display = "none";
 
         tasks.forEach(function (task) {
           const li = document.createElement("li");
           li.className = "task-item";
           li.dataset.id = task.id;
-
-          if (assessmentState && assessmentState.taskId === task.id) {
-            li.classList.add("task-item--active");
-          }
+          if (assessmentState && assessmentState.taskId === task.id) li.classList.add("task-item--active");
 
           const header = document.createElement("div");
           header.className = "task-item-header";
 
           const main = document.createElement("div");
           main.className = "task-main";
-
           const nameEl = document.createElement("div");
           nameEl.className = "task-name";
           nameEl.textContent = task.name;
-
           const metaEl = document.createElement("div");
           metaEl.className = "task-meta";
-          if (task.importance == null || task.urgency == null) {
-            metaEl.textContent = "";
-          } else {
-            const qMeta = quadrantMeta(task.quadrant);
-            metaEl.textContent = qMeta.label;
-          }
-
+          if (task.importance != null && task.urgency != null) metaEl.textContent = quadrantMeta(task.quadrant).label;
           main.appendChild(nameEl);
           main.appendChild(metaEl);
 
@@ -811,34 +472,24 @@
 
           const assessBtn = document.createElement("button");
           assessBtn.className = "btn btn-pill-small";
-          assessBtn.textContent =
-            task.importance == null || task.urgency == null ? "Assess" : "Reassess";
-          assessBtn.addEventListener("click", function () {
-            startAssessment(task.id);
-          });
+          assessBtn.textContent = task.importance == null || task.urgency == null ? "Assess" : "Reassess";
+          assessBtn.addEventListener("click", function () { startAssessment(task.id); });
 
           const revisitBtn = document.createElement("button");
           revisitBtn.className = "btn icon-btn";
           revisitBtn.setAttribute("title", "Reassess task");
-          revisitBtn.innerHTML =
-            '<span aria-hidden="true">↻</span><span class="sr-only">Reassess</span>';
-          revisitBtn.addEventListener("click", function () {
-            startAssessment(task.id);
-          });
+          revisitBtn.innerHTML = '<span aria-hidden="true">↻</span><span class="sr-only">Reassess</span>';
+          revisitBtn.addEventListener("click", function () { startAssessment(task.id); });
 
           const deleteBtn = document.createElement("button");
           deleteBtn.className = "btn icon-btn icon-btn-remove";
           deleteBtn.setAttribute("title", "Remove task");
-          deleteBtn.innerHTML =
-            '<span aria-hidden="true">×</span><span class="sr-only">Remove task</span>';
-          deleteBtn.addEventListener("click", function () {
-            deleteTask(task.id);
-          });
+          deleteBtn.innerHTML = '<span aria-hidden="true">×</span><span class="sr-only">Remove task</span>';
+          deleteBtn.addEventListener("click", function () { deleteTask(task.id); });
 
           actions.appendChild(assessBtn);
           actions.appendChild(revisitBtn);
           actions.appendChild(deleteBtn);
-
           header.appendChild(main);
           header.appendChild(actions);
           li.appendChild(header);
@@ -858,11 +509,9 @@
 
         const header = document.createElement("div");
         header.className = "assessment-header";
-
         const title = document.createElement("div");
         title.className = "assessment-task-name";
         title.textContent = task.name;
-
         header.appendChild(title);
         panel.appendChild(header);
 
@@ -872,11 +521,9 @@
         questions.forEach(function (q) {
           const row = document.createElement("div");
           row.className = "question-row";
-
           const text = document.createElement("div");
           text.className = "question-text";
           text.textContent = q.question;
-
           const scale = document.createElement("div");
           scale.className = "question-scale";
 
@@ -884,19 +531,14 @@
             const val = idx + 1;
             const opt = document.createElement("label");
             opt.className = "scale-option";
-
             const input = document.createElement("input");
             input.type = "radio";
             input.name = "q-" + q.id + "-" + task.id;
             input.value = String(val);
             input.checked = answers[q.id] === val;
-            input.addEventListener("change", function () {
-              handleRadioChange(q.id, val);
-            });
-
+            input.addEventListener("change", function () { handleRadioChange(q.id, val); });
             const span = document.createElement("span");
             span.textContent = label;
-
             opt.appendChild(input);
             opt.appendChild(span);
             scale.appendChild(opt);
@@ -911,24 +553,20 @@
 
         const footer = document.createElement("div");
         footer.className = "assessment-footer";
-
         const hint = document.createElement("div");
-        hint.textContent = "Answer each row quickly. You can revisit later.";
-
+        hint.className = "assessment-footer-hint";
+        hint.textContent = "Answer each row quickly. You can revisit any task later.";
         const actions = document.createElement("div");
         const cancelBtn = document.createElement("button");
         cancelBtn.className = "btn btn-pill-small";
         cancelBtn.textContent = "Cancel";
         cancelBtn.addEventListener("click", cancelAssessment);
-
         const saveBtn = document.createElement("button");
         saveBtn.className = "btn btn-pill-small";
-        saveBtn.textContent = "Save answers";
+        saveBtn.textContent = "Place on board";
         saveBtn.addEventListener("click", finaliseAssessment);
-
         actions.appendChild(cancelBtn);
         actions.appendChild(saveBtn);
-
         footer.appendChild(hint);
         footer.appendChild(actions);
         panel.appendChild(footer);
@@ -938,132 +576,91 @@
 
       function renderBoard() {
         boardInner.innerHTML = "";
-
-        const assessed = tasks.filter(function (t) {
-          return t.importance != null && t.urgency != null;
-        });
+        const assessed = tasks.filter(function (t) { return t.importance != null && t.urgency != null; });
         if (!assessed.length) return;
-
         const innerRect = quadrantGrid.getBoundingClientRect();
 
         assessed.forEach(function (task) {
           ensureNoteDefaults(task);
-
           if (task.x == null || task.y == null) {
             const pos = positionFromScores(task.importance, task.urgency);
             task.x = pos.x;
             task.y = pos.y;
           }
-
           const note = document.createElement("div");
           note.className = "note task-note";
           note.dataset.id = task.id;
           const q = task.quadrant || quadrantFromScores(task.importance, task.urgency);
           note.dataset.quadrant = q;
           note.style.setProperty("--note-rot", task.rotation + "deg");
-
           const title = document.createElement("div");
           title.className = "note-title";
           title.textContent = task.name;
           note.appendChild(title);
-
           boardInner.appendChild(note);
 
           const noteWidth = note.offsetWidth || 150;
           const noteHeight = note.offsetHeight || 60;
-
           const left = clamp(task.x, 0, 1) * innerRect.width - noteWidth / 2;
           const top = clamp(task.y, 0, 1) * innerRect.height - noteHeight / 2;
-
-          note.style.left =
-            clamp(left, 0, innerRect.width - noteWidth) + "px";
-          note.style.top =
-            clamp(top, 0, innerRect.height - noteHeight) + "px";
+          note.style.left = clamp(left, 0, innerRect.width - noteWidth) + "px";
+          note.style.top = clamp(top, 0, innerRect.height - noteHeight) + "px";
         });
       }
 
       function renderPriorities() {
         priorityList.innerHTML = "";
-
-        const assessed = tasks.filter(function (t) {
-          return t.importance != null && t.urgency != null;
-        });
+        const assessed = tasks.filter(function (t) { return t.importance != null && t.urgency != null; });
 
         if (!assessed.length) {
           const li = document.createElement("li");
           li.className = "empty-state";
-          li.textContent = "Assess at least one task to see a working list.";
+          li.textContent = "Assess at least one task to see the ranked list here.";
           priorityList.appendChild(li);
           return;
         }
 
         const qOrder = { q1: 1, q2: 2, q3: 3, q4: 4 };
-
-        const sorted = assessed
-          .slice()
-          .map(function (t) {
-            const q = t.quadrant || quadrantFromScores(t.importance, t.urgency);
-            return {
-              data: t,
-              quadrant: q,
-              score: computePriorityScore(t)
-            };
-          })
-          .sort(function (a, b) {
-            const qa = qOrder[a.quadrant];
-            const qb = qOrder[b.quadrant];
-            if (qa !== qb) return qa - qb;
-            return b.score - a.score;
-          });
+        const sorted = assessed.slice().map(function (t) {
+          const q = t.quadrant || quadrantFromScores(t.importance, t.urgency);
+          return { data: t, quadrant: q, score: computePriorityScore(t) };
+        }).sort(function (a, b) {
+          const qa = qOrder[a.quadrant], qb = qOrder[b.quadrant];
+          if (qa !== qb) return qa - qb;
+          return b.score - a.score;
+        });
 
         sorted.forEach(function (entry, index) {
           const task = entry.data;
           const li = document.createElement("li");
           li.className = "priority-item";
-
           const main = document.createElement("div");
           main.className = "priority-main";
-
           const rank = document.createElement("div");
           rank.className = "priority-rank";
           rank.textContent = index + 1;
-
           const nameEl = document.createElement("div");
           nameEl.className = "priority-name";
           nameEl.textContent = task.name;
-
           const metaEl = document.createElement("div");
           metaEl.className = "priority-meta";
           metaEl.textContent = quadrantMeta(task.quadrant).label;
-
           main.appendChild(rank);
           main.appendChild(nameEl);
           main.appendChild(metaEl);
-
           const pill = document.createElement("div");
           pill.className = "priority-pill";
-          pill.textContent =
-            "Impact " +
-            task.importance.toFixed(1) +
-            " · Timing " +
-            task.urgency.toFixed(1);
-
+          pill.textContent = "Impact " + task.importance.toFixed(1) + " · Timing " + task.urgency.toFixed(1);
           li.appendChild(main);
           li.appendChild(pill);
           priorityList.appendChild(li);
         });
 
-        const unassessed = tasks.filter(function (t) {
-          return t.importance == null || t.urgency == null;
-        });
+        const unassessed = tasks.filter(function (t) { return t.importance == null || t.urgency == null; });
         if (unassessed.length) {
           const li = document.createElement("li");
           li.className = "empty-state";
-          li.textContent =
-            unassessed.length +
-            " task" +
-            (unassessed.length > 1 ? "s" : "") +
-            " not yet assessed.";
+          li.textContent = unassessed.length + " task" + (unassessed.length > 1 ? "s" : "") + " not yet assessed.";
           priorityList.appendChild(li);
         }
       }
@@ -1103,202 +700,68 @@
 
       function formatDateForFilename(date) {
         function pad(n) { return String(n).padStart(2, "0"); }
-        const yyyy = date.getFullYear();
-        const mm = pad(date.getMonth() + 1);
-        const dd = pad(date.getDate());
-        const hh = pad(date.getHours());
-        const mi = pad(date.getMinutes());
-        return yyyy + "-" + mm + "-" + dd + "_" + hh + "-" + mi;
+        return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate()) + "_" + pad(date.getHours()) + "-" + pad(date.getMinutes());
       }
 
       function exportAsPdf() {
-        if (!window.jspdf || !window.jspdf.jsPDF) {
-          alert("PDF export is not available in this browser.");
-          return;
-        }
-        const assessed = tasks.filter(function (t) {
-          return t.importance != null && t.urgency != null;
-        });
-        const unassessed = tasks.filter(function (t) {
-          return t.importance == null || t.urgency == null;
-        });
-
+        if (!window.jspdf || !window.jspdf.jsPDF) { alert("PDF export is not available in this browser."); return; }
+        const assessed = tasks.filter(function (t) { return t.importance != null && t.urgency != null; });
+        const unassessed = tasks.filter(function (t) { return t.importance == null || t.urgency == null; });
         const jsPDF = window.jspdf.jsPDF;
-        const doc = new jsPDF({
-          orientation: "portrait",
-          unit: "pt",
-          format: "a4"
-        });
-
+        const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
         const margin = 40;
         let y = margin;
         const now = new Date();
-
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(16);
-        doc.text("Important vs Urgent planner", margin, y);
-        y += 18;
-
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-        doc.text(now.toLocaleString(), margin, y);
-        y += 18;
-
+        doc.setFont("helvetica", "bold"); doc.setFontSize(16);
+        doc.text("Important vs Urgent planner", margin, y); y += 18;
+        doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+        doc.text(now.toLocaleString(), margin, y); y += 18;
         const sections = [
           { key: "q1", heading: "Do it (important and urgent)" },
           { key: "q2", heading: "Schedule it (important, not urgent)" },
           { key: "q3", heading: "Delegate it (less important, urgent)" },
           { key: "q4", heading: "Delete it (less important, not urgent)" }
         ];
-
         doc.setFontSize(12);
         sections.forEach(function (sec) {
-          const list = assessed.filter(function (t) {
-            const q = t.quadrant || quadrantFromScores(t.importance, t.urgency);
-            return q === sec.key;
-          });
-
-          doc.setFont("helvetica", "bold");
-          doc.text(sec.heading, margin, y);
-          y += 14;
-
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(10);
-
-          if (!list.length) {
-            doc.text("No tasks in this quadrant.", margin + 14, y);
-            y += 14;
-          } else {
-            list.forEach(function (t) {
-              const line =
-                "• " +
-                t.name +
-                " (Impact " +
-                t.importance.toFixed(1) +
-                ", Timing " +
-                t.urgency.toFixed(1) +
-                ")";
-              const split = doc.splitTextToSize(line, 500);
-              doc.text(split, margin + 14, y);
-              y += 14 + (split.length - 1) * 12;
-            });
-          }
-
+          const list = assessed.filter(function (t) { return (t.quadrant || quadrantFromScores(t.importance, t.urgency)) === sec.key; });
+          doc.setFont("helvetica", "bold"); doc.text(sec.heading, margin, y); y += 14;
+          doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+          if (!list.length) { doc.text("No tasks in this quadrant.", margin + 14, y); y += 14; }
+          else { list.forEach(function (t) { const line = "• " + t.name + " (Impact " + t.importance.toFixed(1) + ", Timing " + t.urgency.toFixed(1) + ")"; const split = doc.splitTextToSize(line, 500); doc.text(split, margin + 14, y); y += 14 + (split.length - 1) * 12; }); }
           y += 6;
-          if (y > 760) {
-            doc.addPage();
-            y = margin;
-          }
+          if (y > 760) { doc.addPage(); y = margin; }
           doc.setFontSize(12);
         });
-
         if (assessed.length) {
-          if (y > 720) {
-            doc.addPage();
-            y = margin;
-          }
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(12);
-          doc.text("Priority order", margin, y);
-          y += 14;
-
+          if (y > 720) { doc.addPage(); y = margin; }
+          doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text("Priority order", margin, y); y += 14;
           const qOrder = { q1: 1, q2: 2, q3: 3, q4: 4 };
-          const sorted = assessed
-            .slice()
-            .map(function (t) {
-              const q = t.quadrant || quadrantFromScores(t.importance, t.urgency);
-              return {
-                data: t,
-                quadrant: q,
-                score: computePriorityScore(t)
-              };
-            })
-            .sort(function (a, b) {
-              const qa = qOrder[a.quadrant];
-              const qb = qOrder[b.quadrant];
-              if (qa !== qb) return qa - qb;
-              return b.score - a.score;
-            });
-
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(10);
-
-          sorted.forEach(function (entry, idx) {
-            const t = entry.data;
-            const qMeta = quadrantMeta(entry.quadrant);
-            const base =
-              String(idx + 1) +
-              ". " +
-              t.name +
-              " (" +
-              qMeta.label +
-              ", Impact " +
-              t.importance.toFixed(1) +
-              ", Timing " +
-              t.urgency.toFixed(1) +
-              ")";
-            const split = doc.splitTextToSize(base, 500);
-            doc.text(split, margin, y);
-            y += 14 + (split.length - 1) * 12;
-            if (y > 760) {
-              doc.addPage();
-              y = margin;
-            }
-          });
+          const sorted = assessed.slice().map(function (t) { const q = t.quadrant || quadrantFromScores(t.importance, t.urgency); return { data: t, quadrant: q, score: computePriorityScore(t) }; }).sort(function (a, b) { const qa = qOrder[a.quadrant], qb = qOrder[b.quadrant]; if (qa !== qb) return qa - qb; return b.score - a.score; });
+          doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+          sorted.forEach(function (entry, idx) { const t = entry.data; const qMeta = quadrantMeta(entry.quadrant); const base = String(idx + 1) + ". " + t.name + " (" + qMeta.label + ", Impact " + t.importance.toFixed(1) + ", Timing " + t.urgency.toFixed(1) + ")"; const split = doc.splitTextToSize(base, 500); doc.text(split, margin, y); y += 14 + (split.length - 1) * 12; if (y > 760) { doc.addPage(); y = margin; } });
           y += 8;
         }
-
         if (unassessed.length) {
-          if (y > 740) {
-            doc.addPage();
-            y = margin;
-          }
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(12);
-          doc.text("Not yet assessed", margin, y);
-          y += 14;
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(10);
-          unassessed.forEach(function (t) {
-            const line = "• " + t.name;
-            const split = doc.splitTextToSize(line, 500);
-            doc.text(split, margin + 14, y);
-            y += 14 + (split.length - 1) * 12;
-            if (y > 760) {
-              doc.addPage();
-              y = margin;
-            }
-          });
+          if (y > 740) { doc.addPage(); y = margin; }
+          doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text("Not yet assessed", margin, y); y += 14;
+          doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+          unassessed.forEach(function (t) { const line = "• " + t.name; const split = doc.splitTextToSize(line, 500); doc.text(split, margin + 14, y); y += 14 + (split.length - 1) * 12; if (y > 760) { doc.addPage(); y = margin; } });
         }
-
-        const filename =
-          "important-vs-urgent-" + formatDateForFilename(now) + ".pdf";
-        doc.save(filename);
+        doc.save("important-vs-urgent-" + formatDateForFilename(now) + ".pdf");
         setStatus("PDF created.");
       }
 
       addTaskButton.addEventListener("click", addTaskFromInput);
       clearAllButton.addEventListener("click", clearAllTasks);
-      taskInput.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          addTaskFromInput();
-        }
-      });
-
+      taskInput.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); addTaskFromInput(); } });
       exportPdfButton.addEventListener("click", exportAsPdf);
-
       quadrantExplainerToggle.addEventListener("click", function () {
         const open = !quadrantExplainerBody.classList.contains("open");
         quadrantExplainerBody.classList.toggle("open", open);
-        quadrantExplainerToggle.textContent = open
-          ? "- What the quadrants mean"
-          : "+ What the quadrants mean";
+        quadrantExplainerToggle.textContent = open ? "- What the quadrants mean" : "+ What the quadrants mean";
       });
-
-      window.addEventListener("resize", function () {
-        renderBoard();
-      });
+      window.addEventListener("resize", function () { renderBoard(); });
 
       tasks = loadTasks();
       renderAll();
@@ -1307,4 +770,3 @@
   </script>
 </body>
 </html>
-

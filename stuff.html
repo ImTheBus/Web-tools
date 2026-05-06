@@ -2,248 +2,239 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>IMTHEBUS – About & Info</title>
+  <title>About – IMTHEBUS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="IMTHEBUS is a small, practical set of tools for managers and teams. Open a link, use the tool, get on with it.">
 
-  <!-- Shared site styles and core helpers -->
   <link rel="stylesheet" href="assets/imthebus-base.css" />
   <script src="assets/imthebus-core.js" defer></script>
-
-  <!-- Fonts for this page / game -->
   <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet" />
 
   <style>
-    /* Layout and typography using shared sidebar/board shell */
+
+    /* ── SIDEBAR ──────────────────────────────────────── */
+
+    .about-sidebar-tag {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ink-mid);
+      margin-bottom: 6px;
+    }
 
     .about-sidebar-title {
       font-family: "Archivo Black", system-ui, sans-serif;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      margin: 0 0 4px;
+      margin: 0 0 6px;
     }
 
-    .about-sidebar-subtitle {
-      font-size: 0.85rem;
-      margin: 0 0 8px;
-      color: #4b5563;
+    .about-sidebar-sub {
+      font-size: 0.86rem;
+      color: var(--ink-mid);
+      line-height: 1.55;
+      margin: 0 0 14px;
     }
 
-    .about-heading {
-      font-family: "Archivo Black", system-ui, sans-serif;
-      font-size: 1.05rem;
+    /* Contact / nav links */
+
+    .about-contact-btn,
+    .about-pill-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 2px solid var(--border-strong);
+      background: #fff;
+      font: inherit;
+      font-size: 0.84rem;
+      box-shadow: 3px 3px 0 #000;
+      text-decoration: none;
+      cursor: pointer;
+      color: var(--ink);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      width: 100%;
+    }
+
+    .about-contact-btn:hover,
+    .about-pill-link:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 #000;
+      text-decoration: none;
+    }
+
+    .about-contact-btn .icon,
+    .about-pill-link .icon { font-size: 1.1rem; flex-shrink: 0; }
+
+    /* Ko-fi block */
+
+    .support-block {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 2px solid var(--border-strong);
+      background: #faf5ff;
+      box-shadow: 4px 4px 0 #000;
+    }
+
+    .support-title {
+      font-weight: 700;
+      font-size: 0.8rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin: 10px 0 4px;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
     }
 
-    .about-text {
-      font-size: 0.9rem;
-      line-height: 1.6;
-      margin: 4px 0;
+    .support-text {
+      font-size: 0.84rem;
+      color: var(--ink-mid);
+      line-height: 1.5;
+      margin: 0 0 10px;
     }
 
-    .about-list {
-      margin: 4px 0 6px;
-      padding-left: 1.1rem;
-      font-size: 0.9rem;
+    .support-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 0.84rem;
+      text-decoration: none;
+      border: 2px solid var(--border-strong);
+      background: linear-gradient(135deg, #ffecd5, #ffe5f1);
+      color: var(--ink);
+      box-shadow: 3px 3px 0 #000;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
     }
 
-    .about-list li + li {
-      margin-top: 2px;
+    .support-cta:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 #000;
+      text-decoration: none;
     }
+
+    .about-footer-note {
+      margin-top: 14px;
+      font-size: 0.76rem;
+      color: var(--ink-mid);
+      line-height: 1.5;
+    }
+
+    /* Static sticky notes */
+
+    .static-notes-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .static-note {
+      position: relative;
+      border-radius: 6px;
+      border: 2px solid #000;
+      padding: 8px 8px 10px;
+      width: 115px;
+      min-height: 72px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.25), 0 0 0 2px rgba(0,0,0,0.5);
+      font-family: "Permanent Marker", system-ui;
+      font-size: 0.74rem;
+      line-height: 1.25;
+      text-align: center;
+      cursor: pointer;
+      background: #fff8a7;
+      transform-origin: center top;
+      user-select: none;
+    }
+
+    .static-note::before {
+      content: "";
+      position: absolute;
+      top: 5px; left: 50%;
+      transform: translateX(-50%);
+      width: 26px; height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.85);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.15);
+    }
+
+    .static-note-blue  { background: #bde0fe; }
+    .static-note-red   { background: #ffb3c1; }
+    .static-note-tilt-left  { transform: rotate(-4deg); }
+    .static-note-tilt-right { transform: rotate(3deg); }
+
+    .static-note-flash { animation: edgeFlash 0.28s ease-out; }
+
+    /* ── BOARD: ABOUT CONTENT ─────────────────────────── */
 
     .chip-label {
       display: inline-flex;
       align-items: center;
       gap: 4px;
       border-radius: 999px;
-      border: 1px solid #000;
-      padding: 2px 8px;
+      border: 1.5px solid var(--border-strong);
+      padding: 3px 10px;
       font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      background: #facc15;
-      margin-bottom: 4px;
-    }
-
-    .about-pill-link,
-    .about-contact-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 11px;
-      border-radius: 999px;
-      border: 2px solid #000;
-      background: #ffffff;
-      font-size: 0.85rem;
-      margin-top: 6px;
-      box-shadow: 4px 4px 0 #000;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
-    .about-pill-link:hover,
-    .about-contact-btn:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 6px 6px 0 #000;
-    }
-
-    .about-pill-link span.icon {
-      font-size: 1.1rem;
-    }
-
-    .support-block {
-      margin-top: 8px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 2px solid #000;
-      background: #faf5ff;
-      box-shadow: 4px 4px 0 #000;
-      font-size: 0.9rem;
-    }
-
-    .support-title {
       font-weight: 600;
-      font-size: 0.88rem;
-      margin-bottom: 3px;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
+      background: #facc15;
+      margin-bottom: 6px;
     }
 
-    .support-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      margin-top: 0.55rem;
-      padding: 0.4rem 0.9rem;
-      border-radius: 999px;
-      font-size: 0.85rem;
-      text-decoration: none;
-      border: 2px solid #000;
-      background: linear-gradient(135deg, #ffecd5, #ffe5f1);
-      color: #000;
-      box-shadow: 3px 3px 0 #000;
-      cursor: pointer;
+    .about-heading {
+      font-family: "Archivo Black", system-ui, sans-serif;
+      font-size: 1.05rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 20px 0 6px;
     }
 
-    .support-cta:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 5px 5px 0 #000;
+    .about-heading:first-of-type { margin-top: 8px; }
+
+    .about-text {
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: var(--ink-mid);
+      margin: 4px 0;
     }
 
-    .about-footer-note {
-      margin-top: 12px;
-      font-size: 0.75rem;
-      color: #4b5563;
+    .about-list {
+      margin: 6px 0 8px;
+      padding-left: 1.2rem;
+      font-size: 0.88rem;
+      color: var(--ink-mid);
     }
 
-    /* Static post-it notes that do not affect the game */
+    .about-list li + li { margin-top: 4px; }
 
-    .static-notes-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
+    .about-divider {
+      border: none;
+      border-top: 1px solid var(--border-soft);
+      margin: 20px 0;
     }
 
-    .static-note {
-      position: relative;
-      border-radius: 7px;
-      border: 2px solid #000;
-      padding: 6px 7px 7px;
-      width: 120px;
-      min-height: 70px;
-      box-shadow:
-        0 5px 10px rgba(0, 0, 0, 0.25),
-        0 0 0 2px rgba(0, 0, 0, 0.5);
-      font-family: "Permanent Marker", system-ui;
-      font-size: 0.75rem;
-      line-height: 1.2;
-      text-align: center;
-      cursor: pointer;
-      background: #fff8a7;
-      transform-origin: center top;
+    .game-note {
+      font-size: 0.82rem;
+      color: var(--ink-mid);
+      font-style: italic;
+      margin-top: 16px;
     }
 
-    .static-note::before {
-      content: "";
-      position: absolute;
-      top: 5px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 26px;
-      height: 8px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
-    }
-
-    .static-note-blue {
-      background: #bde0fe;
-    }
-
-    .static-note-red {
-      background: #ffb3c1;
-    }
-
-    .static-note-tilt-left {
-      transform: rotate(-4deg);
-    }
-
-    .static-note-tilt-right {
-      transform: rotate(3deg);
-    }
-
-    .static-note-flash {
-      animation: edgeFlash 0.28s ease-out;
-    }
-
-    /* Retro mode overrides */
-
-    body.retro-mode {
-      background:
-        radial-gradient(circle at 0 0, #3a0ca3, transparent 65%),
-        radial-gradient(circle at 100% 0, #f72585, transparent 60%),
-        radial-gradient(circle at 50% 100%, #4895ef, #000011);
-      color: #f6f6ff;
-    }
-
-    body.retro-mode .sidebar-card,
-    body.retro-mode .board-inner-shell {
-      background: rgba(3, 4, 25, 0.96);
-      border-color: #00f5d4;
-      box-shadow:
-        0 0 0 2px #000,
-        0 0 18px rgba(0, 245, 212, 0.75);
-    }
-
-    body.retro-mode .support-block {
-      background: rgba(0, 0, 0, 0.82);
-      border-color: #00f5d4;
-      box-shadow: 0 0 14px rgba(0, 245, 212, 0.7);
-      color: #f9fafb;
-    }
-
-    body.retro-mode .support-cta {
-      background: rgba(0, 0, 0, 0.7);
-      color: #f6f6ff;
-      border-color: #00f5d4;
-      box-shadow:
-        0 0 10px rgba(0, 245, 212, 0.75),
-        0 0 0 2px #000;
-    }
-
-    /* Falling sticky-note game */
+    /* ── RETRO GAME ───────────────────────────────────── */
 
     .sticky-note {
       position: fixed;
       width: 82px;
       height: 78px;
       border-radius: 6px;
-      box-shadow:
-        0 6px 10px rgba(0, 0, 0, 0.35),
-        0 0 0 2px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 6px 10px rgba(0,0,0,0.35), 0 0 0 2px rgba(0,0,0,0.5);
       transform-origin: center top;
       cursor: pointer;
       z-index: 5;
@@ -255,7 +246,7 @@
       font-family: "Permanent Marker", system-ui;
       font-size: 0.7rem;
       text-align: center;
-      color: rgba(0, 0, 0, 0.85);
+      color: rgba(0,0,0,0.85);
       transition: box-shadow 0.12s ease;
       background: #fff8a7;
     }
@@ -263,81 +254,59 @@
     .sticky-note::before {
       content: "";
       position: absolute;
-      width: 28px;
-      height: 11px;
+      width: 28px; height: 11px;
       border-radius: 999px;
-      background: rgba(0, 0, 0, 0.15);
-      top: -7px;
-      left: 50%;
+      background: rgba(0,0,0,0.15);
+      top: -7px; left: 50%;
       transform: translateX(-50%);
     }
 
     .note-yellow { background: #fff8a7; }
-    .note-red   { background: #ff8ba7; }
-    .note-blue  { background: #bde0fe; }
+    .note-red    { background: #ff8ba7; }
+    .note-blue   { background: #bde0fe; }
 
     .note-tilt-left  { transform: rotate(-5deg); }
     .note-tilt-right { transform: rotate(4deg); }
 
-    .note-edge-flash {
-      animation: edgeFlash 0.26s ease-out;
-    }
+    .note-edge-flash { animation: edgeFlash 0.26s ease-out; }
 
     @keyframes edgeFlash {
       0% {
-        box-shadow:
-          0 0 0 2px rgba(0, 0, 0, 0.5),
-          0 0 0 4px rgba(0, 0, 0, 0);
+        box-shadow: 0 0 0 2px rgba(0,0,0,0.5), 0 0 0 4px rgba(0,0,0,0);
       }
       50% {
-        box-shadow:
-          0 0 0 2px #000,
-          0 0 0 6px #00f5d4;
+        box-shadow: 0 0 0 2px #000, 0 0 0 6px #00f5d4;
       }
       100% {
-        box-shadow:
-          0 6px 10px rgba(0, 0, 0, 0.35),
-          0 0 0 2px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 6px 10px rgba(0,0,0,0.35), 0 0 0 2px rgba(0,0,0,0.5);
       }
     }
 
-    body.retro-mode .sticky-note {
-      box-shadow:
-        0 0 12px rgba(0, 0, 0, 0.9),
-        0 0 0 2px rgba(0, 245, 212, 0.7);
-    }
+    body.retro-mode { background: radial-gradient(circle at 0 0, #3a0ca3, transparent 65%), radial-gradient(circle at 100% 0, #f72585, transparent 60%), radial-gradient(circle at 50% 100%, #4895ef, #000011); color: #f6f6ff; }
 
-    .note-fade-out {
-      opacity: 0;
-      transition: opacity 0.6s ease;
-      pointer-events: none;
-    }
+    body.retro-mode .sidebar-card,
+    body.retro-mode .board-wrapper { background: rgba(3,4,25,0.96); border-color: #00f5d4; box-shadow: 0 0 0 2px #000, 0 0 18px rgba(0,245,212,0.75); }
+
+    body.retro-mode .support-block { background: rgba(0,0,0,0.82); border-color: #00f5d4; box-shadow: 0 0 14px rgba(0,245,212,0.7); color: #f9fafb; }
+    body.retro-mode .support-cta { background: rgba(0,0,0,0.7); color: #f6f6ff; border-color: #00f5d4; box-shadow: 0 0 10px rgba(0,245,212,0.75), 0 0 0 2px #000; }
+    body.retro-mode .sticky-note { box-shadow: 0 0 12px rgba(0,0,0,0.9), 0 0 0 2px rgba(0,245,212,0.7); }
+
+    .note-fade-out { opacity: 0; transition: opacity 0.6s ease; pointer-events: none; }
 
     .note-bottom-hit {
       border-color: #ef4444;
-      box-shadow:
-        0 0 0 2px #ef4444,
-        0 0 14px rgba(239, 68, 68, 0.85);
+      box-shadow: 0 0 0 2px #ef4444, 0 0 14px rgba(239,68,68,0.85);
       animation: bottomHitFlash 0.8s ease-in-out infinite alternate;
     }
 
     @keyframes bottomHitFlash {
-      0% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(-4px) scale(1.03);
-        opacity: 0.95;
-      }
+      0%   { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-4px) scale(1.03); opacity: 0.95; }
     }
-
-    /* Retro scoreboard */
 
     .scoreboard {
       position: fixed;
-      top: 0.75rem;
-      right: 0.75rem;
+      top: 0.75rem; right: 0.75rem;
       background: #05070a;
       border-radius: 0.7rem;
       border: 2px solid #00f5d4;
@@ -346,41 +315,19 @@
       font-size: 0.6rem;
       color: #00f5d4;
       letter-spacing: 0.16em;
-      box-shadow: 0 0 12px rgba(0, 245, 212, 0.85);
+      box-shadow: 0 0 12px rgba(0,245,212,0.85);
       opacity: 0;
       transform: translateY(-8px);
       transition: opacity 0.15s ease, transform 0.15s ease;
       z-index: 20;
     }
 
-    .scoreboard.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .scoreboard.visible { opacity: 1; transform: translateY(0); }
 
-    .score-line {
-      display: flex;
-      justify-content: space-between;
-      gap: 0.75rem;
-      margin-bottom: 0.2rem;
-    }
-
-    .score-label {
-      opacity: 0.8;
-    }
-
-    .score-value {
-      min-width: 4ch;
-      text-align: right;
-    }
-
-    .score-small {
-      font-size: 0.5rem;
-      margin-top: 0.15rem;
-      opacity: 0.75;
-    }
-
-    /* Game over overlay */
+    .score-line { display: flex; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.2rem; }
+    .score-label { opacity: 0.8; }
+    .score-value { min-width: 4ch; text-align: right; }
+    .score-small { font-size: 0.5rem; margin-top: 0.15rem; opacity: 0.75; }
 
     .gameover-overlay {
       position: fixed;
@@ -397,59 +344,35 @@
       font-family: "Press Start 2P", system-ui, monospace;
       text-align: center;
       color: #f6f6ff;
-      text-shadow:
-        0 0 6px #000,
-        0 0 18px #ff006e;
+      text-shadow: 0 0 6px #000, 0 0 18px #ff006e;
       padding: 1.4rem 1rem 2.4rem;
       opacity: 0;
       transform: translateY(120%);
     }
 
-    .gameover-inner.visible {
-      animation: gameoverRise 6s ease-out forwards;
-    }
+    .gameover-inner.visible { animation: gameoverRise 6s ease-out forwards; }
 
     @keyframes gameoverRise {
-      0% {
-        opacity: 0;
-        transform: translateY(120%);
-      }
-      20% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      70% {
-        opacity: 1;
-        transform: translateY(-10%);
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(-120%);
-      }
+      0%   { opacity: 0; transform: translateY(120%); }
+      20%  { opacity: 1; transform: translateY(0); }
+      70%  { opacity: 1; transform: translateY(-10%); }
+      100% { opacity: 0; transform: translateY(-120%); }
     }
 
-    .gameover-title {
-      font-size: 1.4rem;
-      margin-bottom: 0.8rem;
-    }
-
-    .gameover-score {
-      font-size: 0.7rem;
-      margin-bottom: 0.25rem;
-    }
+    .gameover-title { font-size: 1.4rem; margin-bottom: 0.8rem; }
+    .gameover-score { font-size: 0.7rem; margin-bottom: 0.25rem; }
 
     .highscore-stamp {
       position: fixed;
-      bottom: 0.7rem;
-      right: 0.9rem;
+      bottom: 0.7rem; right: 0.9rem;
       font-family: "Press Start 2P", system-ui, monospace;
       font-size: 0.55rem;
       color: #f6f6ff;
       padding: 0.4rem 0.6rem;
       border-radius: 0.5rem;
       border: 2px solid #00f5d4;
-      background: rgba(0, 0, 0, 0.8);
-      box-shadow: 0 0 10px rgba(0, 245, 212, 0.8);
+      background: rgba(0,0,0,0.8);
+      box-shadow: 0 0 10px rgba(0,245,212,0.8);
       opacity: 0;
       transform: translateY(8px);
       transition: opacity 0.25s ease, transform 0.25s ease;
@@ -460,10 +383,7 @@
       pointer-events: auto;
     }
 
-    .highscore-stamp.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .highscore-stamp.visible { opacity: 1; transform: translateY(0); }
 
     .reset-btn {
       border: 1px solid #00f5d4;
@@ -475,157 +395,143 @@
       cursor: pointer;
     }
 
-    .reset-btn:hover {
-      background: #00f5d4;
-      color: #05070a;
-    }
+    .reset-btn:hover { background: #00f5d4; color: #05070a; }
   </style>
 </head>
 
 <body data-counter-key="about_page">
-  <!-- Shared header -->
   <header data-include="partials/header.html"></header>
 
   <main class="page">
-    <!-- LEFT: Ko-fi / Rougvie / contact -->
+
+    <!-- SIDEBAR -->
     <aside class="sidebar-card">
-      <div class="about-sidebar-title">Support & contact</div>
-      <p class="about-sidebar-subtitle">
-        If these tools help your work, you can nudge future experiments along here.
-      </p>
+      <div class="sidebar-section" style="display:block;">
 
-      <button
-        class="about-contact-btn"
-        type="button"
-        onclick="window.location.href='mailto:contact@imthebus.co.uk?subject=IMTHEBUS%20feedback%20or%20chat';"
-      >
-        <span>✉️</span>
-        <span>Contact me with bugs, ideas, or general chit chat</span>
-      </button>
+        <span class="about-sidebar-tag">IMTHEBUS</span>
+        <h1 class="about-sidebar-title">Support &amp; contact</h1>
+        <p class="about-sidebar-sub">
+          If the tools save time or make a conversation easier, you can nudge future work along here.
+        </p>
 
-      <div style="margin-top:10px;">
-        <a
-          class="about-pill-link"
-          href="https://rougvie.com"
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          class="about-contact-btn"
+          type="button"
+          onclick="window.location.href='mailto:contact@imthebus.co.uk?subject=IMTHEBUS%20feedback%20or%20chat';"
         >
-          <span class="icon">🕹️</span>
-          <span>Visit <strong>Rougvie hub</strong> for other experiments</span>
-        </a>
-        <p class="about-text" style="font-size:0.86rem;margin-top:6px;">
-          Rougvie.com hosts other side projects, prototypes, and odd little tools.
-          IMTHEBUS is the part that leans hardest into management and decision making.
-        </p>
-      </div>
+          <span class="icon">✉️</span>
+          <span>Get in touch — bugs, ideas, or a chat</span>
+        </button>
 
-      <div class="support-block">
-        <div class="support-title">Ko-fi tip jar</div>
-        <p class="about-text" style="font-size:0.86rem;">
-          A small one off Ko-fi helps justify time spent building and refining the toolbox.
-          No subscriptions, no tiers, just a simple “this is useful”.
-        </p>
-        <a
-          class="support-cta"
-          href="https://ko-fi.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span>☕</span>
-          <span>Support IMTHEBUS on Ko-fi</span>
-        </a>
-        <p class="about-text" style="font-size:0.8rem;margin-top:0.45rem;opacity:0.8;">
-          Using the tools, sharing links, or sending feedback is also real support.
-        </p>
-      </div>
+        <div style="margin-top:10px;">
+          <a
+            class="about-pill-link"
+            href="https://rougvie.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="icon">🕹️</span>
+            <span>Visit Rougvie for other experiments</span>
+          </a>
+          <p style="font-size:0.8rem;color:var(--ink-mid);margin:8px 0 0;line-height:1.5;">
+            Rougvie.com hosts other side projects, prototypes and odd little tools. IMTHEBUS is the part that focuses on management and decision making.
+          </p>
+        </div>
 
-      <p class="about-footer-note">
-        Somewhere behind this page, a few falling notes are trying not to hit the bottom.
-        The static notes below are safe to click and do not affect the game.
-      </p>
+        <div class="support-block">
+          <div class="support-title">Ko-fi tip jar</div>
+          <p class="support-text">
+            A one-off Ko-fi helps justify the time spent building and improving the toolbox. No subscriptions, no tiers — just a simple "this is useful."
+          </p>
+          <a
+            class="support-cta"
+            href="https://ko-fi.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>☕</span>
+            <span>Support IMTHEBUS on Ko-fi</span>
+          </a>
+          <p style="font-size:0.76rem;color:var(--ink-mid);margin:8px 0 0;line-height:1.5;">
+            Using the tools, sharing a link, or sending feedback is also real support.
+          </p>
+        </div>
 
-      <div class="static-notes-row">
-        <div class="static-note static-note-tilt-left">
-          Draft ideas live here.
+        <p class="about-footer-note">
+          Somewhere behind this page, sticky notes are falling. The static ones below are safe to click and do not affect the game.
+        </p>
+
+        <div class="static-notes-row">
+          <div class="static-note static-note-tilt-left">Draft ideas live here.</div>
+          <div class="static-note static-note-blue">"We should park this."</div>
+          <div class="static-note static-note-red static-note-tilt-right">Check the real problem first.</div>
         </div>
-        <div class="static-note static-note-blue">
-          “We should park this.”
-        </div>
-        <div class="static-note static-note-red static-note-tilt-right">
-          Check the real problem first.
-        </div>
+
       </div>
     </aside>
 
-    <!-- RIGHT: main About / Terms / Privacy content inside board shell -->
+    <!-- BOARD: about content -->
     <section class="board-wrapper">
       <div class="board-inner-shell">
-        <section>
-          <div class="chip-label">Why this exists</div>
-          <h1 class="about-heading" style="margin-top:4px;">About IMTHEBUS</h1>
-          <p class="about-text">
-            IMTHEBUS is a small, evolving set of tools built for practical use in day to day work.
-            The focus is on managers and teams who want clearer conversations and simpler decisions
-            without another platform, login, or training course.
-          </p>
 
-          <h2 class="about-heading">Design principles</h2>
-          <ul class="about-list">
-            <li><strong>Lightweight</strong> open a link and it is ready. No accounts by default.</li>
-            <li><strong>Focused</strong> each tool exists to solve one problem in one conversation.</li>
-            <li><strong>Conversation first</strong> designed to sit in the middle of a group, not quietly solo.</li>
-            <li><strong>Brutalist on purpose</strong> clear boxes, visible structure, and honest interface edges.</li>
-          </ul>
+        <div class="chip-label">Why this exists</div>
+        <h2 class="about-heading" style="margin-top:6px;">About IMTHEBUS</h2>
+        <p class="about-text">
+          IMTHEBUS is a small set of tools built for real use in day-to-day work. The focus is on managers and teams who want clearer conversations and simpler decisions — without another platform, login, or training course to deal with.
+        </p>
 
-          <p class="about-text">
-            The whiteboard metaphor runs across the site. Different tools feel like sections of the same wall.
-            Notes move between tools, prototypes can be rough, and nothing is treated as finished forever.
-          </p>
+        <h2 class="about-heading">Design principles</h2>
+        <ul class="about-list">
+          <li><strong>Lightweight.</strong> Open a link and it is ready. No accounts by default.</li>
+          <li><strong>Focused.</strong> Each tool exists to solve one problem in one conversation.</li>
+          <li><strong>Conversation first.</strong> Designed to sit in the middle of a group, not quietly solo.</li>
+          <li><strong>Brutalist on purpose.</strong> Clear boxes, visible structure, and honest interface edges.</li>
+        </ul>
 
-          <h2 class="about-heading">Terms of use</h2>
-          <p class="about-text">
-            This is an experimental project. By using it you accept that:
-          </p>
-          <ul class="about-list">
-            <li>You use all tools at your own risk and judgement.</li>
-            <li>Nothing here replaces legal, HR, medical, or financial advice.</li>
-            <li>You are responsible for any decisions taken using ideas from this site.</li>
-            <li>The site may change, break, or vanish without notice.</li>
-          </ul>
+        <p class="about-text">
+          The whiteboard metaphor runs across the site. Different tools feel like sections of the same wall. Notes move, prototypes stay rough, and nothing is treated as finished forever.
+        </p>
 
-          <h2 class="about-heading">Privacy</h2>
-          <p class="about-text">
-            Current tools are built to run in your browser and avoid collecting personal data.
-          </p>
-          <ul class="about-list">
-            <li>Where possible, inputs stay in your browser and are not stored on a server.</li>
-            <li>Any analytics added later will focus on aggregated usage, not individuals.</li>
-            <li>Future account or team features will ship with a clear privacy notice.</li>
-            <li>Anything you type should still be treated like any other web form.</li>
-          </ul>
+        <hr class="about-divider" />
 
-          <p class="about-text">
-            A more formal policy will be added as the project grows and linked from this page.
-          </p>
+        <h2 class="about-heading">Terms of use</h2>
+        <p class="about-text">By using these tools you accept that:</p>
+        <ul class="about-list">
+          <li>You use all tools at your own risk and judgement.</li>
+          <li>Nothing here replaces legal, HR, medical, or financial advice.</li>
+          <li>You are responsible for any decisions taken using ideas from this site.</li>
+          <li>The site may change, break, or vanish without notice.</li>
+        </ul>
 
-          <h2 class="about-heading">Using the tools well</h2>
-          <ul class="about-list">
-            <li>Open a tool while you are in the conversation, not afterwards.</li>
-            <li>Write in language everyone in the room would recognise.</li>
-            <li>Treat everything on the board as draft, not a verdict.</li>
-            <li>Move outcomes into your own systems once you are done.</li>
-          </ul>
+        <h2 class="about-heading">Privacy</h2>
+        <p class="about-text">Current tools run in your browser and avoid collecting personal data.</p>
+        <ul class="about-list">
+          <li>Where possible, inputs stay in your browser and are not stored on a server.</li>
+          <li>Any analytics added later will focus on aggregated usage, not individuals.</li>
+          <li>Future account or team features will ship with a clear privacy notice.</li>
+          <li>Anything you type should be treated like any other web form.</li>
+        </ul>
+        <p class="about-text">A more formal policy will be added as the project grows.</p>
 
-          <p class="about-text" style="margin-top:10px;">
-            The rest of this page quietly hosts a small browser-based sticky note distraction.
-            It still does not need instructions.
-          </p>
-        </section>
+        <hr class="about-divider" />
+
+        <h2 class="about-heading">Using the tools well</h2>
+        <ul class="about-list">
+          <li>Open a tool while you are in the conversation, not afterwards.</li>
+          <li>Write in language everyone in the room would recognise.</li>
+          <li>Treat everything on the board as draft, not a verdict.</li>
+          <li>Move outcomes into your own systems once you are done.</li>
+        </ul>
+
+        <p class="game-note">
+          The rest of this page quietly hosts a small browser-based sticky note distraction. It still does not need instructions.
+        </p>
+
       </div>
     </section>
+
   </main>
 
-  <!-- Shared footer -->
   <footer data-include="partials/footer.html"></footer>
 
   <!-- Retro scoreboard -->

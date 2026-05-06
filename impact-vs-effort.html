@@ -2,482 +2,246 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Impact vs Effort – IMTHEBUS Toolbox</title>
+  <title>Impact vs Effort – IMTHEBUS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Plot tasks by impact and effort. Quick wins rise to the top, time sinks get challenged. Your board is saved in your browser.">
 
-  <!-- Shared styles and core helpers -->
   <link rel="stylesheet" href="assets/imthebus-base.css" />
   <script src="assets/imthebus-core.js" defer></script>
-
-  <!-- jsPDF for PDF export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 
-  <!-- Page-specific styles -->
   <style>
-    :root {
-      --muted: #4b5563;
-      /* Reuse the same note colour mapping as Important vs Urgent */
-      --q1-note: var(--q-do);
-      --q2-note: var(--q-schedule);
-      --q3-note: var(--q-delegate);
-      --q4-note: var(--q-delete);
-    }
-
-    .sidebar-title {
-      font-family: "Archivo Black", system-ui, sans-serif;
-      font-size: 1.4rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .sidebar-subtitle {
-      font-size: 0.85rem;
-      margin-bottom: 8px;
-    }
+    :root { --muted: #4b5563; }
 
     .task-input-row {
       display: flex;
       gap: 8px;
-      margin: 8px 0 6px;
+      margin: 0 0 6px;
     }
-
-    .task-input-row input[type="text"] {
-      flex: 1;
-    }
+    .task-input-row input[type="text"] { flex: 1; }
 
     .task-list {
-      list-style: none;
-      padding: 0;
-      margin: 8px 0 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 0.8rem;
+      list-style: none; padding: 0; margin: 0 0 6px;
+      display: flex; flex-direction: column; gap: 5px;
+      font-size: 0.82rem;
     }
 
     .task-item {
-      border-radius: 8px;
-      border: 1px solid #000000;
-      padding: 6px 6px 4px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      background: rgba(255, 255, 255, 0.95);
+      border-radius: 8px; border: 1.5px solid var(--border-strong);
+      padding: 8px 8px 6px;
+      display: flex; flex-direction: column; gap: 4px;
+      background: rgba(255,255,255,0.96);
     }
 
     .task-item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 6px;
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 6px;
     }
 
-    .task-main {
-      flex: 1;
-      min-width: 0;
-    }
+    .task-main { flex: 1; min-width: 0; }
+    .task-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .task-meta { font-size: 0.74rem; color: var(--muted); margin-top: 2px; }
 
-    .task-name {
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .task-meta {
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-
-    .task-actions {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-      flex-wrap: nowrap;
-    }
+    .task-actions { display: flex; gap: 4px; align-items: center; flex-wrap: nowrap; }
 
     .pill {
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid #000000;
-      font-size: 0.7rem;
-      white-space: nowrap;
-      background: #ffffff;
+      padding: 3px 9px; border-radius: 999px; border: 1.5px solid var(--border-strong);
+      font-size: 0.72rem; white-space: nowrap; background: #fff;
     }
+    .pill-q1 { background: var(--q-do); }
+    .pill-q2 { background: var(--q-schedule); }
+    .pill-q3 { background: var(--q-delegate); }
+    .pill-q4 { background: var(--q-delete); }
 
-    .pill-q1 { background: var(--q1-note); }
-    .pill-q2 { background: var(--q2-note); }
-    .pill-q3 { background: var(--q3-note); }
-    .pill-q4 { background: var(--q4-note); }
-
-    .empty-state {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin: 4px 0 6px;
-    }
+    .empty-state { font-size: 0.82rem; color: var(--muted); padding: 4px 0; }
 
     .quadrant-explainer-toggle {
-      margin-top: 4px;
-      font-size: 0.8rem;
-      text-decoration: underline;
-      cursor: pointer;
+      font-size: 0.8rem; color: var(--ink-mid); cursor: pointer;
+      padding: 4px 0;
+      border: none; background: none; font-family: inherit; text-align: left;
+      text-decoration: underline; width: 100%;
     }
 
     .quadrant-explainer-body {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.2s ease;
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 2px;
+      max-height: 0; overflow: hidden; transition: max-height 0.25s ease;
+      font-size: 0.8rem; color: var(--muted); margin-top: 2px;
     }
-
-    .quadrant-explainer-body.open {
-      max-height: 260px;
-    }
-
-    .quadrant-explainer-body p {
-      margin: 4px 0;
-    }
+    .quadrant-explainer-body.open { max-height: 320px; }
+    .quadrant-explainer-body p { margin: 5px 0; line-height: 1.5; }
 
     .task-status {
-      min-height: 1.1em;
-      margin-top: 4px;
-      font-size: 0.75rem;
-      color: var(--muted);
+      min-height: 1.1em; margin-top: 4px;
+      font-size: 0.76rem; color: var(--muted);
     }
-
-    .task-status.flash {
-      animation: statusFlash 0.3s ease-out;
-    }
+    .task-status.flash { animation: statusFlash 0.3s ease-out; }
 
     @keyframes statusFlash {
-      from {
-        opacity: 0;
-        transform: translateY(-2px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-2px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* About section */
-
-    .about-tool {
-      margin-bottom: 8px;
-    }
-
-    .about-body {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .about-body p {
-      margin: 2px 0 4px;
-    }
-
-    /* Inline assessment panel */
+    /* Assessment panel */
 
     .assessment-panel {
-      margin-top: 6px;
-      border-radius: 8px;
-      border: 1px solid #000000;
-      padding: 8px 8px 10px;
-      background: rgba(255, 255, 255, 0.96);
-      font-size: 0.78rem;
+      margin-top: 6px; border-radius: 8px;
+      border: 1.5px solid var(--border-strong);
+      padding: 10px 10px 12px;
+      background: rgba(255,255,255,0.98);
+      font-size: 0.8rem;
     }
 
-    .assessment-header {
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
-      align-items: baseline;
-      margin-bottom: 4px;
-    }
+    .assessment-header { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; margin-bottom: 6px; }
 
     .assessment-task-name {
-      font-weight: 700;
-      font-size: 0.9rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-weight: 700; font-size: 0.92rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
-    .assessment-body {
-      margin-top: 2px;
-    }
+    .assessment-body { margin-top: 2px; }
 
-    .question-row {
-      padding-top: 4px;
-      margin-top: 4px;
-      border-top: 1px dashed rgba(0, 0, 0, 0.16);
-    }
-
-    .question-row:first-of-type {
-      border-top: none;
-      margin-top: 0;
-      padding-top: 0;
-    }
-
-    .question-text {
-      margin-bottom: 2px;
-    }
+    .question-row { padding-top: 6px; margin-top: 6px; border-top: 1px dashed rgba(0,0,0,0.14); }
+    .question-row:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+    .question-text { margin-bottom: 4px; line-height: 1.4; }
 
     .question-scale {
-      display: flex;
-      justify-content: space-between;
-      gap: 4px;
-      margin-top: 2px;
+      display: flex; justify-content: space-between; gap: 2px; margin-top: 4px;
     }
-
-    .scale-option {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-size: 0.7rem;
-    }
-
-    .scale-option input[type="radio"] {
-      cursor: pointer;
-      margin-bottom: 1px;
-    }
+    .scale-option { flex: 1; display: flex; flex-direction: column; align-items: center; font-size: 0.68rem; text-align: center; }
+    .scale-option input[type="radio"] { cursor: pointer; margin-bottom: 2px; }
 
     .assessment-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 6px;
-      font-size: 0.74rem;
-      gap: 6px;
-      flex-wrap: wrap;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 8px; font-size: 0.76rem; gap: 6px; flex-wrap: wrap;
     }
+    .assessment-footer-hint { color: var(--muted); line-height: 1.4; }
 
-    .task-item--active {
-      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5) inset;
-    }
+    .task-item--active { box-shadow: 0 0 0 2px rgba(0,0,0,0.5) inset; }
 
-    /* Board / priority panel text */
+    /* Board */
 
     .board-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px;
     }
 
     .board-title {
       font-family: "Archivo Black", system-ui, sans-serif;
-      font-size: 1.4rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      font-size: 1.35rem; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 2px;
     }
 
-    .board-subtitle {
-      font-size: 0.78rem;
-      color: var(--muted);
-    }
+    .board-subtitle { font-size: 0.82rem; color: var(--muted); line-height: 1.45; }
+    .board-meta { font-size: 0.78rem; color: var(--ink-light); margin: 6px 0 10px; }
 
-    .board-meta {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
+    .task-note[data-quadrant="q1"] { background-color: var(--q-do); }
+    .task-note[data-quadrant="q2"] { background-color: var(--q-schedule); }
+    .task-note[data-quadrant="q3"] { background-color: var(--q-delegate); }
+    .task-note[data-quadrant="q4"] { background-color: var(--q-delete); }
 
-    .task-note[data-quadrant="q1"] { background-color: var(--q1-note); }
-    .task-note[data-quadrant="q2"] { background-color: var(--q2-note); }
-    .task-note[data-quadrant="q3"] { background-color: var(--q3-note); }
-    .task-note[data-quadrant="q4"] { background-color: var(--q4-note); }
+    /* Priority panel */
 
     .priority-panel {
-      margin-top: 8px;
-      border-radius: 8px;
-      border: 1px solid #000000;
-      background: rgba(255, 255, 255, 0.96);
-      padding: 6px 8px 6px;
-      font-size: 0.8rem;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+      margin-top: 14px; border-radius: 8px;
+      border: 1.5px solid var(--border-strong);
+      background: rgba(255,255,255,0.96);
+      padding: 12px 14px;
+      font-size: 0.82rem;
     }
 
     .priority-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 8px;
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 8px; margin-bottom: 8px;
       font-family: "Archivo Black", system-ui, sans-serif;
-      text-transform: uppercase;
-      font-size: 0.9rem;
+      text-transform: uppercase; font-size: 0.88rem;
     }
 
     .priority-panel-header small {
       font-family: "Inter", system-ui, sans-serif;
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-transform: none;
+      font-size: 0.72rem; color: var(--muted); text-transform: none;
     }
 
     .priority-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      max-height: 130px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 0.8rem;
+      list-style: none; padding: 0; margin: 0;
+      display: flex; flex-direction: column; gap: 5px;
+      font-size: 0.82rem;
     }
 
     .priority-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
-      align-items: center;
-      border-radius: 6px;
-      border: 1px solid #000000;
-      padding: 4px 6px;
-      background: #ffffff;
+      display: flex; justify-content: space-between; gap: 8px; align-items: center;
+      border-radius: 6px; border: 1.5px solid var(--border-strong);
+      padding: 5px 8px; background: #fff;
     }
 
-    .priority-main {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex: 1;
-      min-width: 0;
-    }
-
-    .priority-rank {
-      width: 16px;
-      font-size: 0.75rem;
-      color: var(--muted);
-      text-align: right;
-    }
-
-    .priority-name {
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .priority-meta {
-      font-size: 0.7rem;
-      color: var(--muted);
-      white-space: nowrap;
-    }
+    .priority-main { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+    .priority-rank { width: 18px; font-size: 0.74rem; color: var(--muted); text-align: right; flex-shrink: 0; }
+    .priority-name { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .priority-meta { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
 
     .priority-pill {
-      font-size: 0.7rem;
-      padding: 2px 6px;
-      border-radius: 999px;
-      border: 1px solid #000000;
-      white-space: nowrap;
-      background: #f9fafb;
+      font-size: 0.7rem; padding: 2px 8px; border-radius: 999px;
+      border: 1.5px solid var(--border-strong); white-space: nowrap; background: #f9fafb;
+      flex-shrink: 0;
     }
   </style>
 </head>
 
 <body data-counter-key="impact_vs_effort">
-  <!-- Shared header -->
   <header data-include="partials/header.html"></header>
 
   <main class="page">
-    <!-- Sidebar -->
+
     <aside class="sidebar-card">
-      <div class="sidebar-title">Impact vs Effort</div>
-      <div class="sidebar-subtitle">
-        Use an Impact vs Effort grid to spot quick wins, big bets, low-value fillers, and work to challenge.
+
+      <div class="sidebar-section">
+        <h1 class="page-title">Impact vs Effort</h1>
+        <p class="page-subtitle">Plot every task by how much it moves the needle and how much it costs to do. Quick wins rise to the top.</p>
       </div>
 
-      <!-- About this tool -->
-      <div class="about-tool">
-        <button
-          class="btn btn-pill-small"
-          data-collapsible-toggle
-          data-collapsible-target="#aboutToolBody"
-          data-label-base="About this tool"
-        >
-          + About this tool
-        </button>
-        <div id="aboutToolBody" data-collapsible-body class="about-body">
-          <p>
-            This layout comes from the classic <strong>Impact vs Effort</strong> matrix.
-            It helps you compare how much a task could move the dial against how much time,
-            energy, and coordination it really needs.
-          </p>
-          <p>
-            High impact and low effort tasks show up as <strong>quick wins</strong>.
-            High impact and high effort tasks become <strong>big bets</strong> that you
-            plan and support properly.
-          </p>
-          <p>
-            Low impact work with low effort sits in <strong>filler</strong> territory,
-            and low impact work with high effort is where you <strong>challenge, redesign,
-            delegate, or drop</strong> the task entirely.
-          </p>
-          <p>
-            Add tasks on the left, answer the questions to place each one on the board,
-            then work from the priority list at the bottom. Quick wins come first, then
-            the right big bets, followed by fillers and tasks to avoid or question.
-          </p>
+      <div class="sidebar-section">
+        <div class="task-input-row">
+          <input
+            type="text"
+            id="taskInput"
+            class="input-text"
+            placeholder="Name a task, then hit Add"
+            autocomplete="off"
+          />
+          <button class="btn btn-primary" id="addTaskButton">Add</button>
+        </div>
+
+        <ul class="task-list" id="taskList"></ul>
+        <div class="empty-state" id="noTasksMessage">
+          No tasks yet. Add one above and the board starts filling in.
+        </div>
+
+        <div class="task-status" id="taskStatus"></div>
+
+        <div style="margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-pill-small" id="clearAllButton">Clear all</button>
+          <button class="quadrant-explainer-toggle" id="quadrantExplainerToggle">+ What each zone means</button>
+        </div>
+
+        <div class="quadrant-explainer-body" id="quadrantExplainerBody">
+          <p><strong>Quick wins</strong> — High impact, low effort. Do these first; they move the dial without draining the team.</p>
+          <p><strong>Big bets</strong> — High impact, high effort. Worth doing, but plan them properly and give them the right support.</p>
+          <p><strong>Fillers</strong> — Low impact, low effort. Fine to do when capacity allows. Don't let them crowd out bigger work.</p>
+          <p><strong>Avoid or question</strong> — Low impact, high effort. Challenge whether these belong on the list at all.</p>
         </div>
       </div>
 
-      <div class="task-input-row">
-        <input
-          type="text"
-          id="taskInput"
-          class="input-text"
-          placeholder="Example: Draft Q2 strategy paper"
-          autocomplete="off"
-        />
-        <button class="btn btn-primary" id="addTaskButton">Add</button>
-      </div>
-
-      <button class="btn btn-pill-small" id="clearAllButton">Clear</button>
-
-      <ul class="task-list" id="taskList"></ul>
-      <div class="empty-state" id="noTasksMessage">
-        No tasks yet. Add one above to get started.
-      </div>
-
-      <div class="quadrant-explainer-toggle" id="quadrantExplainerToggle">
-        + What the quadrants mean
-      </div>
-      <div class="quadrant-explainer-body" id="quadrantExplainerBody">
-        <p><strong>Quick wins</strong> · High impact and low effort. Do these first where they genuinely move the dial.</p>
-        <p><strong>Big bets</strong> · High impact and high effort. Plan carefully and schedule with the right support.</p>
-        <p><strong>Fillers</strong> · Low impact and low effort. Do only when you have space, or bundle them together.</p>
-        <p><strong>Avoid or question</strong> · Low impact and high effort. Challenge, redesign, delegate, or drop.</p>
-      </div>
-
-      <div class="task-status" id="taskStatus"></div>
     </aside>
 
-    <!-- Board and priority -->
     <section class="board-wrapper">
       <div class="board-inner-shell">
         <div class="board-header-row">
           <div>
-            <div class="board-title">Impact vs Effort board</div>
+            <div class="board-title">Impact vs Effort</div>
             <div class="board-subtitle">
-              Grid: Impact (vertical) vs Effort (horizontal). Quick wins → Big bets → Fillers → Avoid or question.
+              Impact (↑ high / ↓ low) vs Effort (← less / → more). Add a task and answer a few questions — it lands where the answers point.
             </div>
           </div>
-          <div>
-            <button class="btn btn-pill-small" id="exportPdfButton">PDF</button>
-          </div>
+          <button class="btn btn-pill-small" id="exportPdfButton">Export PDF</button>
         </div>
 
-        <div class="board-meta">
-          Drag notes to fine tune where they sit. Moving a note updates impact and effort.
-        </div>
+        <div class="board-meta">Drag any note to fine-tune its position. The priority list below updates as you move things.</div>
 
         <div class="quadrant-board" id="board">
           <div class="quadrant-grid" id="quadrantGrid">
@@ -504,20 +268,19 @@
         <div class="priority-panel">
           <div class="priority-panel-header">
             <div>Priority order</div>
-            <small>Ordered by quadrant (Quick wins → Big bets → Fillers → Avoid or question), then by impact and effort.</small>
+            <small>Quick wins first · Big bets next · Fillers · Avoid or question last</small>
           </div>
           <ul class="priority-list" id="priorityList">
-            <li class="empty-state">Assess at least one task to see a working list.</li>
+            <li class="empty-state">Assess at least one task to see the ranked list here.</li>
           </ul>
         </div>
       </div>
     </section>
+
   </main>
 
-  <!-- Shared footer -->
   <footer data-include="partials/footer.html"></footer>
 
-  <!-- Page logic -->
   <script>
     (function () {
       const taskInput = document.getElementById("taskInput");
@@ -542,7 +305,6 @@
       let assessmentState = null;
       let dragInitialised = false;
 
-      // Impact vs Effort questions (from your previous version)
       const questions = [
         {
           id: "impOutcome",
@@ -602,7 +364,7 @@
           if (existing && existing[q.id] != null) {
             answers[q.id] = existing[q.id];
           } else {
-            answers[q.id] = 3; // middle
+            answers[q.id] = 3;
           }
         });
         return answers;
@@ -665,7 +427,7 @@
           answers: defaultAnswers(task.answers)
         };
         renderAll();
-        setStatus("Answer the questions below this task.");
+        setStatus("Answer the questions to place this task on the board.");
       }
 
       function cancelAssessment() {
@@ -699,11 +461,6 @@
       function quadrantFromScores(impact, effort) {
         const impactHigh = impact >= 3;
         const effortHigh = effort >= 3;
-
-        // q1: high impact, low effort (quick wins)
-        // q2: high impact, high effort (big bets)
-        // q3: low impact, low effort (fillers)
-        // q4: low impact, high effort (avoid or question)
         if (impactHigh && !effortHigh) return "q1";
         if (impactHigh && effortHigh) return "q2";
         if (!impactHigh && !effortHigh) return "q3";
@@ -721,13 +478,10 @@
 
       function computePriorityScore(task) {
         if (task.impact == null || task.effort == null) return 0;
-        // Higher impact and lower effort is better
         return task.impact * 2 - task.effort;
       }
 
       function positionFromScores(impact, effort) {
-        // Effort: 1 = low (left), 5 = high (right)
-        // Impact: 1 = low (bottom), 5 = high (top)
         const x = (effort - 1) / 4;
         const y = 1 - (impact - 1) / 4;
         return {
@@ -928,7 +682,8 @@
         footer.className = "assessment-footer";
 
         const hint = document.createElement("div");
-        hint.textContent = "Adjust only the answers that stand out. The rest can stay in the middle.";
+        hint.className = "assessment-footer-hint";
+        hint.textContent = "Change only what stands out. The rest can stay in the middle.";
 
         const actions = document.createElement("div");
         const cancelBtn = document.createElement("button");
@@ -938,7 +693,7 @@
 
         const saveBtn = document.createElement("button");
         saveBtn.className = "btn btn-pill-small";
-        saveBtn.textContent = "Save answers";
+        saveBtn.textContent = "Place on board";
         saveBtn.addEventListener("click", finaliseAssessment);
 
         actions.appendChild(cancelBtn);
@@ -1007,7 +762,7 @@
         if (!assessed.length) {
           const li = document.createElement("li");
           li.className = "empty-state";
-          li.textContent = "Assess at least one task to see a working list.";
+          li.textContent = "Assess at least one task to see the ranked list here.";
           priorityList.appendChild(li);
           return;
         }
@@ -1307,8 +1062,8 @@
         const open = !quadrantExplainerBody.classList.contains("open");
         quadrantExplainerBody.classList.toggle("open", open);
         quadrantExplainerToggle.textContent = open
-          ? "- What the quadrants mean"
-          : "+ What the quadrants mean";
+          ? "- What each zone means"
+          : "+ What each zone means";
       });
 
       window.addEventListener("resize", function () {
@@ -1322,4 +1077,3 @@
   </script>
 </body>
 </html>
-

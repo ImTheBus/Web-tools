@@ -2,294 +2,267 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>IMTHEBUS tools – Bored to Panic</title>
+  <title>Bored to Panic – IMTHEBUS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Map where your work sits on the scale from Bored to Panic. Answer 25 questions, get your zone distribution, and build a shared language with your manager.">
 
-  <!-- Shared base styles and core helpers -->
   <link rel="stylesheet" href="assets/imthebus-base.css" />
   <script src="assets/imthebus-core.js" defer></script>
-
-  <!-- External libs used only on this page -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 
   <style>
-    main.page {
-      align-items: flex-start;
-    }
+    /* ── PAGE-LEVEL ALIGNMENT ─────────────────────────── */
 
-    .b2p-sidebar {
-      position: relative;
-      padding-top: 1.4rem;
-    }
+    main.page { align-items: flex-start; }
 
-    .b2p-sidebar-inner {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
+    /* ── SIDEBAR ──────────────────────────────────────── */
+
+    .b2p-sidebar { padding-top: 0; }
+
+    .b2p-sidebar-inner { display: flex; flex-direction: column; }
 
     .b2p-sidebar-title {
-      font-size: 1.15rem;
-      margin: 0;
-      line-height: 1.2;
+      font-family: "Archivo Black", system-ui, sans-serif;
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0 0 2px;
+    }
+
+    .b2p-sidebar-tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ink-mid);
+      margin-bottom: 8px;
+      display: block;
     }
 
     .b2p-sidebar-text {
-      font-size: 0.9rem;
+      font-size: 0.86rem;
+      color: var(--ink-mid);
+      line-height: 1.55;
       margin: 0;
     }
 
-    .b2p-sidebar-meta-row {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.4rem;
-      margin-bottom: 0.4rem;
-    }
-
-    .b2p-sidebar-meta-row label {
-      display: block;
-      font-size: 0.8rem;
-      margin-bottom: 0.1rem;
-    }
-
-    .b2p-sidebar-meta-row input,
-    .b2p-sidebar-meta-row select {
-      width: 100%;
-      font: inherit;
-      font-size: 0.85rem;
-      border-radius: 999px;
-      border: 2px solid #000;
-      padding: 0.28rem 0.55rem;
-      background: #fff;
-    }
-
-    .b2p-context-row {
-      margin-top: 0.25rem;
-    }
-
-    .b2p-context-custom {
-      margin-top: 0.3rem;
-    }
-
-    .b2p-context-custom input {
-      width: 100%;
-      font: inherit;
-      font-size: 0.85rem;
-      border-radius: 999px;
-      border: 2px solid #000;
-      padding: 0.28rem 0.55rem;
-      background: #fff;
-    }
-
-    .b2p-assessment-count {
-      font-size: 0.8rem;
-      margin-top: 0.2rem;
-    }
-
-    /* Sidebar collapsible sections */
+    /* Collapsible sidebar sections */
 
     .sidebar-section {
-      border-radius: 18px;
-      border: 2px solid #000;
-      background: #fff;
-      margin-top: 0.4rem;
-      overflow: hidden;
+      border-top: 1px solid var(--border-soft);
     }
+
+    .sidebar-section:first-child { border-top: none; }
 
     .sidebar-section-header {
       width: 100%;
-      background: #fff;
+      background: none;
       border: none;
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      padding: 0.45rem 0.7rem;
+      padding: 14px 20px;
       font: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
       cursor: pointer;
+      color: var(--ink);
+      text-align: left;
     }
 
-    .sidebar-section-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
+    .sidebar-section-title { font-size: 0.82rem; font-weight: 600; }
 
     .sidebar-section-toggle {
-      font-size: 0.95rem;
-      padding-left: 0.5rem;
+      font-size: 1rem;
+      opacity: 0.5;
+      padding-left: 8px;
+      flex-shrink: 0;
     }
 
     .sidebar-section-body {
-      padding: 0.35rem 0.7rem 0.55rem;
+      padding: 0 20px 16px;
       font-size: 0.82rem;
       display: none;
     }
 
-    .sidebar-section.open .sidebar-section-body {
+    .sidebar-section.open .sidebar-section-body { display: block; }
+
+    .sidebar-section-body p { margin: 0 0 6px; line-height: 1.5; }
+    .sidebar-section-body p:last-child { margin-bottom: 0; }
+
+    /* Meta fields */
+
+    .b2p-meta-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .b2p-meta-row label {
       display: block;
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-mid);
+      margin-bottom: 3px;
     }
 
-    .sidebar-section-body p {
-      margin: 0.25rem 0;
+    .b2p-meta-row input,
+    .b2p-meta-row select,
+    .b2p-context-row select,
+    .b2p-context-custom input {
+      width: 100%;
+      font: inherit;
+      font-size: 0.84rem;
+      border-radius: 6px;
+      border: 2px solid var(--border-strong);
+      padding: 7px 10px;
+      background: #fff;
+      color: var(--ink);
     }
 
-    .sidebar-section-body ul {
-      margin: 0.25rem 0 0.25rem 1rem;
-      padding: 0;
+    .b2p-context-row { margin-bottom: 8px; }
+    .b2p-context-row label {
+      display: block;
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-mid);
+      margin-bottom: 3px;
     }
 
-    .b2p-sidebar-load-row {
-      margin-top: 0.4rem;
-      font-size: 0.82rem;
+    .b2p-context-custom { margin-top: 6px; }
+    .b2p-context-custom label {
+      display: block;
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-mid);
+      margin-bottom: 3px;
     }
 
+    .b2p-assessment-count {
+      font-size: 0.76rem;
+      color: var(--ink-mid);
+      margin: 8px 0 0;
+    }
+
+    /* Load row and sidebar buttons */
+
+    .b2p-sidebar-load-row { margin-bottom: 8px; }
     .b2p-sidebar-load-row label {
       display: block;
-      margin-bottom: 0.1rem;
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-mid);
+      margin-bottom: 3px;
     }
 
     .b2p-sidebar-load-row select {
       width: 100%;
       font: inherit;
-      font-size: 0.85rem;
-      border-radius: 999px;
-      border: 2px solid #000;
-      padding: 0.25rem 0.55rem;
+      font-size: 0.84rem;
+      border-radius: 6px;
+      border: 2px solid var(--border-strong);
+      padding: 7px 10px;
       background: #fff;
     }
 
     .sidebar-buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.3rem;
-      margin-top: 0.55rem;
+      gap: 6px;
+      margin-top: 8px;
     }
 
     .sidebar-buttons button {
       font: inherit;
-      font-size: 0.8rem;
-      border-radius: 999px;
-      border: 2px solid #000;
-      padding: 0.3rem 0.4rem;
+      font-size: 0.78rem;
+      border-radius: 6px;
+      border: 2px solid var(--border-strong);
+      padding: 7px 8px;
       cursor: pointer;
       background: #fff;
-      transition: background 0.12s ease-out, transform 0.08s ease-out;
-      white-space: nowrap;
+      transition: background 0.12s ease-out;
     }
 
-    .sidebar-buttons button.primary {
-      background: #000;
-      color: #fff;
-    }
-
-    .sidebar-buttons button.danger {
-      border-color: #b91c1c;
-    }
-
-    .sidebar-buttons button:hover {
-      transform: translateY(1px);
-    }
+    .sidebar-buttons button.primary { background: #000; color: #fff; border-color: #000; }
+    .sidebar-buttons button.primary:hover { background: #333; }
+    .sidebar-buttons button.danger { border-color: #b91c1c; color: #b91c1c; }
+    .sidebar-buttons button.danger:hover { background: #fff1f1; }
 
     .sidebar-note {
-      font-size: 0.78rem;
-      margin: 0.4rem 0 0;
+      font-size: 0.74rem;
+      color: var(--ink-mid);
+      margin: 8px 0 0;
+      line-height: 1.5;
     }
 
-    /* Board layout */
+    /* ── BOARD LAYOUT ─────────────────────────────────── */
 
-    .b2p-board-inner {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
+    .b2p-board-inner { display: flex; flex-direction: column; gap: 0; }
 
     .b2p-board-header {
       display: flex;
       justify-content: space-between;
-      gap: 0.75rem;
+      gap: 16px;
       align-items: flex-start;
-      margin-bottom: 0.25rem;
+      margin-bottom: 20px;
     }
 
-    .b2p-board-header .page-title {
-      margin-bottom: 0.15rem;
-    }
+    .b2p-board-header .page-title { margin-bottom: 4px; }
+    .b2p-board-header .page-subtitle { max-width: 38rem; }
 
-    .b2p-board-header .page-subtitle {
-      max-width: 34rem;
-      margin: 0;
-      font-size: 0.9rem;
-    }
-
-    .board-toolbar {
-      display: flex;
-      gap: 0.35rem;
-      align-items: center;
-    }
-
-    .board-toolbar .btn {
-      font-size: 0.8rem;
-    }
+    .board-toolbar { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+    .board-toolbar .btn { font-size: 0.78rem; }
 
     .b2p-board-body {
       display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-      gap: 0.75rem;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      gap: 24px;
       align-items: flex-start;
     }
 
-    .b2p-column {
-      display: flex;
-      flex-direction: column;
-      gap: 0.55rem;
-    }
+    .b2p-column { display: flex; flex-direction: column; gap: 12px; }
 
-    /* Question sections */
+    /* ── QUESTION SECTIONS ────────────────────────────── */
 
     .question-section {
-      border-radius: 16px;
-      border: 2px solid #000;
+      border-radius: 8px;
+      border: 2px solid var(--border-strong);
       background: #fff;
-      margin-bottom: 0.45rem;
       overflow: hidden;
     }
 
+    .question-section + .question-section { margin-top: 8px; }
+
     .question-section-header {
-      padding: 0.45rem 0.7rem;
+      padding: 11px 14px;
       display: flex;
       justify-content: space-between;
       align-items: baseline;
       cursor: pointer;
-      font-size: 0.9rem;
+      user-select: none;
     }
 
-    .question-section-title-group {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .question-section-title {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-
-    .question-section-subtitle {
-      font-size: 0.78rem;
-    }
-
-    .question-section-toggle {
-      font-size: 0.95rem;
-      padding-left: 0.5rem;
-    }
+    .question-section-title-group { display: flex; flex-direction: column; gap: 1px; }
+    .question-section-title { font-weight: 700; font-size: 0.86rem; }
+    .question-section-subtitle { font-size: 0.75rem; color: var(--ink-mid); }
+    .question-section-toggle { font-size: 1rem; opacity: 0.45; padding-left: 8px; }
 
     .question-section-body {
       display: none;
-      padding: 0 0.7rem 0.55rem;
+      padding: 0 14px 14px;
     }
 
-    .question-section.open .question-section-body {
-      display: block;
-    }
+    .question-section.open .question-section-body { display: block; }
 
     .question-table {
       width: 100%;
@@ -298,158 +271,125 @@
     }
 
     .question-table thead th {
-      border-bottom: 1px solid #000;
-      padding: 0.2rem 0.2rem;
+      border-bottom: 1.5px solid var(--border-strong);
+      padding: 6px 4px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-mid);
     }
 
     .question-table tbody td {
-      padding: 0.25rem 0.2rem;
+      padding: 7px 4px;
       vertical-align: middle;
+      border-bottom: 1px solid var(--border-soft);
     }
 
-    .question-text {
-      width: 60%;
-      text-align: left;
-    }
+    .question-table tbody tr:last-child td { border-bottom: none; }
 
-    .response-cell {
-      text-align: center;
-    }
+    .question-text { width: 58%; text-align: left; line-height: 1.45; }
+    .response-cell { text-align: center; }
 
     .response-radio {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 999px;
-      border: 2px solid #000;
+      border: 2px solid var(--border-strong);
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
+      transition: background 0.1s;
     }
 
-    .response-radio input {
-      display: none;
-    }
-
-    .response-radio span {
-      user-select: none;
-    }
-
-    .response-radio.selected {
-      background: #000;
-      color: #fff;
-    }
+    .response-radio input { display: none; }
+    .response-radio span { user-select: none; }
+    .response-radio.selected { background: #000; color: #fff; }
 
     .calculate-row {
-      margin-top: 0.65rem;
+      margin-top: 14px;
       display: flex;
       justify-content: flex-start;
     }
 
     .calculate-row button {
       font: inherit;
-      font-size: 0.9rem;
-      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border-radius: 6px;
       border: 2px solid #000;
       background: #000;
       color: #fff;
-      padding: 0.45rem 1.1rem;
+      padding: 10px 20px;
       cursor: pointer;
-      transition: background 0.15s ease-out, transform 0.08s ease-out;
+      transition: background 0.15s ease-out;
     }
 
-    .calculate-row button.calculating {
-      background: #1f2937;
-      transform: translateY(1px);
-    }
+    .calculate-row button:hover { background: #333; }
+    .calculate-row button.calculating { background: #1f2937; }
 
-    /* Right column panels */
+    /* ── RIGHT COLUMN PANELS ──────────────────────────── */
 
-    .donut-panel {
-      border-radius: 16px;
-      border: 2px solid #000;
+    .donut-panel,
+    .results-panel,
+    .overall-panel,
+    .entries-panel {
+      border-radius: 8px;
+      border: 2px solid var(--border-strong);
       background: #fff;
-      padding: 0.6rem 0.8rem 0.7rem;
-      margin-bottom: 0.6rem;
+      padding: 16px 18px;
     }
 
     .donut-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 0.3rem;
+      margin-bottom: 10px;
     }
 
-    .donut-header-title {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
+    .donut-header-title { font-weight: 700; font-size: 0.9rem; }
+    .donut-header-note { font-size: 0.76rem; color: var(--ink-mid); }
 
-    .donut-header-note {
-      font-size: 0.75rem;
-      color: #555;
-    }
-
-    #zoneRing {
-      width: 100%;
-      height: 220px;
-      display: block;
-    }
+    #zoneRing { width: 100%; height: 240px; display: block; }
 
     .zone-legend-row {
       display: flex;
       align-items: center;
-      gap: 0.3rem;
-      font-size: 0.78rem;
-      margin-top: 0.15rem;
+      gap: 6px;
+      font-size: 0.8rem;
+      margin-top: 5px;
     }
 
     .zone-legend-swatch {
       width: 10px;
       height: 10px;
       border-radius: 999px;
+      flex-shrink: 0;
     }
 
-    .zone-legend-label {
-      flex: 1;
-    }
-
-    .zone-legend-value {
-      min-width: 2.2rem;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .results-panel,
-    .overall-panel,
-    .entries-panel {
-      border-radius: 16px;
-      border: 2px solid #000;
-      background: #fff;
-      padding: 0.7rem 0.8rem;
-      font-size: 0.85rem;
-      margin-bottom: 0.6rem;
-    }
+    .zone-legend-label { flex: 1; }
+    .zone-legend-value { min-width: 2.5rem; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
 
     .results-panel h3,
     .overall-panel h3,
     .entries-panel h3 {
-      margin: 0 0 0.4rem;
-      font-size: 0.95rem;
-      font-weight: 600;
+      margin: 0 0 10px;
+      font-family: "Archivo Black", system-ui, sans-serif;
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .results-panel p,
-    .overall-panel p {
-      margin: 0.25rem 0;
-    }
+    .overall-panel p { margin: 6px 0; font-size: 0.84rem; line-height: 1.5; }
 
     .results-panel table,
     .overall-panel table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 0.35rem;
+      margin-top: 8px;
       font-size: 0.8rem;
     }
 
@@ -457,112 +397,107 @@
     .results-panel td,
     .overall-panel th,
     .overall-panel td {
-      border: 1px solid #000;
-      padding: 0.25rem 0.3rem;
+      border: 1px solid var(--border-soft);
+      padding: 5px 7px;
       vertical-align: top;
     }
 
+    .results-panel th,
+    .overall-panel th {
+      background: var(--bg-off);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
     .conversation-prompts {
-      margin-top: 0.4rem;
+      margin-top: 10px;
       font-size: 0.8rem;
     }
 
     .conversation-prompts ul {
-      margin: 0.25rem 0 0.25rem 1rem;
+      margin: 4px 0 4px 1rem;
       padding: 0;
     }
+
+    .conversation-prompts li + li { margin-top: 4px; }
 
     .entries-panel table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
     }
 
     .entries-panel th,
     .entries-panel td {
-      border: 1px solid #000;
-      padding: 0.2rem 0.25rem;
+      border: 1px solid var(--border-soft);
+      padding: 5px 6px;
       text-align: left;
     }
 
     .entries-panel th {
-      background: #f5f5f5;
+      background: var(--bg-off);
+      font-weight: 600;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
-    /* Export tweaks */
+    /* Export */
 
     .export-header {
-      border-radius: 16px;
-      border: 2px solid #000;
+      border-radius: 8px;
+      border: 2px solid var(--border-strong);
       background: #fff;
-      padding: 0.6rem 0.8rem 0.7rem;
-      margin-bottom: 0.6rem;
-      font-size: 0.85rem;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      font-size: 0.84rem;
     }
 
-    .export-header-title {
-      font-weight: 700;
-      font-size: 1rem;
-      margin-bottom: 0.2rem;
-    }
+    .export-header-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .export-header-meta { font-size: 0.78rem; margin-bottom: 6px; }
+    .export-highlight { font-size: 0.8rem; margin-bottom: 6px; }
+    .export-suggestion { font-size: 0.78rem; font-style: italic; }
+    .export-footer { margin-top: 12px; font-size: 0.76rem; color: var(--ink-mid); }
+    .export-mode { background: #fff; }
 
-    .export-header-meta {
-      font-size: 0.8rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .export-highlight {
-      font-size: 0.82rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .export-suggestion {
-      font-size: 0.8rem;
-      font-style: italic;
-    }
-
-    .export-footer {
-      margin-top: 0.6rem;
-      font-size: 0.78rem;
-    }
-
-    .export-mode {
-      background: #fff;
-    }
+    /* ── RESPONSIVE ───────────────────────────────────── */
 
     @media (max-width: 960px) {
-      .b2p-board-body {
-        grid-template-columns: 1fr;
-      }
+      .b2p-board-body { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body data-counter-key="bored-to-panic">
-  <div data-include="partials/header.html"></div>
+  <header data-include="partials/header.html"></header>
 
   <main class="page">
-    <!-- Sidebar -->
+
+    <!-- SIDEBAR -->
     <aside class="sidebar-card b2p-sidebar">
       <div class="b2p-sidebar-inner">
-        <h2 class="b2p-sidebar-title">Bored to Panic assessment</h2>
-        <p class="b2p-sidebar-text">
-          This tool helps you and your manager understand how work feels at the moment. It maps your answers
-          to five zones: Bored, Comfort, Stretch, Stress and Panic, giving you a shared language for how
-          work feels and where pressure is landing.
-        </p>
 
-        <!-- Details first, open by default -->
+        <div class="sidebar-section" style="display:block; padding-bottom:14px;">
+          <span class="b2p-sidebar-tag">Assessment tool</span>
+          <h1 class="b2p-sidebar-title">Bored to Panic</h1>
+          <p class="b2p-sidebar-text">
+            25 questions. Five zones. A clear picture of where work lands right now — and whether it's helping or draining you.
+          </p>
+        </div>
+
+        <!-- Details — open by default -->
         <div class="sidebar-section open" id="detailsSection">
           <button type="button" class="sidebar-section-header">
-            <span class="sidebar-section-title">Details for this assessment</span>
+            <span class="sidebar-section-title">Assessment details</span>
             <span class="sidebar-section-toggle">+</span>
           </button>
           <div class="sidebar-section-body">
-            <div class="b2p-sidebar-meta-row">
+            <div class="b2p-meta-row">
               <div>
                 <label for="personName">Name (optional)</label>
-                <input id="personName" type="text" placeholder="Name" />
+                <input id="personName" type="text" placeholder="Your name" />
               </div>
               <div>
                 <label for="roleLevel">Role level</label>
@@ -578,29 +513,29 @@
             </div>
 
             <div class="b2p-context-row">
-              <label for="contextSelect">Context</label>
+              <label for="contextSelect">What period does this cover?</label>
               <select id="contextSelect">
                 <option value="">Whole role</option>
                 <option value="Last 2 weeks">Last 2 weeks</option>
                 <option value="Last 3 months">Last 3 months</option>
                 <option value="Busy season / peak">Busy season / peak</option>
                 <option value="Specific project">Specific project</option>
-                <option value="User-defined">Something else (describe)</option>
+                <option value="User-defined">Something else</option>
               </select>
             </div>
 
             <div class="b2p-context-custom" id="contextCustomWrapper" style="display:none;">
               <label for="contextCustom">Describe the context</label>
-              <input id="contextCustom" type="text" placeholder="For example: stocktake week, new role, etc." />
+              <input id="contextCustom" type="text" placeholder="e.g. stocktake week, new role" />
             </div>
 
             <p class="b2p-assessment-count">
-              Assessments completed in this browser: <strong id="assessmentCount">0</strong>
+              Assessments saved in this browser: <strong id="assessmentCount">0</strong>
             </p>
           </div>
         </div>
 
-        <!-- About second -->
+        <!-- About -->
         <div class="sidebar-section" id="aboutSection">
           <button type="button" class="sidebar-section-header">
             <span class="sidebar-section-title">About this tool</span>
@@ -608,18 +543,19 @@
           </button>
           <div class="sidebar-section-body">
             <p>
-              Both Bored and Panic are zones we do not enjoy. They are not places where we feel safely
-              challenged or comfortable, and they rarely support learning.
+              Both Bored and Panic feel bad. Neither supports learning. The goal is to understand where you currently
+              spend your time — and whether the daily work is helping you grow or wearing you down.
             </p>
             <p>
-              We spend time in <strong>Stretch</strong> to expand our Comfort zone, and we learn how to
-              recover when we have to visit <strong>Stress</strong>. This assessment is about understanding
-              where you currently spend your time and whether the daily “exercise” of work is helping or
-              hindering that growth.
+              <strong>Stretch</strong> is where growth happens. <strong>Comfort</strong> is where you recover and perform reliably. Knowing your pattern gives you and your manager a shared starting point for real conversation.
+            </p>
+            <p>
+              Select a role level to compare your result against a typical target pattern for that level.
             </p>
           </div>
         </div>
 
+        <!-- Saved assessments -->
         <div class="sidebar-section">
           <button type="button" class="sidebar-section-header">
             <span class="sidebar-section-title">Saved assessments</span>
@@ -634,37 +570,39 @@
             </div>
 
             <div class="sidebar-buttons">
-              <button id="saveEntry" type="button" class="primary">Save current view</button>
+              <button id="saveEntry" type="button" class="primary">Save current</button>
               <button id="exportCsv" type="button">Export CSV</button>
               <button id="clearEntries" type="button" class="danger">Clear all</button>
             </div>
 
             <p class="sidebar-note">
-              Entries stay in this browser only. Use CSV or PDF to keep a record elsewhere.
+              Entries stay in this browser only. Use CSV or PDF to keep a record.
             </p>
           </div>
         </div>
+
       </div>
     </aside>
 
-    <!-- Board -->
+    <!-- BOARD -->
     <section class="board-wrapper" id="boardWrapper">
       <div class="board-inner-shell b2p-board-inner" id="boardInner">
+
         <div class="b2p-board-header">
           <div>
             <div class="page-title">Bored to Panic assessment board</div>
             <p class="page-subtitle">
-              Map where your time sits between Bored, Comfort, Stretch, Stress and Panic, then compare it to
-              a typical pattern for your role level.
+              Work through the sections, then click Calculate. Your answers are mapped to five zones — Bored, Comfort, Stretch, Stress and Panic — and compared against a typical pattern for your role level.
             </p>
           </div>
           <div class="board-toolbar">
-            <button type="button" class="btn btn-pill-small" id="fullscreenToggle">Fullscreen board</button>
-            <button type="button" class="btn btn-pill-small" id="exportPdf">Save as PDF</button>
+            <button type="button" class="btn btn-pill-small" id="fullscreenToggle">Fullscreen</button>
+            <button type="button" class="btn btn-pill-small" id="exportPdf">Save PDF</button>
           </div>
         </div>
 
         <div class="b2p-board-body" id="boardBody">
+
           <!-- Left: questions -->
           <div class="b2p-column">
             <div id="questionSections"></div>
@@ -673,36 +611,34 @@
             </div>
           </div>
 
-          <!-- Right: ring chart and results -->
+          <!-- Right: ring chart + results -->
           <div class="b2p-column">
+
             <div class="donut-panel">
               <div class="donut-header">
                 <div class="donut-header-title">Zone pattern</div>
-                <div class="donut-header-note" id="donutLabel">
-                  Equal starting pattern. Updates after calculation.
-                </div>
+                <div class="donut-header-note" id="donutLabel">Equal starting view. Updates after calculation.</div>
               </div>
-              <canvas id="zoneRing" width="260" height="220"></canvas>
+              <canvas id="zoneRing" width="280" height="240"></canvas>
               <div id="zoneRingLegend"></div>
             </div>
 
             <div class="results-panel">
-              <h3>Calculated zone and scores</h3>
+              <h3>Zone scores</h3>
               <div id="calculationResults">
-                Answer the questions and click <strong>Calculate from answers</strong> to see your
-                distribution across Bored, Comfort, Stretch, Stress and Panic.
+                Answer all questions and click <strong>Calculate from answers</strong> to see your distribution across Bored, Comfort, Stretch, Stress and Panic.
               </div>
             </div>
 
             <div class="overall-panel">
-              <h3>Overall scale result</h3>
+              <h3>Overall result</h3>
               <div id="overallResult">
-                Select a role level to compare your pattern against a typical target for that role.
+                Select a role level to compare your pattern against the typical target for that level.
               </div>
             </div>
 
             <div class="entries-panel">
-              <h3>Recorded entries in this browser</h3>
+              <h3>Recorded entries</h3>
               <table id="entriesTable">
                 <thead>
                   <tr>
@@ -717,19 +653,22 @@
                 <tbody></tbody>
               </table>
             </div>
+
           </div>
         </div>
       </div>
     </section>
+
   </main>
 
-  <div data-include="partials/footer.html"></div>
+  <footer data-include="partials/footer.html"></footer>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       /* Sidebar collapsibles */
       document.querySelectorAll(".sidebar-section").forEach(section => {
         const header = section.querySelector(".sidebar-section-header");
+        if (!header) return;
         header.addEventListener("click", () => {
           section.classList.toggle("open");
         });
@@ -1085,7 +1024,7 @@
       }
 
       drawRingChart(null);
-      updateRingLegend(null, "Equal starting pattern. Updates after calculation.");
+      updateRingLegend(null, "Equal starting view. Updates after calculation.");
 
       /* Scoring */
 
@@ -1717,7 +1656,7 @@
           <div class="export-highlight">
             Both Bored and Panic are zones that feel negative and rarely support learning. We spend time in
             Stretch to grow our Comfort zone, and to learn how to recover when we have to visit Stress. This
-            assessment is about understanding where that time is spent and whether the daily “exercise” of work
+            assessment is about understanding where that time is spent and whether the daily "exercise" of work
             is helping or hindering that growth.
           </div>
           <div class="export-suggestion">
