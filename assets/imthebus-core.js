@@ -1,6 +1,21 @@
 (function () {
   "use strict";
 
+  // Inject a skip-to-content link and ensure <main> is focusable, once per page.
+  function injectSkipLink() {
+    if (document.querySelector(".skip-link")) return;
+    var main = document.querySelector("main");
+    if (main && !main.id) main.id = "main-content";
+    var target = main ? main.id : null;
+    if (!target) return;
+    if (main && !main.hasAttribute("tabindex")) main.setAttribute("tabindex", "-1");
+    var link = document.createElement("a");
+    link.className = "skip-link";
+    link.href = "#" + target;
+    link.textContent = "Skip to content";
+    document.body.insertBefore(link, document.body.firstChild);
+  }
+
   // Inject header/footer partials
   async function injectPartials() {
     const nodes = document.querySelectorAll("[data-include]");
@@ -17,6 +32,30 @@
       } catch (err) {
         console.warn("Could not load partial", url, err);
       }
+    }
+  }
+
+  // Wire the injected header: mobile toggle + active-page marking.
+  // Runs from core JS (after partials inject) because <script> tags inserted
+  // via innerHTML do not execute.
+  function initHeader() {
+    var toggle = document.getElementById("navMobileToggle");
+    var nav = document.getElementById("siteNavLeft");
+    if (toggle && nav) {
+      toggle.addEventListener("click", function () {
+        var open = nav.classList.toggle("is-open");
+        toggle.setAttribute("aria-expanded", String(open));
+      });
+    }
+    if (nav) {
+      try {
+        var here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
+        if (here === "") here = "index.html";
+        nav.querySelectorAll("a").forEach(function (a) {
+          var href = (a.getAttribute("href") || "").toLowerCase();
+          if (href === here) a.setAttribute("aria-current", "page");
+        });
+      } catch (e) {}
     }
   }
 
@@ -192,7 +231,9 @@
   };
 
   document.addEventListener("DOMContentLoaded", function () {
+    injectSkipLink();
     injectPartials().then(function () {
+      initHeader();
       initCollapsibles();
       initToolCounter();
       // per page scripts run after this via their own script tags
